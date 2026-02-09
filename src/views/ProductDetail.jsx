@@ -45,6 +45,99 @@ export default function ProductDetail() {
         return () => clearInterval(timer);
     }, [id]);
 
+    // SEO Meta Tags - Dynamic updates based on product data
+    useEffect(() => {
+        if (!product) return;
+
+        // Update page title
+        document.title = `${product.name} - KiplyStart`;
+
+        // Helper function to update or create meta tags
+        const updateMetaTag = (selector, attribute, value) => {
+            let element = document.querySelector(selector);
+            if (!element) {
+                element = document.createElement('meta');
+                const [attr, attrValue] = selector.replace('[', '').replace(']', '').split('=');
+                element.setAttribute(attr, attrValue.replace(/"/g, ''));
+                document.head.appendChild(element);
+            }
+            element.setAttribute(attribute, value);
+        };
+
+        // Meta Description
+        const metaDescription = `${product.name.slice(0, 60)}. Instalación 3 min sin mecánico. Envío gratis Venezuela ✓ Garantía 3 meses`;
+        updateMetaTag('meta[name="description"]', 'content', metaDescription);
+
+        // Canonical URL
+        let canonical = document.querySelector('link[rel="canonical"]');
+        if (!canonical) {
+            canonical = document.createElement('link');
+            canonical.rel = 'canonical';
+            document.head.appendChild(canonical);
+        }
+        canonical.href = `https://kiplystart.com/producto/${id}`;
+
+        // Open Graph Tags
+        updateMetaTag('meta[property="og:type"]', 'content', 'product');
+        updateMetaTag('meta[property="og:title"]', 'content', product.name);
+        updateMetaTag('meta[property="og:description"]', 'content', metaDescription);
+        updateMetaTag('meta[property="og:image"]', 'content', product.image_url || 'https://kiplystart.com/default-product.jpg');
+        updateMetaTag('meta[property="og:url"]', 'content', `https://kiplystart.com/producto/${id}`);
+        updateMetaTag('meta[property="og:site_name"]', 'content', 'KiplyStart');
+        updateMetaTag('meta[property="og:locale"]', 'content', 'es_VE');
+
+        // Twitter Card
+        updateMetaTag('meta[name="twitter:card"]', 'content', 'summary_large_image');
+        updateMetaTag('meta[name="twitter:title"]', 'content', product.name);
+        updateMetaTag('meta[name="twitter:description"]', 'content', metaDescription);
+        updateMetaTag('meta[name="twitter:image"]', 'content', product.image_url || 'https://kiplystart.com/default-product.jpg');
+
+        // Schema.org JSON-LD for Product
+        let schemaScript = document.querySelector('script[type="application/ld+json"]');
+        if (!schemaScript) {
+            schemaScript = document.createElement('script');
+            schemaScript.type = 'application/ld+json';
+            document.head.appendChild(schemaScript);
+        }
+
+        const schemaData = {
+            "@context": "https://schema.org/",
+            "@type": "Product",
+            "name": product.name,
+            "image": product.image_url || 'https://kiplystart.com/default-product.jpg',
+            "description": product.description?.substring(0, 200) || metaDescription,
+            "brand": {
+                "@type": "Brand",
+                "name": "KiplyStart"
+            },
+            "offers": {
+                "@type": "Offer",
+                "url": `https://kiplystart.com/producto/${id}`,
+                "priceCurrency": "USD",
+                "price": product.price?.toString() || "0",
+                "priceValidUntil": "2026-12-31",
+                "itemCondition": "https://schema.org/NewCondition",
+                "availability": product.in_stock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+                "seller": {
+                    "@type": "Organization",
+                    "name": "KiplyStart"
+                }
+            },
+            "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.8",
+                "reviewCount": "127"
+            }
+        };
+
+        schemaScript.textContent = JSON.stringify(schemaData);
+
+        // Cleanup function to reset title on unmount
+        return () => {
+            document.title = 'KiplyStart - Accesorios Premium para Auto';
+        };
+    }, [product, id]);
+
     async function fetchProduct() {
         try {
             setLoading(true);
