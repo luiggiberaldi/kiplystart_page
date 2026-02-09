@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabaseClient';
 import CODModal from '../components/CODModal';
 import ProductImageGallery from '../components/product/ProductImageGallery';
 import BundleSelector from '../components/product/BundleSelector';
+import ProductDescription from '../components/ProductDescription';
 
 /**
  * ProductDetail View (High Conversion - Enhanced)
@@ -183,11 +184,7 @@ export default function ProductDetail() {
                         getSavings={getSavings}
                     />
 
-                    <div className="border-t border-gray-100 pt-4">
-                        <p className="text-[#212529] text-[16px] leading-[1.6] font-body text-justify">
-                            {product.description || "Descripción del producto no disponible."}
-                        </p>
-                    </div>
+                    <ProductDescription description={product.description} />
 
                     {product.tags && product.tags.length > 0 && (
                         <div className="flex flex-wrap gap-2">

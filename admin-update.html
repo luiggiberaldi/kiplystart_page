@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar Descripción del Producto</title>
+    <script type="module">
+        import { supabase } from './src/lib/supabaseClient.js';
+
+        const newDescription = `¿Cansado de que tu carro luzca "común y corriente"? Este **Pomo Táctil con Tecnología LED de Cristal** convierte cualquier vehículo en una experiencia visual que impresiona desde el primer momento que lo tocas.
+
+**¿Por qué es diferente a los pomos normales?**
+- **Sensor Táctil Inteligente:** Se ilumina SOLO cuando lo agarras. No gasta batería innecesariamente.
+- **Efecto Multicolor Fluido:** Crea una atmósfera de "carro exótico" con cambios de color suaves y automáticos.
+- **Cristal Premium con Agarre Ergonómico:** No más manos sudadas. Diseño que se siente como los carros alemanes de lujo.
+- **100% Recargable:** Olvídate de pilas. Incluye cable USB + adaptador de encendedor.
+- **Instalación Express (3 minutos):** Sin mecánico. Incluye 3 adaptadores universales (8mm, 10mm, 12mm).
+
+**Compatible con 98% de vehículos** (manuales y automáticos sin botón de bloqueo).`;
+
+        window.updateProduct = async function () {
+            const button = document.getElementById('updateBtn');
+            const status = document.getElementById('status');
+
+            button.disabled = true;
+            status.innerHTML = '🔄 Actualizando.argumentos..';
+            status.className = 'status loading';
+
+            try {
+                const { data, error } = await supabase
+                    .from('products')
+                    .update({ description: newDescription })
+                    .eq('id', 'fcd9bf2d-53e1-4884-83ca-8eb17efa4fab')
+                    .select();
+
+                if (error) throw error;
+
+                status.innerHTML = `✅ <strong>¡Producto actualizado exitosamente!</strong><br><br>
+                    <strong>Producto:</strong> ${data[0].name}<br>
+                    <strong>ID:</strong> ${data[0].id}<br><br>
+                    <strong>Nueva descripción (primeras 100 caracteres):</strong><br>
+                    ${data[0].description.substring(0, 100)}...`;
+                status.className = 'status success';
+            } catch (error) {
+                status.innerHTML = `❌ <strong>Error:</strong> ${error.message}`;
+                status.className = 'status error';
+                button.disabled = false;
+            }
+        };
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .info-box {
+            background: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .info-box strong {
+            color: #2d3748;
+        }
+
+        .info-box code {
+            background: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .status.loading,
+        .status.success,
+        .status.error {
+            display: block;
+        }
+
+        .status.loading {
+            background: #fff5e6;
+            border-left: 4px solid #f59e0b;
+            color: #92400e;
+        }
+
+        .status.success {
+            background: #ecfdf5;
+            border-left: 4px solid #10b981;
+            color: #065f46;
+        }
+
+        .status.error {
+            background: #fef2f2;
+            border-left: 4px solid #ef4444;
+            color: #991b1b;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🖊️ Actualizar Descripción de Producto</h1>
+        <p class="subtitle">Panel de administración - KiplyStart</p>
+
+        <div class="info-box">
+            <strong>Producto:</strong> Pomo táctil iluminado LED<br>
+            <strong>ID:</strong> <code>fcd9bf2d-53e1-4884-83ca-8eb17efa4fab</code><br><br>
+            <strong>Acción:</strong> Actualizar con descripción optimizada (copywriting profesional)
+        </div>
+
+        <button id="updateBtn" onclick="updateProduct()">
+            ✨ Actualizar Descripción Ahora
+        </button>
+
+        <div id="status" class="status"></div>
+    </div>
+</body>
+
+</html>

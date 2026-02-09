@@ -8,8 +8,6 @@ import { supabase } from '../lib/supabaseClient';
  * Bypasses standard checkout for direct WhatsApp conversion.
  */
 export default function CODModal({ isOpen, onClose, product, quantity, totalPrice, selectedBundle }) {
-    if (!isOpen) return null;
-
     const [formData, setFormData] = useState({
         name: '',
         ci: '',
@@ -25,11 +23,24 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
 
     // Lock body scroll when modal is open
     useEffect(() => {
-        document.body.style.overflow = 'hidden';
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+    }, [isOpen]);
+
+    // CRITICAL: Always ensure scroll is unlocked on unmount
+    // This handles edge cases where user navigates away (WhatsApp redirect)
+    // and browser restores page state via back button
+    useEffect(() => {
         return () => {
             document.body.style.overflow = 'unset';
         };
     }, []);
+
+    // Return null if modal is closed (but AFTER hooks have run)
+    if (!isOpen) return null;
 
     const handleChange = (e) => {
         const { name, value } = e.target;
