@@ -52,21 +52,23 @@ export default function ProductDetail() {
         // Update page title
         document.title = `${product.name} - KiplyStart`;
 
-        // Helper function to update or create meta tags
-        const updateMetaTag = (selector, attribute, value) => {
+        // Helper function to update or create meta tags (FIXED: proper attribute handling)
+        const updateMetaTag = (name, content, isProperty = false) => {
+            const attr = isProperty ? 'property' : 'name';
+            const selector = `meta[${attr}="${name}"]`;
+
             let element = document.querySelector(selector);
             if (!element) {
                 element = document.createElement('meta');
-                const [attr, attrValue] = selector.replace('[', '').replace(']', '').split('=');
-                element.setAttribute(attr, attrValue.replace(/"/g, ''));
+                element.setAttribute(attr, name);
                 document.head.appendChild(element);
             }
-            element.setAttribute(attribute, value);
+            element.setAttribute('content', content);
         };
 
-        // Meta Description
+        // Meta Description (optimized for SEO)
         const metaDescription = `${product.name.slice(0, 60)}. Instalación 3 min sin mecánico. Envío gratis Venezuela ✓ Garantía 3 meses`;
-        updateMetaTag('meta[name="description"]', 'content', metaDescription);
+        updateMetaTag('description', metaDescription);
 
         // Canonical URL
         let canonical = document.querySelector('link[rel="canonical"]');
@@ -77,35 +79,39 @@ export default function ProductDetail() {
         }
         canonical.href = `https://kiplystart.com/producto/${id}`;
 
-        // Open Graph Tags
-        updateMetaTag('meta[property="og:type"]', 'content', 'product');
-        updateMetaTag('meta[property="og:title"]', 'content', product.name);
-        updateMetaTag('meta[property="og:description"]', 'content', metaDescription);
-        updateMetaTag('meta[property="og:image"]', 'content', product.image_url || 'https://kiplystart.com/default-product.jpg');
-        updateMetaTag('meta[property="og:url"]', 'content', `https://kiplystart.com/producto/${id}`);
-        updateMetaTag('meta[property="og:site_name"]', 'content', 'KiplyStart');
-        updateMetaTag('meta[property="og:locale"]', 'content', 'es_VE');
+        // Open Graph Tags (use isProperty = true)
+        updateMetaTag('og:type', 'product', true);
+        updateMetaTag('og:title', product.name, true);
+        updateMetaTag('og:description', metaDescription, true);
+        updateMetaTag('og:image', product.image_url || 'https://kiplystart.com/default-product.jpg', true);
+        updateMetaTag('og:url', `https://kiplystart.com/producto/${id}`, true);
+        updateMetaTag('og:site_name', 'KiplyStart', true);
+        updateMetaTag('og:locale', 'es_VE', true);
 
         // Twitter Card
-        updateMetaTag('meta[name="twitter:card"]', 'content', 'summary_large_image');
-        updateMetaTag('meta[name="twitter:title"]', 'content', product.name);
-        updateMetaTag('meta[name="twitter:description"]', 'content', metaDescription);
-        updateMetaTag('meta[name="twitter:image"]', 'content', product.image_url || 'https://kiplystart.com/default-product.jpg');
+        updateMetaTag('twitter:card', 'summary_large_image');
+        updateMetaTag('twitter:title', product.name);
+        updateMetaTag('twitter:description', metaDescription);
+        updateMetaTag('twitter:image', product.image_url || 'https://kiplystart.com/default-product.jpg');
 
         // Schema.org JSON-LD for Product
-        let schemaScript = document.querySelector('script[type="application/ld+json"]');
+        let schemaScript = document.querySelector('script[type="application/ld+json"]#product-schema');
         if (!schemaScript) {
             schemaScript = document.createElement('script');
             schemaScript.type = 'application/ld+json';
+            schemaScript.id = 'product-schema';
             document.head.appendChild(schemaScript);
         }
+
+        // Check stock: if stock_quantity exists and > 0, it's in stock
+        const isInStock = product.stock_quantity ? product.stock_quantity > 0 : true;
 
         const schemaData = {
             "@context": "https://schema.org/",
             "@type": "Product",
             "name": product.name,
             "image": product.image_url || 'https://kiplystart.com/default-product.jpg',
-            "description": product.description?.substring(0, 200) || metaDescription,
+            "description": metaDescription, // Use optimized meta description
             "brand": {
                 "@type": "Brand",
                 "name": "KiplyStart"
@@ -117,7 +123,7 @@ export default function ProductDetail() {
                 "price": product.price?.toString() || "0",
                 "priceValidUntil": "2026-12-31",
                 "itemCondition": "https://schema.org/NewCondition",
-                "availability": product.in_stock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+                "availability": isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
                 "seller": {
                     "@type": "Organization",
                     "name": "KiplyStart"
