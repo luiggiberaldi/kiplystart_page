@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0a2461",
+                        "accent-blue": "#457B9D",
+                        "accent-red": "#E63946",
+                        "background-light": "#f5f5f5",
+                        "background-dark": "#111621",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<title>KiplyStart Admin Panel</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#111318] dark:text-gray-100 min-h-screen">
+<!-- Header Bar -->
+<header class="h-[80px] bg-primary flex items-center justify-between px-10 shadow-lg sticky top-0 z-50">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-white text-3xl">inventory_2</span>
+<h1 class="text-white text-2xl font-bold tracking-tight">KiplyStart Admin</h1>
+</div>
+<a class="text-white text-base font-medium hover:underline flex items-center gap-2" href="#">
+<span class="material-symbols-outlined text-sm">logout</span>
+            Cerrar Sesión
+        </a>
+</header>
+<main class="max-w-[1440px] mx-auto p-8 lg:p-12">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left Column: Add Product -->
+<section class="lg:col-span-4">
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700">
+<h2 class="text-primary dark:text-white text-2xl font-bold mb-6">Añadir Nuevo Producto</h2>
+<form class="space-y-5">
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Nombre</label>
+<input class="h-12 w-full px-4 rounded-lg border-[#D1D5DB] dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-primary focus:border-primary transition-all" placeholder="Ej. Camiseta Algodón Orgánico" type="text"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Precio (USD)</label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+<input class="h-12 w-full pl-8 pr-4 rounded-lg border-[#D1D5DB] dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-primary focus:border-primary transition-all" placeholder="0.00" step="0.01" type="number"/>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Descripción</label>
+<textarea class="w-full p-4 rounded-lg border-[#D1D5DB] dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-primary focus:border-primary transition-all resize-none" placeholder="Describe las características principales..." rows="4"></textarea>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-semibold text-gray-700 dark:text-gray-300">URL de la Imagen</label>
+<input class="h-12 w-full px-4 rounded-lg border-[#D1D5DB] dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-primary focus:border-primary transition-all" placeholder="https://ejemplo.com/imagen.jpg" type="url"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Stock Inicial</label>
+<input class="h-12 w-full px-4 rounded-lg border-[#D1D5DB] dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-primary focus:border-primary transition-all" placeholder="0" type="number"/>
+</div>
+<button class="w-full h-14 bg-accent-blue hover:bg-opacity-90 text-white font-bold text-lg rounded-lg transition-all shadow-md mt-4 flex items-center justify-center gap-2" type="submit">
+<span class="material-symbols-outlined">add_box</span>
+                            Crear Producto
+                        </button>
+</form>
+</div>
+</section>
+<!-- Right Column: Product List -->
+<section class="lg:col-span-8">
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 overflow-hidden">
+<div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+<h2 class="text-primary dark:text-white text-2xl font-bold">Productos en el Catálogo</h2>
+<div class="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg px-3 py-1.5 gap-2">
+<span class="material-symbols-outlined text-gray-500 text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm p-0 w-32 md:w-48" placeholder="Buscar..." type="text"/>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-gray-50 dark:bg-gray-900 text-gray-600 dark:text-gray-400 text-xs uppercase tracking-wider font-bold">
+<th class="px-6 py-4">Imagen</th>
+<th class="px-6 py-4">Nombre</th>
+<th class="px-6 py-4">Precio</th>
+<th class="px-6 py-4 text-center">Stock</th>
+<th class="px-6 py-4 text-right">Acciones</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+<!-- Row 1 -->
+<tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors">
+<td class="px-6 py-4">
+<div class="w-[60px] h-[60px] rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Modern white t-shirt on a minimal background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5gGfBG7yVMXOB3NoaaXZUSIeBHby1_v73ACiQNtVpnENEFtBOpVXd0iOr1Px6c02TAvKY7UaXBPCqZhSHXVm2dp9G3Rq_qKmIBIKT5RWlULeevp-ZMtTsXl3bSPDlr_Xf2AxxkUrXXxcC3oCW5hk9vHg-5IU2T7PL3X2eF9Im10x5DjbNeMSrwrrM6tB-pBqls3qI5mcGbB4NKUK-xOM_sz8hSRiMCnxD4KCaR3kq7O8_Z8Tm07l0t8fa8Ax3KiKj2TRJfC-2yJgd"/>
+</div>
+</td>
+<td class="px-6 py-4 font-medium">Camiseta Classic White</td>
+<td class="px-6 py-4 tabular-nums font-medium">$25.00</td>
+<td class="px-6 py-4 text-center">
+<span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-bold">42</span>
+</td>
+<td class="px-6 py-4 text-right space-x-3">
+<button class="text-accent-blue font-semibold hover:underline text-sm">Editar</button>
+<button class="bg-accent-red text-white px-3 py-1.5 rounded-lg text-sm hover:bg-opacity-90 transition-all">Eliminar</button>
+</td>
+</tr>
+<!-- Row 2 - Low Stock Example -->
+<tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors">
+<td class="px-6 py-4">
+<div class="w-[60px] h-[60px] rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Elegant leather handbag in tan color" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbFK5xZ4qJL3ogVwr7lV6ivOoPKirJUZzaf2kO9I0GVhRqYTtRPJZJg5rM2uAC773DdaX_0F8_nJCx9lSMGYP5gr6tHLh8IqI73crDEmKhjakIoRo83q02Ft1JB2BNMaMHBOP3Nkzg34qRgqqcxZV250iY4MfGft_v5wV-Qa9BBaFhGKpdaVsG4SOI6QItiJCkkio7y-CPodeg0RCk9_vdcu156DnZohh1EgH9viHIFqt4js88twuIZEFo28rZ-rXxaG6njAT1V-pQ"/>
+</div>
+</td>
+<td class="px-6 py-4 font-medium">Bolso Piel Minimalista</td>
+<td class="px-6 py-4 tabular-nums font-medium">$120.00</td>
+<td class="px-6 py-4 text-center">
+<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs font-bold ring-1 ring-orange-200">3</span>
+</td>
+<td class="px-6 py-4 text-right space-x-3">
+<button class="text-accent-blue font-semibold hover:underline text-sm">Editar</button>
+<button class="bg-accent-red text-white px-3 py-1.5 rounded-lg text-sm hover:bg-opacity-90 transition-all">Eliminar</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors">
+<td class="px-6 py-4">
+<div class="w-[60px] h-[60px] rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Red sport sneakers high performance shoe" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfxBbOBl_yDrg80JAAa-K5G-HoLCg_CrWafxZONPKe-llz9Zjc85pAjm5BLSVdhUPkUsGfyF2XhToUlRDUpjCnsKedICKDvvzS7cxJ9pc7QrSiHCoRiDRoYqYOCXioycKjGi8oU9dHtNhFG5OTZs1GC4qRypvwN3PgcpAd2RH-eY7CuMmbfoBkJN08GBjwI4Sjp9MptarE4hJeHxcWvl4GkvW5cwgvqH82wcKHg_LBF8K-kU4Yg8ahGWlYZ6YSKluL6-w_WXlZ9Riv"/>
+</div>
+</td>
+<td class="px-6 py-4 font-medium">Zapatillas Runner Red</td>
+<td class="px-6 py-4 tabular-nums font-medium">$89.99</td>
+<td class="px-6 py-4 text-center">
+<span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-bold">12</span>
+</td>
+<td class="px-6 py-4 text-right space-x-3">
+<button class="text-accent-blue font-semibold hover:underline text-sm">Editar</button>
+<button class="bg-accent-red text-white px-3 py-1.5 rounded-lg text-sm hover:bg-opacity-90 transition-all">Eliminar</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors">
+<td class="px-6 py-4">
+<div class="w-[60px] h-[60px] rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Modern smartwatch with silver casing" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDH_FDhtq2fXjnbjVBcYQXYhTr1e28lU1SA8Gy5YdH4wa0wtU8KHXv0bc2EwA15I0hBtVQMVWkWDDZPeXVVGrZ09egHC_tZrGT08O2KByjSC1ZDqRzzBft012q3blwlpazAA95cb3_ddqiW3b93qS3tCiJwz_WDV8ASm5NAVFdWrG6ScpqW5-0Hx74qE0iW8y3yd1N_Y7--gujDDrHyoG9jOg6oAe8y0vqoKqw0O9nPkgO8gZV1-T3zOoK_4DTHT_ne_Yc_YBkLOv_8"/>
+</div>
+</td>
+<td class="px-6 py-4 font-medium">Reloj Smart Tech v2</td>
+<td class="px-6 py-4 tabular-nums font-medium">$215.50</td>
+<td class="px-6 py-4 text-center">
+<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs font-bold ring-1 ring-orange-200">1</span>
+</td>
+<td class="px-6 py-4 text-right space-x-3">
+<button class="text-accent-blue font-semibold hover:underline text-sm">Editar</button>
+<button class="bg-accent-red text-white px-3 py-1.5 rounded-lg text-sm hover:bg-opacity-90 transition-all">Eliminar</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-6 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between text-sm text-gray-500">
+<p>Mostrando 4 de 48 productos</p>
+<div class="flex gap-2">
+<button class="px-3 py-1 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50">Ant.</button>
+<button class="px-3 py-1 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50">Sig.</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<footer class="mt-12 py-8 text-center text-gray-400 text-sm border-t border-gray-200 dark:border-gray-800">
+<p>© 2023 KiplyStart E-commerce Platform. Panel de Administración v1.4.2</p>
+</footer>
+</body></html>

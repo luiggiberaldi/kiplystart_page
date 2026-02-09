@@ -22,3 +22,19 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Project specific ignores
+tema shopify/
+*.py
+__pycache__/
+*.zip
+*.rar
+branding_research_results.md
+check_res.py
+extract_frames.py
+extract_pc.py
+extract_pc_hd.py
+trim_hero_webp.py
+verify_mcp.py
+branding_research_script*.py
+VERCEL_DEPLOYMENT.md

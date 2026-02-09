@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KiplyStart Checkout Page</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=Open+Sans:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e63746",
+                        "primary-blue": "#0A2463",
+                        "accent-blue": "#457B9D",
+                        "background-light": "#f5f5f5",
+                        "background-dark": "#211112",
+                        "neutral-text": "#212529",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "body": ["Open Sans", "sans-serif"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .ios-input {
+            font-family: 'Open Sans', sans-serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen text-neutral-text dark:text-gray-100">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-10 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
+<div class="flex items-center p-4">
+<button class="flex items-center justify-center size-10 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-neutral-text dark:text-white">arrow_back</span>
+</button>
+<h1 class="text-lg font-bold flex-1 text-center font-display mr-8">Checkout</h1>
+</div>
+</header>
+<main class="max-w-md mx-auto p-4 pb-32">
+<!-- Progress Indicator -->
+<div class="mb-6">
+<div class="flex items-center justify-between mb-2">
+<p class="text-accent-blue font-medium text-base font-display">Paso 2 de 3: Confirma tus datos</p>
+<span class="text-xs font-bold text-accent-blue/60">66%</span>
+</div>
+<div class="w-full bg-gray-200 dark:bg-gray-700 h-1.5 rounded-full overflow-hidden">
+<div class="bg-accent-blue h-full w-[66%] rounded-full"></div>
+</div>
+</div>
+<!-- Order Summary Card -->
+<section class="bg-white dark:bg-[#2c1a1b] rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-4 mb-6">
+<div class="flex gap-4 mb-6">
+<div class="size-20 rounded-lg bg-cover bg-center shrink-0 border border-gray-100 dark:border-gray-700" data-alt="Imagen del producto seleccionado para compra" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDIdlK9FROljVh91Jn89NvQVqgM-DAFUUh7c5REBhibF3opWC_kM7AUcjVUbhYRcR_LDFGYbmbXKAm6AUDMn5_JwF9iW85MWNTm02-CJT4bBRCM0B2vAUuQmANg8kzhgkWaS5dvdOqYEkFk2Mw9wH6hmajQ8DCnLY_pqwXTLM49A_ls025LoTZKSZRJLCpgLLABAZ9A5VuXmmIkHuz6DlIHB8gj-TSjg0M-yTHMOEASR9w2QkKY8FQdBYrMtFu7i2Wbpfv1B11NQDes');">
+</div>
+<div class="flex flex-col justify-between py-1">
+<div>
+<h3 class="font-bold text-lg leading-tight">Producto de KiplyStart</h3>
+<p class="text-gray-500 dark:text-gray-400 text-sm">Edición Limitada</p>
+</div>
+<p class="text-primary-blue dark:text-blue-300 font-bold">$250.00</p>
+</div>
+</div>
+<div class="flex items-center justify-between py-4 border-t border-gray-100 dark:border-gray-800">
+<span class="text-sm font-medium text-gray-600 dark:text-gray-400">Cantidad</span>
+<div class="flex items-center bg-gray-50 dark:bg-gray-800 rounded-lg p-1">
+<button class="size-12 flex items-center justify-center bg-white dark:bg-gray-700 rounded-md shadow-sm active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-xl">remove</span>
+</button>
+<span class="w-12 text-center font-bold text-lg">1</span>
+<button class="size-12 flex items-center justify-center bg-white dark:bg-gray-700 rounded-md shadow-sm active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-xl">add</span>
+</button>
+</div>
+</div>
+<div class="pt-4 space-y-2">
+<div class="flex justify-between text-sm text-gray-500 dark:text-gray-400">
+<span>Subtotal</span>
+<span>$250.00</span>
+</div>
+<div class="flex justify-between items-center pt-2">
+<span class="text-lg font-bold">Total</span>
+<span class="text-2xl font-bold text-primary-blue dark:text-blue-400 tracking-tight">$250.00</span>
+</div>
+</div>
+</section>
+<!-- Delivery Form Card -->
+<section class="bg-white dark:bg-[#2c1a1b] rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-5 mb-8">
+<h2 class="text-xl font-bold mb-5 font-display">Datos de Entrega</h2>
+<div class="space-y-4">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-medium text-gray-700 dark:text-gray-300 ml-1">Nombre completo</label>
+<input class="ios-input h-14 w-full px-4 rounded-lg border-[#D1D5DB] dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="Ej: Juan Pérez" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-medium text-gray-700 dark:text-gray-300 ml-1">Teléfono</label>
+<input class="ios-input h-14 w-full px-4 rounded-lg border-[#D1D5DB] dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="+52 000 000 0000" type="tel"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-medium text-gray-700 dark:text-gray-300 ml-1">Dirección de entrega</label>
+<textarea class="ios-input w-full p-4 rounded-lg border-[#D1D5DB] dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none" placeholder="Calle, número, colonia y referencias..." rows="3"></textarea>
+</div>
+</div>
+</section>
+<!-- Trust Information -->
+<div class="flex items-center justify-center gap-2 mb-4 text-accent-blue dark:text-blue-300">
+<span class="material-symbols-outlined text-lg">local_shipping</span>
+<p class="text-sm font-medium">Pagarás cuando recibas el producto</p>
+</div>
+</main>
+<!-- Bottom Action Area -->
+<div class="fixed bottom-0 left-0 right-0 bg-white dark:bg-background-dark p-4 border-t border-gray-100 dark:border-gray-800 pb-8 safe-area-bottom">
+<div class="max-w-md mx-auto">
+<button class="w-full h-16 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold text-lg flex items-center justify-center gap-3 shadow-lg shadow-primary/20 active:scale-[0.98] transition-all">
+<svg class="size-6 fill-current" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M17.472 14.382c-.301-.15-1.767-.872-2.04-.971-.272-.099-.47-.15-.667.15-.199.301-.765 1.05-.938 1.252-.172.201-.344.227-.645.077-.301-.15-1.269-.467-2.417-1.491-.892-.795-1.493-1.777-1.669-2.078-.176-.301-.019-.463.131-.613.135-.134.301-.351.451-.527.15-.176.201-.301.301-.502.1-.201.05-.376-.025-.526-.075-.151-.667-1.609-.913-2.203-.24-.577-.483-.498-.667-.508-.172-.01-.371-.011-.57-.011-.199 0-.523.074-.797.371-.274.297-1.045 1.021-1.045 2.489 0 1.468 1.069 2.887 1.218 3.088.15.201 2.103 3.211 5.094 4.503.711.307 1.266.49 1.701.628.715.227 1.365.195 1.878.118.572-.086 1.767-.722 2.016-1.419.249-.696.249-1.294.175-1.419-.075-.124-.275-.199-.576-.349z"></path>
+<path d="M12.004 2c-5.518 0-10 4.482-10 10 0 1.764.462 3.42 1.268 4.864l-1.35 4.928 5.053-1.325c1.405.766 3.006 1.205 4.706 1.205 5.518 0 10-4.482 10-10s-4.482-10-10-10zm0 18.25c-1.63 0-3.167-.442-4.496-1.21l-.322-.187-2.996.786.8-2.92-.206-.328c-.787-1.256-1.233-2.733-1.233-4.314 0-4.549 3.701-8.25 8.25-8.25s8.25 3.701 8.25 8.25-3.701 8.25-8.25 8.25z"></path>
+</svg>
+                Confirmar Pedido por WhatsApp
+            </button>
+</div>
+</div>
+</body></html>

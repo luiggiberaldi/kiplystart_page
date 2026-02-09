@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KiplyStart Product Catalog</title>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e63746",
+                        "secondary": "#0A2463",
+                        "background-light": "#f5f5f5",
+                        "background-dark": "#211112",
+                        "text-dark": "#212529",
+                        "stock-warning": "#F59E0B"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .skeleton-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-text-dark dark:text-white min-h-screen">
+<!-- Navbar -->
+<nav class="sticky top-0 z-50 bg-white dark:bg-background-dark border-b border-gray-200 dark:border-gray-800 px-4 py-3">
+<div class="flex items-center justify-between max-w-screen-xl mx-auto">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary dark:text-primary">storefront</span>
+<h1 class="text-secondary dark:text-white text-xl font-bold tracking-tight">KiplyStart</h1>
+</div>
+<div class="hidden md:flex gap-6 items-center">
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Inicio</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Contacto</a>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-sm">
+                Ver Productos
+            </button>
+</div>
+<!-- Mobile Links (Mini Scroll) -->
+<div class="flex gap-4 mt-3 md:hidden overflow-x-auto pb-1 no-scrollbar">
+<a class="text-sm font-bold border-b-2 border-primary pb-1 shrink-0" href="#">Inicio</a>
+<a class="text-sm font-medium text-gray-500 dark:text-gray-400 pb-1 shrink-0" href="#">Contacto</a>
+</div>
+</nav>
+<main class="max-w-screen-xl mx-auto pb-20">
+<!-- Header & Filter Section -->
+<div class="px-4 pt-8 pb-4">
+<h2 class="text-secondary dark:text-white text-[32px] font-bold leading-tight mb-6">Catálogo de Productos</h2>
+<div class="flex flex-col gap-2">
+<label class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Categoría</label>
+<div class="relative max-w-xs">
+<select class="appearance-none w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 pr-10 focus:ring-2 focus:ring-primary focus:border-primary outline-none text-sm font-medium">
+<option>Todas</option>
+<option>Electrónica</option>
+<option>Hogar</option>
+<option>Accesorios</option>
+</select>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Product Grid (2 Columns Mobile) -->
+<div class="grid grid-cols-2 gap-4 p-4">
+<!-- Card 1 -->
+<div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col">
+<div class="aspect-square bg-[#D1D5DB] rounded-lg mb-4 overflow-hidden">
+<img alt="Product" class="w-full h-full object-cover" data-alt="Modern white minimalist watch on gray background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwZDPyo5vBRWFgDX1TqGxzLYe7vLMocLAorf8XV_RwO_AWV7CbZnJFKFtmQQytLZC-4Vdovfeorc_5BF3LZ-nTILa9j4tFCu2PqEvto7BFtZ0KwP_MnPfrX4IFHiXYxr73KQ2qgtaGrxaJGKA3xPiXUsLlTnAthMvtrxjWW6GKrlfUS-CiXgNZscYJri_fTlLa58prHwIHSzAUBAMSsLy16Gb1c6FXs3Wjr8D3z133kzHtMC-fY9FY7KtvNokukoMX27OhdB0OijaX"/>
+</div>
+<div class="flex-grow">
+<h3 class="text-[18px] font-semibold text-text-dark dark:text-gray-100 leading-tight mb-1">Reloj Minimal</h3>
+<p class="text-[24px] font-medium text-secondary dark:text-primary mb-1">$45.00</p>
+<p class="text-xs font-bold text-stock-warning mb-4">Quedan 2 unidades</p>
+</div>
+<button class="w-full h-[44px] bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-colors text-sm">
+                    Ver Detalles
+                </button>
+</div>
+<!-- Card 2 -->
+<div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col">
+<div class="aspect-square bg-[#D1D5DB] rounded-lg mb-4 overflow-hidden">
+<img alt="Product" class="w-full h-full object-cover" data-alt="Professional wireless black over-ear headphones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxvZoERsgRfOQen5QvzCKL669oEUoisfrQbfmSg9_0WRHet-mkjT1M4Cim5DnXa7VO-52hgdD5o5Ahy42HHDrrJAO3J-WQnoRbCQJmo4uxvTWbAq6gYcemIxnHJCk14tB3Kjy6VnLUwoIOi24ODaMvmNl_tqXenJB9LDhVB8E_fKPOXetF4lJZJdd9-OEHFAQluQHJPeEiKIIpjpyB6rogBzIObBmvRoexvWE5O33m7VnJxQvOR-8jvmb5cjHeNrxCcLQvng62N5IL"/>
+</div>
+<div class="flex-grow">
+<h3 class="text-[18px] font-semibold text-text-dark dark:text-gray-100 leading-tight mb-1">Auriculares Pro</h3>
+<p class="text-[24px] font-medium text-secondary dark:text-primary mb-1">$89.99</p>
+<div class="h-4 mb-4"></div> <!-- Spacer for optional stock -->
+</div>
+<button class="w-full h-[44px] bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-colors text-sm">
+                    Ver Detalles
+                </button>
+</div>
+<!-- Card 3 -->
+<div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col">
+<div class="aspect-square bg-[#D1D5DB] rounded-lg mb-4 overflow-hidden">
+<img alt="Product" class="w-full h-full object-cover" data-alt="Classic red athletic sneaker on gray background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMcwRIsT3veOYWL15kEiGC1uvimTK1LnJT9Qf_RbtT24z4dpc80t7F9pK1VEgqAjN0bSH8eSbb4FQcSau5gzZWLib1o-YwBnyCDcvokPmQI4xAjRI2WGG34hB_qx_L4gGuD_1YAa9oUSnDH9Cewzzju5ZUGUnLs11agitjI_TAzXWa9oH393jmy_-5eFQk9BMFDa9HRJjx-a1D7-HXa4tKRXFJxuFkuNC5DQy7kyKKSZRkrV6wNFTjU5Gynzy8gE5Rhi79-eeoBRCF"/>
+</div>
+<div class="flex-grow">
+<h3 class="text-[18px] font-semibold text-text-dark dark:text-gray-100 leading-tight mb-1">Zapatillas Urban</h3>
+<p class="text-[24px] font-medium text-secondary dark:text-primary mb-1">$55.00</p>
+<p class="text-xs font-bold text-stock-warning mb-4">Quedan 5 unidades</p>
+</div>
+<button class="w-full h-[44px] bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-colors text-sm">
+                    Ver Detalles
+                </button>
+</div>
+<!-- Card 4 -->
+<div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col">
+<div class="aspect-square bg-[#D1D5DB] rounded-lg mb-4 overflow-hidden">
+<img alt="Product" class="w-full h-full object-cover" data-alt="Vintage style analog 35mm film camera" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3q8uNtL3PJuPYfR4B5G3S3jwQXYO_cb2XxfEcg5ZEpUCaeKyM-fyXbv6ME8YQLsRFOiFIfn9zMvXCwOveFOkQGWGBeIOz-G9QHspGaIy5uZ_y5QSKf2SaRzl82p4qoju9r6FMeDopYo9adxhM8avi8muPJtZ9WxAZwCy-a6xuRgs-yXSqKuoHhAhJ8w1S1EcefPH0KQBXuSC8w6DRnFXOm-SeoPrn04MNY4e-GNq0-tmPNl87ghyvN9BJlAMNdhyo6TZOn4p3fpxZ"/>
+</div>
+<div class="flex-grow">
+<h3 class="text-[18px] font-semibold text-text-dark dark:text-gray-100 leading-tight mb-1">Cámara Retro</h3>
+<p class="text-[24px] font-medium text-secondary dark:text-primary mb-1">$120.00</p>
+<div class="h-4 mb-4"></div>
+</div>
+<button class="w-full h-[44px] bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-colors text-sm">
+                    Ver Detalles
+                </button>
+</div>
+</div>
+<!-- Skeleton Loading Section -->
+<div class="px-4 py-8">
+<h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 border-b border-gray-200 dark:border-gray-800 pb-2">Cargando más productos</h3>
+<div class="grid grid-cols-2 gap-4">
+<!-- Skeleton Card 1 -->
+<div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
+<div class="aspect-square bg-gray-200 dark:bg-gray-700 rounded-lg mb-4 skeleton-pulse"></div>
+<div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2 skeleton-pulse"></div>
+<div class="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-4 skeleton-pulse"></div>
+<div class="h-[44px] bg-gray-100 dark:bg-gray-700 rounded-lg skeleton-pulse"></div>
+</div>
+<!-- Skeleton Card 2 -->
+<div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
+<div class="aspect-square bg-gray-200 dark:bg-gray-700 rounded-lg mb-4 skeleton-pulse"></div>
+<div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2 skeleton-pulse"></div>
+<div class="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-4 skeleton-pulse"></div>
+<div class="h-[44px] bg-gray-100 dark:bg-gray-700 rounded-lg skeleton-pulse"></div>
+</div>
+<!-- Skeleton Card 3 -->
+<div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
+<div class="aspect-square bg-gray-200 dark:bg-gray-700 rounded-lg mb-4 skeleton-pulse"></div>
+<div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2 skeleton-pulse"></div>
+<div class="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-4 skeleton-pulse"></div>
+<div class="h-[44px] bg-gray-100 dark:bg-gray-700 rounded-lg skeleton-pulse"></div>
+</div>
+<!-- Skeleton Card 4 -->
+<div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
+<div class="aspect-square bg-gray-200 dark:bg-gray-700 rounded-lg mb-4 skeleton-pulse"></div>
+<div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2 skeleton-pulse"></div>
+<div class="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-4 skeleton-pulse"></div>
+<div class="h-[44px] bg-gray-100 dark:bg-gray-700 rounded-lg skeleton-pulse"></div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (iOS feel) -->
+<div class="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-background-dark/90 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 px-6 py-3 flex justify-between items-center z-50">
+<div class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="text-[10px] font-bold">Catálogo</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-gray-400">
+<span class="material-symbols-outlined">search</span>
+<span class="text-[10px] font-medium">Buscar</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-gray-400">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span class="text-[10px] font-medium">Carrito</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-gray-400">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Perfil</span>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KiplyStart Product Detail</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=Open+Sans:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e63743",
+                        "background-light": "#f5f5f5",
+                        "background-dark": "#211112",
+                        "kiply-navy": "#0A2463",
+                        "kiply-blue": "#457B9D",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "body": ["Open Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+        }
+        h1, h2, h3, .font-inter {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex flex-col pb-20">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 bg-white dark:bg-background-dark border-b border-gray-100 dark:border-gray-800">
+<div class="flex items-center p-4 justify-between max-w-md mx-auto">
+<div class="text-kiply-navy dark:text-white flex size-10 shrink-0 items-center justify-center cursor-pointer">
+<span class="material-symbols-outlined">arrow_back</span>
+</div>
+<h2 class="text-kiply-navy dark:text-white text-lg font-bold leading-tight tracking-tight flex-1 text-center font-inter">KiplyStart</h2>
+<div class="flex w-10 items-center justify-end">
+<button class="text-kiply-navy dark:text-white">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</div>
+</header>
+<main class="max-w-md mx-auto w-full">
+<!-- Breadcrumbs -->
+<nav class="px-4 py-3">
+<p class="text-kiply-blue text-[14px] font-normal font-body">
+                Inicio &gt; Catálogo &gt; Audífonos Bluetooth
+            </p>
+</nav>
+<!-- Product Image Section -->
+<div class="bg-white dark:bg-gray-900 border-y border-gray-100 dark:border-gray-800">
+<div class="aspect-square w-full max-w-[500px] mx-auto overflow-hidden flex items-center justify-center p-6">
+<img alt="Premium noise cancelling headphones" class="w-full h-full object-contain" data-alt="Professional wireless black headphones on white background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDV5P1ixXD-OamM3CEV6IxYh3oxZyVK_qkuQeYI2jyabQekj7V0we7W4_KYaKFGFRD78IKAb-ja42XII3tg4XOYWMgSAS_adH7fo5ofuf22A5QUdeVXT41pKM02weatKOiGntTys11kXGQy4S5f3IjY8WibWgv9NtsFAXvILoHGMuqbadoNCwSyriYpBcBAQiHkU8aeXhmWydXRWf-vX0zy1U7vaWFqCGHe6VDqkm_eS-DX82SQAOkuqvGeTKd3Bs972JTGdj8_z7k0"/>
+</div>
+</div>
+<!-- Product Information Card -->
+<div class="m-4 p-6 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
+<div class="flex flex-col gap-2">
+<h1 class="text-kiply-navy dark:text-white text-[28px] font-bold leading-tight font-inter">
+                    Audífonos Bluetooth HD
+                </h1>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="text-kiply-navy dark:text-white text-[36px] font-medium font-inter">$65.00</span>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="material-symbols-outlined text-[#10B981] text-sm">inventory_2</span>
+<span class="text-[#10B981] text-[16px] font-semibold font-body">Disponible: 15 unidades</span>
+</div>
+<div class="my-4 border-t border-gray-50 dark:border-gray-800 pt-4">
+<p class="text-[#212529] dark:text-gray-300 text-[16px] leading-[1.6] font-body">
+                        Experimenta una calidad de sonido superior con cancelación de ruido activa y hasta 30 horas de batería. Diseño ergonómico ideal para largas sesiones de uso.
+                    </p>
+</div>
+<!-- Specifications Accordion -->
+<div class="border-t border-gray-50 dark:border-gray-800 pt-4">
+<button class="flex items-center justify-between w-full text-kiply-blue font-medium text-[16px] font-inter">
+<span>Ver especificaciones técnicas</span>
+<span class="material-symbols-outlined">expand_more</span>
+</button>
+<!-- Specs list hidden/collapsed state visually represented -->
+<div class="hidden mt-4 space-y-2">
+<div class="flex justify-between text-sm">
+<span class="text-gray-500">Bluetooth</span>
+<span class="font-medium">5.2</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-gray-500">Batería</span>
+<span class="font-medium">30 Horas</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Product Features Grid -->
+<div class="px-4 pb-8 grid grid-cols-2 gap-3">
+<div class="bg-white dark:bg-gray-900 p-4 rounded-lg border border-gray-100 dark:border-gray-800 flex flex-col items-center text-center">
+<span class="material-symbols-outlined text-primary mb-2">speed</span>
+<span class="text-xs font-bold text-gray-800 dark:text-gray-200 uppercase">Carga Rápida</span>
+<span class="text-[10px] text-gray-500">10 min = 3h de uso</span>
+</div>
+<div class="bg-white dark:bg-gray-900 p-4 rounded-lg border border-gray-100 dark:border-gray-800 flex flex-col items-center text-center">
+<span class="material-symbols-outlined text-primary mb-2">verified_user</span>
+<span class="text-xs font-bold text-gray-800 dark:text-gray-200 uppercase">Garantía</span>
+<span class="text-[10px] text-gray-500">1 año oficial</span>
+</div>
+</div>
+</main>
+<!-- Sticky CTA Bar -->
+<div class="fixed bottom-0 left-0 right-0 bg-white dark:bg-background-dark p-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] border-t border-gray-100 dark:border-gray-800 z-50">
+<div class="max-w-md mx-auto">
+<button class="w-full h-14 bg-primary text-white font-inter font-bold text-[18px] rounded-xl flex items-center justify-center gap-3 active:scale-[0.98] transition-transform">
+<span class="material-symbols-outlined">shopping_cart_checkout</span>
+                Comprar Ahora (Pago al Recibir)
+            </button>
+<!-- Safe area spacer for iOS -->
+<div class="h-2"></div>
+</div>
+</div>
+</body></html>
