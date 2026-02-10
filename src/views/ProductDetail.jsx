@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import CODModal from '../components/CODModal';
+import PriceDual from '../components/PriceDual';
 import ProductImageGallery from '../components/product/ProductImageGallery';
 import BundleSelector from '../components/product/BundleSelector';
 import ProductDescription from '../components/ProductDescription';
@@ -217,7 +218,17 @@ export default function ProductDetail() {
                         {product.name}
                     </h2>
                     <div className="flex size-9 md:w-10 items-center justify-end shrink-0">
-                        <button className="text-brand-blue hover:text-brand-red transition-colors">
+                        <button className="text-brand-blue hover:text-brand-red transition-colors"
+                            onClick={async () => {
+                                const url = window.location.href;
+                                const text = `${product.name} — ${url}`;
+                                if (navigator.share) {
+                                    try { await navigator.share({ title: product.name, url }); } catch { }
+                                } else {
+                                    await navigator.clipboard.writeText(text);
+                                    alert('¡Enlace copiado!');
+                                }
+                            }}>
                             <span className="material-symbols-outlined text-[22px]">share</span>
                         </button>
                     </div>
@@ -249,9 +260,7 @@ export default function ProductDetail() {
                                 </span>
                             )}
                             <div className="flex items-center gap-2 md:gap-3 flex-wrap">
-                                <span className="text-brand-blue text-[26px] md:text-[32px] font-bold font-display">
-                                    ${Math.ceil(product.price)}
-                                </span>
+                                <PriceDual amount={Math.ceil(product.price)} size="lg" showRate />
                                 {product.compare_at_price && (
                                     <span className="bg-red-100 text-brand-red text-[10px] md:text-xs font-bold px-2 py-0.5 md:py-1 rounded">
                                         AHORRAS {Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)}%
@@ -367,7 +376,7 @@ export default function ProductDetail() {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 product={product}
-                quantity={selectedBundle}
+                quantity={1}
                 totalPrice={getPrice()}
                 selectedBundle={selectedBundle}
             />

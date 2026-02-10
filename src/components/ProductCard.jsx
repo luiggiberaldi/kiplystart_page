@@ -22,10 +22,9 @@
  */
 
 import { Link } from 'react-router-dom';
-import { useCurrency } from '../context/CurrencyContext';
+import PriceDual from './PriceDual';
 
 export default function ProductCard({ product, loading = false }) {
-    const { formatPrice } = useCurrency();
 
     // Skeleton Loading State (24% más rápido percibido que spinner)
     if (loading) {
@@ -80,9 +79,7 @@ export default function ProductCard({ product, loading = false }) {
                 <h3 className="text-[16px] md:text-[18px] font-semibold text-soft-black leading-tight mb-1 font-display line-clamp-2">
                     {product.name}
                 </h3>
-                <p className="text-[22px] md:text-[24px] font-bold text-brand-blue mb-1">
-                    {formatPrice(product.price)}
-                </p>
+                <PriceDual amount={product.price} size="sm" />
                 <p className="text-xs text-gray-500 mb-2">
                     Envío Gratis · Tasa BCV
                 </p>

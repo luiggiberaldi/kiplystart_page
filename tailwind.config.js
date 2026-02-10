@@ -42,6 +42,36 @@ export default {
         '3xl': '3rem',     // 48px
         'full': '9999px',  // pills
       },
+      keyframes: {
+        slideUp: {
+          '0%': { transform: 'translateY(100%)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(8px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        scaleIn: {
+          '0%': { transform: 'scale(0.8)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        checkmark: {
+          '0%': { transform: 'scale(0) rotate(-45deg)', opacity: '0' },
+          '50%': { transform: 'scale(1.2) rotate(0deg)', opacity: '1' },
+          '100%': { transform: 'scale(1) rotate(0deg)', opacity: '1' },
+        },
+        'pulse-slow': {
+          '0%, 100%': { opacity: '0.15' },
+          '50%': { opacity: '0.05' },
+        },
+      },
+      animation: {
+        slideUp: 'slideUp 0.35s ease-out',
+        fadeIn: 'fadeIn 0.3s ease-out',
+        scaleIn: 'scaleIn 0.4s cubic-bezier(0.34,1.56,0.64,1)',
+        checkmark: 'checkmark 0.5s cubic-bezier(0.34,1.56,0.64,1)',
+        'pulse-slow': 'pulse-slow 2s ease-in-out infinite',
+      },
     },
   },
   plugins: [],

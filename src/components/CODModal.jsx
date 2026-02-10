@@ -1,292 +1,224 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { useCurrency } from '../context/CurrencyContext';
+import { ZONES, getSavedCustomer, saveCustomer, clearSavedCustomer } from './cod/codData';
+import CODProductSummary from './cod/CODProductSummary';
+import CODStepPersonal from './cod/CODStepPersonal';
+import CODStepDelivery from './cod/CODStepDelivery';
+import CODSuccess from './cod/CODSuccess';
+
+const EMPTY_FORM = { name: '', ci: '', phone: '', state: '', city: '', address: '', ref: '' };
 
 /**
- * CODModal Component (Releasit Style)
- * @description
- * High-conversion modal for "Cash on Delivery" orders.
- * Bypasses standard checkout for direct WhatsApp conversion.
+ * CODModal v2 — Stepper + Smart Autofill + Dual Currency
+ * Orchestrator only — UI lives in sub-components under /cod
  */
 export default function CODModal({ isOpen, onClose, product, quantity, totalPrice, selectedBundle }) {
-    const [formData, setFormData] = useState({
-        name: '',
-        ci: '',
-        phone: '',
-        state: 'Miranda', // Default for now
-        city: '',
-        address: '',
-        ref: ''
-    });
+    const { formatUSD, formatBs, exchangeRate } = useCurrency();
 
+    const [step, setStep] = useState(1);
+    const [returning, setReturning] = useState(false);
+    const [formData, setFormData] = useState({ ...EMPTY_FORM });
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
+    const [touched, setTouched] = useState({});
+    const [success, setSuccess] = useState(false);
+    const formRef = useRef(null);
 
-    // Lock body scroll when modal is open
+    /* ===== Lifecycle ===== */
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
+            const saved = getSavedCustomer();
+            if (saved?.name) { setFormData(prev => ({ ...prev, ...saved })); setReturning(true); }
         } else {
             document.body.style.overflow = 'unset';
+            setStep(1); setSuccess(false); setErrors({}); setTouched({});
         }
     }, [isOpen]);
 
-    // CRITICAL: Always ensure scroll is unlocked on unmount
-    // This handles edge cases where user navigates away (WhatsApp redirect)
-    // and browser restores page state via back button
-    useEffect(() => {
-        return () => {
-            document.body.style.overflow = 'unset';
-        };
-    }, []);
+    useEffect(() => () => { document.body.style.overflow = 'unset'; }, []);
 
-    // Return null if modal is closed (but AFTER hooks have run)
     if (!isOpen) return null;
 
-    const handleChange = (e) => {
+    /* ===== Field helpers ===== */
+    const selectedZone = ZONES.find(z => z.state === formData.state);
+    const deliveryTime = selectedZone?.delivery || '';
+
+    function handleChange(e) {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-        // Clear error when user types
-        if (errors[name]) {
-            setErrors(prev => ({ ...prev, [name]: null }));
-        }
-    };
+        setFormData(prev => {
+            const next = { ...prev, [name]: value };
+            if (name === 'state') next.city = '';
+            return next;
+        });
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
+    }
 
-    const validateForm = () => {
-        const newErrors = {};
-        if (!formData.name.trim()) newErrors.name = 'El nombre es obligatorio';
-        if (!formData.ci.trim()) newErrors.ci = 'La cédula es obligatoria';
-        if (!formData.phone.trim()) newErrors.phone = 'El teléfono es obligatorio';
-        if (formData.phone.length < 10) newErrors.phone = 'Verifica el número';
-        if (!formData.city.trim()) newErrors.city = 'La ciudad es obligatoria';
-        if (!formData.address.trim()) newErrors.address = 'La dirección es obligatoria';
+    function handleBlur(name) { setTouched(prev => ({ ...prev, [name]: true })); }
 
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
+    function getFieldStatus(name) {
+        if (!touched[name] && !errors[name]) return 'idle';
+        if (errors[name]) return 'error';
+        const v = formData[name]?.trim();
+        if (name === 'phone') return v && v.length >= 10 ? 'valid' : 'idle';
+        return v ? 'valid' : 'idle';
+    }
 
-    const handleSubmit = async (e) => {
+    function fieldBorder(name) {
+        const s = getFieldStatus(name);
+        if (s === 'error') return 'border-red-400 ring-2 ring-red-100';
+        if (s === 'valid') return 'border-green-400 ring-2 ring-green-50';
+        return 'border-gray-200 focus-within:border-brand-blue focus-within:ring-2 focus-within:ring-blue-50';
+    }
+
+    /* ===== Validation ===== */
+    function goToStep2() {
+        const e = {};
+        if (!formData.name.trim()) e.name = 'Requerido';
+        if (!formData.ci.trim()) e.ci = 'Requerido';
+        if (!formData.phone.trim()) e.phone = 'Requerido';
+        else if (formData.phone.length < 10) e.phone = 'Verifica el número';
+        setErrors(e);
+        if (Object.keys(e).length === 0) { setErrors({}); setTouched({}); setStep(2); }
+    }
+
+    /* ===== Submit ===== */
+    async function handleSubmit(e) {
         e.preventDefault();
-        if (!validateForm()) return;
+        const err = {};
+        if (!formData.state) err.state = 'Selecciona un estado';
+        if (!formData.city) err.city = 'Selecciona una ciudad';
+        if (!formData.address.trim()) err.address = 'La dirección es obligatoria';
+        setErrors(err);
+        if (Object.keys(err).length > 0) return;
 
         setLoading(true);
-
         try {
-            // 1. Save order to Supabase (Optional but recommended for analytics)
-            const { data, error } = await supabase
-                .from('orders')
-                .insert({
-                    user_name: formData.name,
-                    user_phone: formData.phone,
-                    user_ci: formData.ci,
-                    product_id: product.id,
-                    product_name: product.name,
-                    quantity: quantity,
-                    bundle_type: selectedBundle, // '1', '2', '3'
-                    total_price: totalPrice,
-                    delivery_address: `${formData.address}, ${formData.city}, ${formData.state}. Ref: ${formData.ref}`,
-                    status: 'pending_whatsapp'
-                })
-                .select();
+            saveCustomer(formData);
 
-            if (error) {
-                console.error("Supabase error:", error);
-                // Continue anyway to WhatsApp as fallback
-            }
+            // Generate order_id: KS-YYYYMMDD-XXXX
+            const now = new Date();
+            const datePart = now.toISOString().slice(0, 10).replace(/-/g, '');
+            const rand = Math.floor(1000 + Math.random() * 9000);
+            const orderId = `KS-${datePart}-${rand}`;
+            const unitPrice = selectedBundle > 1 ? totalPrice / (quantity * selectedBundle) : totalPrice / quantity;
 
-            // 2. Build WhatsApp Message
-            const orderId = data && data[0] ? `#${data[0].id.toString().padStart(4, '0')}` : 'N/A';
+            const { data, error } = await supabase.from('orders').insert({
+                order_id: orderId,
+                user_name: formData.name,
+                user_phone: formData.phone,
+                user_ci: formData.ci,
+                product_id: product.id,
+                product_name: product.name,
+                quantity,
+                bundle_type: selectedBundle,
+                unit_price: unitPrice,
+                total_price: totalPrice,
+                city: formData.city,
+                state: formData.state,
+                delivery_address: formData.address,
+                delivery_ref: formData.ref || null,
+                status: 'pending_whatsapp'
+            }).select();
+
+            if (error) console.error('Supabase error:', error);
+            setSuccess(true);
+
+            const displayId = data?.[0]?.order_id || orderId;
             const bundleText = selectedBundle > 1 ? `(Oferta ${selectedBundle} unidades)` : '';
+            const bsLine = exchangeRate ? `\n💱 *En Bs:* ${formatBs(totalPrice)}` : '';
 
-            const message = `*¡Hola! Quiero confirmar mi pedido KiplyStart!* 🚀\n\n` +
-                `📦 *Producto:* ${product.name}\n` +
-                `🔢 *Cantidad:* ${quantity} ${bundleText}\n` +
-                `💰 *Total a Pagar:* $${Math.ceil(totalPrice)}\n\n` +
-                `👤 *Datos de Envío:*\n` +
-                ` Nombre: ${formData.name}\n` +
-                ` C.I: ${formData.ci}\n` +
-                ` Tel: ${formData.phone}\n` +
-                ` Dirección: ${formData.city}, ${formData.state}. ${formData.address}\n` +
-                ` Ref: ${formData.ref}\n\n` +
-                `📍 *ID Pedido:* ${orderId}\n` +
-                `_Espero confirmación para el envío. Gracias!_`;
+            const message =
+                `Hola, deseo confirmar mi pedido en KiplyStart.\n\n` +
+                `DETALLES DEL PEDIDO\n` +
+                `ID: ${displayId}\n` +
+                `Producto: ${product.name}\n` +
+                `Cantidad: ${quantity} ${bundleText}\n` +
+                `Total: ${formatUSD(totalPrice)}${bsLine}\n\n` +
+                `DATOS DE ENVÍO\n` +
+                `Nombre: ${formData.name}\n` +
+                `CI: ${formData.ci}\n` +
+                `Teléfono: ${formData.phone}\n` +
+                `Dirección: ${formData.city}, ${formData.state}\n` +
+                `Dirección exacta: ${formData.address}\n` +
+                (formData.ref ? `Referencia: ${formData.ref}\n` : '') +
+                `\nEspero su confirmación para el despacho.`;
 
-            // 3. Redirect
-            const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '584241234567';
-            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-            window.location.href = whatsappUrl;
-
+            const WA = import.meta.env.VITE_WHATSAPP_NUMBER || '584241234567';
+            setTimeout(() => { window.location.href = `https://wa.me/${WA}?text=${encodeURIComponent(message)}`; }, 1200);
         } catch (err) {
-            console.error("Submission error:", err);
-            setLoading(false);
-            alert("Hubo un error procesando el pedido. Por favor intenta de nuevo.");
+            console.error('Submission error:', err);
+            setLoading(false); setSuccess(false);
         }
-    };
+    }
+
+    function clearSaved() {
+        clearSavedCustomer();
+        setFormData({ ...EMPTY_FORM });
+        setReturning(false);
+    }
+
+    /* ===== Shared field props ===== */
+    const fieldProps = { formData, errors, handleChange, handleBlur, fieldBorder, getFieldStatus };
+
+    /* ===== Render ===== */
+    if (success) return <CODSuccess />;
 
     return (
         <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">
-            {/* Backdrop */}
-            <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
-                onClick={onClose}
-            ></div>
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
-            {/* Modal Content */}
-            <div className="relative bg-white w-full max-w-lg sm:rounded-2xl rounded-t-2xl shadow-2xl max-h-[90vh] overflow-y-auto animate-slideUp" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+            <div className="relative bg-white w-full max-w-lg sm:rounded-2xl rounded-t-2xl shadow-2xl max-h-[92vh] overflow-y-auto animate-slideUp"
+                style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
 
-                {/* Header */}
-                <div className="sticky top-0 bg-brand-blue text-white p-3 md:p-4 flex justify-between items-center z-10">
-                    <div className="flex items-center gap-1.5 md:gap-2 min-w-0">
-                        <span className="material-symbols-outlined text-[20px] md:text-[24px] shrink-0">local_shipping</span>
-                        <h3 className="font-display font-bold text-base md:text-lg truncate">Envío Rápido y Seguro</h3>
+                {/* Header + Stepper */}
+                <div className="sticky top-0 bg-brand-blue text-white p-3 md:p-4 z-10 sm:rounded-t-2xl">
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2 min-w-0">
+                            <span className="material-symbols-outlined text-[20px] shrink-0">local_shipping</span>
+                            <h3 className="font-display font-bold text-base truncate">Envío Rápido y Seguro</h3>
+                        </div>
+                        <button onClick={onClose} className="text-white/80 hover:text-white shrink-0 ml-2">
+                            <span className="material-symbols-outlined">close</span>
+                        </button>
                     </div>
-                    <button onClick={onClose} className="text-white/80 hover:text-white shrink-0 ml-2">
-                        <span className="material-symbols-outlined">close</span>
-                    </button>
+
+                    <div className="flex items-center gap-2 mt-3">
+                        <StepPill active={step === 1} done={step > 1} icon={step > 1 ? 'check_circle' : 'person'} label="Tus datos" />
+                        <div className={`h-[2px] flex-1 rounded ${step > 1 ? 'bg-white' : 'bg-white/20'}`} />
+                        <StepPill active={step === 2} icon="location_on" label="Envío" />
+                    </div>
                 </div>
 
-                {/* Form Body */}
+                {/* Body */}
                 <div className="p-4 md:p-6">
-                    {/* Product Summary */}
-                    <div className="flex gap-3 md:gap-4 mb-4 md:mb-6 bg-gray-50 p-2.5 md:p-3 rounded-lg border border-gray-100">
-                        <div className="w-14 h-14 md:w-16 md:h-16 bg-white rounded-md border border-gray-200 p-1 flex-shrink-0">
-                            <img src={product.image_url} alt={product.name} className="w-full h-full object-contain" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                            <p className="font-bold text-sm text-brand-blue truncate">{product.name}</p>
-                            <p className="text-[11px] md:text-xs text-gray-500">Cantidad: {quantity} {selectedBundle > 1 && `(${selectedBundle}x)`}</p>
-                            <p className="font-bold text-brand-red text-base md:text-lg">${Math.ceil(totalPrice)}</p>
-                        </div>
-                    </div>
+                    <CODProductSummary product={product} quantity={quantity}
+                        selectedBundle={selectedBundle} totalPrice={totalPrice} />
 
-                    <form onSubmit={handleSubmit} className="space-y-4 font-body">
-                        <h4 className="font-bold text-sm md:text-base text-gray-800 border-b pb-2 mb-3 md:mb-4">Datos de Entrega</h4>
-
-                        {/* Name & CI row */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label className="block text-xs font-bold text-gray-700 mb-1">Nombre Completo *</label>
-                                <input
-                                    type="text"
-                                    name="name"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    className={`w-full border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue outline-none`}
-                                    placeholder="Pedro Pérez"
-                                />
-                                {errors.name && <p className="text-red-500 text-[10px] mt-1">{errors.name}</p>}
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-gray-700 mb-1">Cédula / ID *</label>
-                                <input
-                                    type="text"
-                                    name="ci"
-                                    value={formData.ci}
-                                    onChange={handleChange}
-                                    className={`w-full border ${errors.ci ? 'border-red-500' : 'border-gray-300'} rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue outline-none`}
-                                    placeholder="V-12345678"
-                                />
-                                {errors.ci && <p className="text-red-500 text-[10px] mt-1">{errors.ci}</p>}
-                            </div>
-                        </div>
-
-                        {/* Phone */}
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 mb-1">Teléfono (WhatsApp) *</label>
-                            <input
-                                type="tel"
-                                name="phone"
-                                value={formData.phone}
-                                onChange={handleChange}
-                                className={`w-full border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue outline-none`}
-                                placeholder="04241234567"
-                            />
-                            {errors.phone && <p className="text-red-500 text-[10px] mt-1">{errors.phone}</p>}
-                        </div>
-
-                        {/* City & State row */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label className="block text-xs font-bold text-gray-700 mb-1">Estado</label>
-                                <select
-                                    name="state"
-                                    value={formData.state}
-                                    onChange={handleChange}
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-brand-blue outline-none"
-                                >
-                                    <option>Distrito Capital</option>
-                                    <option>Miranda</option>
-                                    <option>Carabobo</option>
-                                    <option>Aragua</option>
-                                    <option>Lara</option>
-                                    <option>Zulia</option>
-                                    <option>Otro</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-gray-700 mb-1">Ciudad *</label>
-                                <input
-                                    type="text"
-                                    name="city"
-                                    value={formData.city}
-                                    onChange={handleChange}
-                                    className={`w-full border ${errors.city ? 'border-red-500' : 'border-gray-300'} rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue outline-none`}
-                                    placeholder="Ej: Caracas"
-                                />
-                                {errors.city && <p className="text-red-500 text-[10px] mt-1">{errors.city}</p>}
-                            </div>
-                        </div>
-
-                        {/* Address */}
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 mb-1">Dirección Exacta *</label>
-                            <textarea
-                                name="address"
-                                value={formData.address}
-                                onChange={handleChange}
-                                rows="2"
-                                className={`w-full border ${errors.address ? 'border-red-500' : 'border-gray-300'} rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue outline-none`}
-                                placeholder="Av. Principal, Edif. Azul, Piso 2, Apto 2B"
-                            ></textarea>
-                            {errors.address && <p className="text-red-500 text-[10px] mt-1">{errors.address}</p>}
-                        </div>
-
-                        {/* Reference */}
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 mb-1">Punto de Referencia (Opcional)</label>
-                            <input
-                                type="text"
-                                name="ref"
-                                value={formData.ref}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue outline-none"
-                                placeholder="Frente a la panadería..."
-                            />
-                        </div>
-
-                        {/* Submit Button */}
-                        <div className="pt-3 md:pt-4 pb-2">
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full bg-brand-red text-white font-display font-bold text-base md:text-lg py-3.5 md:py-4 rounded-xl shadow-lg shadow-brand-red/30 active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
-                            >
-                                {loading ? (
-                                    <span className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                                ) : (
-                                    <>
-                                        <span className="material-symbols-outlined">send</span>
-                                        Completar Pedido por WhatsApp
-                                    </>
-                                )}
-                            </button>
-                            <p className="text-center text-[10px] text-gray-400 mt-3 flex items-center justify-center gap-1">
-                                <span className="material-symbols-outlined text-xs">lock</span>
-                                Tus datos están protegidos y encriptados.
-                            </p>
-                        </div>
+                    <form onSubmit={handleSubmit} ref={formRef}>
+                        {step === 1 && (
+                            <CODStepPersonal {...fieldProps}
+                                returning={returning} onClearSaved={clearSaved} onContinue={goToStep2} />
+                        )}
+                        {step === 2 && (
+                            <CODStepDelivery {...fieldProps}
+                                loading={loading} onBack={() => { setStep(1); setErrors({}); }} />
+                        )}
                     </form>
                 </div>
             </div>
+        </div>
+    );
+}
+
+/* ===== Tiny helper ===== */
+function StepPill({ active, done, icon, label }) {
+    return (
+        <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors
+            ${active ? 'bg-white text-brand-blue' : 'bg-white/20 text-white/70'}`}>
+            <span className="material-symbols-outlined text-[14px]">{icon}</span>
+            {label}
         </div>
     );
 }

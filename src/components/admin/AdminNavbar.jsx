@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useCurrency } from "../../context/CurrencyContext";
 
 export default function AdminNavbar() {
-    const { currency, toggleCurrency, exchangeRate } = useCurrency();
+    const { exchangeRate, rateSource } = useCurrency();
 
     return (
         <nav className="bg-white/80 backdrop-blur-md border-b border-white/20 text-soft-black p-4 sticky top-0 z-30 shadow-sm">
@@ -16,22 +16,18 @@ export default function AdminNavbar() {
                 </div>
 
                 <div className="flex items-center gap-6">
-                    {/* Currency Widget */}
-                    <div
-                        onClick={toggleCurrency}
-                        className="hidden md:flex flex-col items-end cursor-pointer group"
-                        title="Click to toggle currency"
-                    >
-                        <div className="flex items-center gap-2">
-                            <span className={`text-xs font-bold px-2 py-0.5 rounded-full transition-colors ${currency === 'USD' ? 'bg-brand-blue text-white' : 'bg-gray-100 text-gray-500'}`}>USD</span>
-                            <span className={`text-xs font-bold px-2 py-0.5 rounded-full transition-colors ${currency === 'VES' ? 'bg-brand-blue text-white' : 'bg-gray-100 text-gray-500'}`}>VES</span>
-                        </div>
-                        {exchangeRate && (
-                            <span className="text-[10px] text-gray-400 font-mono group-hover:text-brand-blue transition-colors">
-                                BCV: Bs. {exchangeRate.toFixed(2)}
+                    {/* Exchange Rate Display */}
+                    {exchangeRate && (
+                        <div className="hidden md:flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[16px] text-gray-400">currency_exchange</span>
+                            <span className="text-xs text-gray-500 font-mono">
+                                Bs {exchangeRate.toFixed(2)}
                             </span>
-                        )}
-                    </div>
+                            <span className="text-[9px] text-gray-300 font-mono">
+                                {rateSource === 'manual' ? 'manual' : 'BCV'}
+                            </span>
+                        </div>
+                    )}
 
                     <Link to="/" className="text-sm hover:text-brand-blue flex items-center gap-1 transition-colors font-medium">
                         <span className="material-symbols-outlined text-[18px]">storefront</span>
