@@ -29,6 +29,7 @@ const Terminos = React.lazy(() => import('./views/Terminos'));
 const Privacidad = React.lazy(() => import('./views/Privacidad'));
 const Soporte = React.lazy(() => import('./views/Soporte'));
 const AdminPortal = React.lazy(() => import('./views/AdminPortal'));
+const NotFound = React.lazy(() => import('./views/NotFound'));
 
 // Loading fallback for lazy routes
 function PageLoader() {
@@ -57,15 +58,7 @@ function App() {
           <Route path="/admin-portal-2026" element={<AdminPortal />} />
 
           {/* 404 Fallback */}
-          <Route path="*" element={
-            <div className="min-h-screen bg-brand-white flex items-center justify-center">
-              <div className="text-center">
-                <h1 className="font-sans font-bold text-4xl text-brand-blue mb-4">404</h1>
-                <p className="font-body text-lg mb-4">Página no encontrada</p>
-                <a href="/" className="text-steel-blue hover:underline">Volver al inicio</a>
-              </div>
-            </div>
-          } />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </Router>
