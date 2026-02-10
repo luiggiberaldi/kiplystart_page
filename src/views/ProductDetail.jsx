@@ -170,20 +170,19 @@ export default function ProductDetail() {
         const discount2 = product.bundle_2_discount || 10;
         const discount3 = product.bundle_3_discount || 20;
 
-        if (bundle === 2) return (basePrice * 2) * (1 - discount2 / 100);
-        if (bundle === 3) return (basePrice * 3) * (1 - discount3 / 100);
+        if (bundle === 2) return Math.ceil((basePrice * 2) * (1 - discount2 / 100));
+        if (bundle === 3) return Math.ceil((basePrice * 3) * (1 - discount3 / 100));
         return basePrice;
     };
 
     const getSavings = (bundle) => {
         if (!product) return 0;
         const basePrice = product.price;
-        const discount2 = product.bundle_2_discount || 10;
-        const discount3 = product.bundle_3_discount || 20;
-
-        if (bundle === 2) return (basePrice * 2) - ((basePrice * 2) * (1 - discount2 / 100));
-        if (bundle === 3) return (basePrice * 3) - ((basePrice * 3) * (1 - discount3 / 100));
-        return 0;
+        // Savings = Regular Price - Bundle Price
+        // Regular Price for 2 = base * 2
+        // Bundle Price for 2 = ceil(base * 2 * 0.9)
+        const bundlePrice = getPrice(bundle);
+        return (basePrice * bundle) - bundlePrice;
     };
 
     const allImages = product ? [
@@ -251,7 +250,7 @@ export default function ProductDetail() {
                             )}
                             <div className="flex items-center gap-2 md:gap-3 flex-wrap">
                                 <span className="text-brand-blue text-[26px] md:text-[32px] font-bold font-display">
-                                    ${product.price.toFixed(2)}
+                                    ${Math.ceil(product.price)}
                                 </span>
                                 {product.compare_at_price && (
                                     <span className="bg-red-100 text-brand-red text-[10px] md:text-xs font-bold px-2 py-0.5 md:py-1 rounded">
@@ -354,7 +353,7 @@ export default function ProductDetail() {
                         >
                             <span className="absolute inset-0 bg-white/20 animate-pulse-slow"></span>
                             <span className="material-symbols-outlined relative z-10 text-[18px] md:text-[20px]">shopping_cart_checkout</span>
-                            <span className="relative z-10 truncate">Reservar · Pagas al Recibir - ${getPrice().toFixed(2)}</span>
+                            <span className="relative z-10 truncate">Reservar · Pagas al Recibir - ${Math.ceil(getPrice())}</span>
                         </button>
                         {/* Risk Reversal Microcopy - Product Bible 2026 */}
                         <p className="text-center text-gray-500 text-[10px] md:text-xs mt-1">

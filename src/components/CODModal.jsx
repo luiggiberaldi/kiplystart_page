@@ -100,7 +100,7 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
             const message = `*¡Hola! Quiero confirmar mi pedido KiplyStart!* 🚀\n\n` +
                 `📦 *Producto:* ${product.name}\n` +
                 `🔢 *Cantidad:* ${quantity} ${bundleText}\n` +
-                `💰 *Total a Pagar:* $${totalPrice.toFixed(2)}\n\n` +
+                `💰 *Total a Pagar:* $${Math.ceil(totalPrice)}\n\n` +
                 `👤 *Datos de Envío:*\n` +
                 ` Nombre: ${formData.name}\n` +
                 ` C.I: ${formData.ci}\n` +
@@ -154,7 +154,7 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
                         <div className="min-w-0 flex-1">
                             <p className="font-bold text-sm text-brand-blue truncate">{product.name}</p>
                             <p className="text-[11px] md:text-xs text-gray-500">Cantidad: {quantity} {selectedBundle > 1 && `(${selectedBundle}x)`}</p>
-                            <p className="font-bold text-brand-red text-base md:text-lg">${totalPrice.toFixed(2)}</p>
+                            <p className="font-bold text-brand-red text-base md:text-lg">${Math.ceil(totalPrice)}</p>
                         </div>
                     </div>
 

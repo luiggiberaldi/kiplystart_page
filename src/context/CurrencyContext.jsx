@@ -65,14 +65,18 @@ export const CurrencyProvider = ({ children }) => {
     }, []);
 
     const formatPrice = (amountUSD) => {
-        if (!amountUSD) return '$0.00';
+        if (!amountUSD) return '$0';
 
         if (currency === 'VES' && exchangeRate) {
             const amountVES = amountUSD * exchangeRate;
             return `Bs. ${amountVES.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         }
 
-        return `$${amountUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        const hasDecimals = amountUSD % 1 !== 0;
+        return `$${amountUSD.toLocaleString('en-US', {
+            minimumFractionDigits: hasDecimals ? 2 : 0,
+            maximumFractionDigits: 2
+        })}`;
     };
 
     const value = {

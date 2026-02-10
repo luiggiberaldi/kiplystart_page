@@ -39,8 +39,8 @@ export default function BundleSelector({ product, selectedBundle, onSelectBundle
                     </div>
                 </div>
                 <div className="text-right shrink-0 ml-2">
-                    <span className="block text-[10px] md:text-xs text-gray-400 line-through">${(product.price * 2).toFixed(2)}</span>
-                    <span className="font-bold text-sm md:text-base text-brand-blue">${getPrice(2).toFixed(2)}</span>
+                    <span className="block text-[10px] md:text-xs text-gray-400 line-through">${Math.ceil(product.price * 2)}</span>
+                    <span className="font-bold text-sm md:text-base text-brand-blue">${getPrice(2)}</span>
                 </div>
             </div>
 
@@ -55,12 +55,12 @@ export default function BundleSelector({ product, selectedBundle, onSelectBundle
                     </div>
                     <div className="min-w-0">
                         <span className="font-bold text-sm md:text-base text-soft-black block">3 Unidades</span>
-                        <span className="text-[10px] text-green-600 font-bold">Ahorras ${getSavings(3).toFixed(2)}</span>
+                        <span className="text-[10px] text-green-600 font-bold">Ahorras ${Math.ceil(getSavings(3))}</span>
                     </div>
                 </div>
                 <div className="text-right shrink-0 ml-2">
-                    <span className="block text-[10px] md:text-xs text-gray-400 line-through">${(product.price * 3).toFixed(2)}</span>
-                    <span className="font-bold text-sm md:text-base text-brand-blue">${getPrice(3).toFixed(2)}</span>
+                    <span className="block text-[10px] md:text-xs text-gray-400 line-through">${Math.ceil(product.price * 3)}</span>
+                    <span className="font-bold text-sm md:text-base text-brand-blue">${getPrice(3)}</span>
                 </div>
             </div>
         </div>
