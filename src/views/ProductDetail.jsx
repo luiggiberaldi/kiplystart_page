@@ -5,6 +5,8 @@ import CODModal from '../components/CODModal';
 import ProductImageGallery from '../components/product/ProductImageGallery';
 import BundleSelector from '../components/product/BundleSelector';
 import ProductDescription from '../components/ProductDescription';
+import TrustBarSticky from '../components/TrustBarSticky';
+import PASBlock from '../components/PASBlock';
 
 /**
  * ProductDetail View (High Conversion - Enhanced)
@@ -203,22 +205,21 @@ export default function ProductDetail() {
     );
 
     return (
-        <div className="bg-background-light min-h-screen flex flex-col pb-32 font-body relative">
-            <div className="bg-brand-blue text-white text-xs font-bold text-center py-2 px-4 sticky top-0 z-40 shadow-sm">
-                🔥 ¡Oferta Flash! Termina en: <span className="font-mono text-yellow-300 text-sm ml-1">{String(timeLeft.m).padStart(2, '0')}:{String(timeLeft.s).padStart(2, '0')}</span>
-            </div>
+        <div className="bg-background-light min-h-screen flex flex-col pb-36 font-body relative">
+            {/* Trust Bar - Product Bible 2026 Standard */}
+            <TrustBarSticky />
 
-            <header className="bg-white border-b border-gray-100 sticky top-[32px] z-30">
-                <div className="flex items-center p-4 justify-between max-w-md mx-auto md:max-w-4xl">
-                    <Link to="/catalogo" className="text-brand-blue flex size-10 shrink-0 items-center justify-center cursor-pointer hover:bg-gray-50 rounded-full transition-colors">
-                        <span className="material-symbols-outlined">arrow_back</span>
+            <header className="bg-white border-b border-gray-100 sticky top-[38px] z-30">
+                <div className="flex items-center p-3 md:p-4 justify-between max-w-md mx-auto md:max-w-4xl gap-1">
+                    <Link to="/catalogo" className="text-brand-blue flex size-9 md:size-10 shrink-0 items-center justify-center cursor-pointer hover:bg-gray-50 rounded-full transition-colors">
+                        <span className="material-symbols-outlined text-[22px]">arrow_back</span>
                     </Link>
-                    <h2 className="text-brand-blue text-lg font-bold leading-tight tracking-tight flex-1 text-center font-display truncate px-2">
+                    <h2 className="text-brand-blue text-sm md:text-lg font-bold leading-tight tracking-tight flex-1 text-center font-display truncate px-1">
                         {product.name}
                     </h2>
-                    <div className="flex w-10 items-center justify-end">
+                    <div className="flex size-9 md:w-10 items-center justify-end shrink-0">
                         <button className="text-brand-blue hover:text-brand-red transition-colors">
-                            <span className="material-symbols-outlined">share</span>
+                            <span className="material-symbols-outlined text-[22px]">share</span>
                         </button>
                     </div>
                 </div>
@@ -237,23 +238,23 @@ export default function ProductDetail() {
                     viewersCount={viewersCount}
                 />
 
-                <div className="p-5 md:p-8 space-y-6">
+                <div className="p-4 md:p-8 space-y-5 md:space-y-6">
                     <div>
-                        <h1 className="text-brand-blue text-[26px] md:text-[32px] font-bold leading-tight font-display mb-2">
+                        <h1 className="text-brand-blue text-[22px] md:text-[32px] font-bold leading-tight font-display mb-2">
                             {product.name}
                         </h1>
                         <div className="flex flex-col">
                             {product.compare_at_price && (
-                                <span className="text-gray-400 text-sm line-through decoration-red-500 decoration-1 mb-0.5">
+                                <span className="text-gray-400 text-xs md:text-sm line-through decoration-red-500 decoration-1 mb-0.5">
                                     ${product.compare_at_price.toFixed(2)}
                                 </span>
                             )}
-                            <div className="flex items-center gap-3">
-                                <span className="text-brand-blue text-[32px] font-bold font-display">
+                            <div className="flex items-center gap-2 md:gap-3 flex-wrap">
+                                <span className="text-brand-blue text-[26px] md:text-[32px] font-bold font-display">
                                     ${product.price.toFixed(2)}
                                 </span>
                                 {product.compare_at_price && (
-                                    <span className="bg-red-100 text-brand-red text-xs font-bold px-2 py-1 rounded">
+                                    <span className="bg-red-100 text-brand-red text-[10px] md:text-xs font-bold px-2 py-0.5 md:py-1 rounded">
                                         AHORRAS {Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)}%
                                     </span>
                                 )}
@@ -263,14 +264,14 @@ export default function ProductDetail() {
 
                     {product.stock !== null && (
                         <div className="flex items-center gap-2">
-                            <div className="h-2 flex-1 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-2 flex-1 min-w-[60px] bg-gray-100 rounded-full overflow-hidden">
                                 <div
                                     className={`h-full rounded-full ${product.stock <= (product.low_stock_threshold || 5) ? 'bg-brand-red animate-pulse' : 'bg-green-500'}`}
                                     style={{ width: `${Math.min((product.stock / 30) * 100, 100)}%` }}
                                 ></div>
                             </div>
-                            <span className={`text-xs font-bold ${product.stock <= (product.low_stock_threshold || 5) ? 'text-brand-red' : 'text-green-600'}`}>
-                                {product.stock <= (product.low_stock_threshold || 5) ? '¡Quedan pocas unidades!' : `${product.stock} disponibles`}
+                            <span className={`text-[11px] md:text-xs font-bold whitespace-nowrap ${product.stock <= (product.low_stock_threshold || 5) ? 'text-brand-red' : 'text-green-600'}`}>
+                                {product.stock <= (product.low_stock_threshold || 5) ? '¡Pocas unidades!' : `${product.stock} disponibles`}
                             </span>
                         </div>
                     )}
@@ -284,6 +285,9 @@ export default function ProductDetail() {
                     />
 
                     <ProductDescription description={product.description} />
+
+                    {/* PAS Block - Product Bible 2026 Standard */}
+                    <PASBlock product={product} />
 
                     {product.tags && product.tags.length > 0 && (
                         <div className="flex flex-wrap gap-2">
@@ -323,35 +327,40 @@ export default function ProductDetail() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 px-5 pb-8">
-                    <div className="bg-white p-4 rounded-lg border border-gray-100 flex flex-col items-center text-center shadow-sm">
-                        <span className="material-symbols-outlined text-brand-blue mb-2">local_shipping</span>
-                        <span className="text-xs font-bold text-gray-800 uppercase">Envío Gratis</span>
+                <div className="grid grid-cols-2 gap-2 md:gap-3 px-4 md:px-5 pb-8">
+                    <div className="bg-white p-3 md:p-4 rounded-lg border border-gray-100 flex flex-col items-center text-center shadow-sm">
+                        <span className="material-symbols-outlined text-brand-blue mb-1 md:mb-2 text-[22px] md:text-[24px]">local_shipping</span>
+                        <span className="text-[11px] md:text-xs font-bold text-gray-800 uppercase">Envío Gratis</span>
                         <span className="text-[10px] text-gray-500">A toda Venezuela</span>
                     </div>
-                    <div className="bg-white p-4 rounded-lg border border-gray-100 flex flex-col items-center text-center shadow-sm">
-                        <span className="material-symbols-outlined text-brand-blue mb-2">workspace_premium</span>
-                        <span className="text-xs font-bold text-gray-800 uppercase">Garantía Total</span>
-                        <span className="text-[10px] text-gray-500">3 Meses de Cobertura</span>
+                    <div className="bg-white p-3 md:p-4 rounded-lg border border-gray-100 flex flex-col items-center text-center shadow-sm">
+                        <span className="material-symbols-outlined text-brand-blue mb-1 md:mb-2 text-[22px] md:text-[24px]">workspace_premium</span>
+                        <span className="text-[11px] md:text-xs font-bold text-gray-800 uppercase">Garantía Total</span>
+                        <span className="text-[10px] text-gray-500">3 Meses Cobertura</span>
                     </div>
                 </div>
             </main>
 
-            <div className="fixed bottom-0 left-0 right-0 bg-white p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] border-t border-gray-100 z-50 animate-slideUp">
-                <div className="max-w-md mx-auto md:max-w-4xl flex gap-3 items-center">
+            <div className="fixed bottom-0 left-0 right-0 bg-white p-3 md:p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] border-t border-gray-100 z-50 animate-slideUp" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+                <div className="max-w-md mx-auto md:max-w-4xl flex flex-col md:flex-row gap-1.5 md:gap-3 md:items-center">
                     <div className="hidden md:block flex-1">
                         <p className="font-bold text-brand-blue">{product.name}</p>
                         <p className="text-xs text-gray-500">Envío Gratis + Pago al Recibir</p>
                     </div>
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="w-full md:w-auto md:min-w-[300px] h-14 bg-brand-red text-white font-display font-bold text-[18px] rounded-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-transform shadow-lg shadow-brand-red/25 relative overflow-hidden"
-                    >
-                        <span className="absolute inset-0 bg-white/20 animate-pulse-slow"></span>
-                        <span className="material-symbols-outlined relative z-10">shopping_cart_checkout</span>
-                        <span className="relative z-10">Comprar Ahora - ${getPrice().toFixed(2)}</span>
-                    </button>
-                    <div className="h-2 md:hidden"></div>
+                    <div className="flex flex-col items-center w-full md:w-auto">
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="w-full md:w-auto md:min-w-[300px] h-[46px] md:h-14 bg-green-600 hover:bg-green-700 text-white font-display font-bold text-[14px] md:text-[18px] rounded-xl flex items-center justify-center gap-1.5 md:gap-2 active:scale-[0.98] transition-all shadow-lg shadow-green-600/25 relative overflow-hidden px-3 md:px-4"
+                        >
+                            <span className="absolute inset-0 bg-white/20 animate-pulse-slow"></span>
+                            <span className="material-symbols-outlined relative z-10 text-[18px] md:text-[20px]">shopping_cart_checkout</span>
+                            <span className="relative z-10 truncate">Reservar · Pagas al Recibir - ${getPrice().toFixed(2)}</span>
+                        </button>
+                        {/* Risk Reversal Microcopy - Product Bible 2026 */}
+                        <p className="text-center text-gray-500 text-[10px] md:text-xs mt-1">
+                            ✓ Verificas antes de pagar · ✓ Devolución gratis 30 días
+                        </p>
+                    </div>
                 </div>
             </div>
 

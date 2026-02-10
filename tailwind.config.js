@@ -4,7 +4,7 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: "class", // Stitch uses "class" strategy
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
@@ -14,24 +14,17 @@ export default {
         'brand-white': '#F5F5F5',    // -34% fatiga visual vs. blanco puro
         'soft-black': '#212529',     // +18% legibilidad vs. #000
         'steel-blue': '#457B9D',     // CTAs secundarios, puente emocional
+        'sky-blue': '#A8DADC',       // Acentos decorativos suaves
         'success': '#10B981',        // Stock disponible
         'warning': '#F59E0B',        // Stock bajo (<5 unidades)
-        primary: {
-          DEFAULT: '#062665', // Stitch Primary
-          'brand-blue': '#062665',
-          'brand-red': '#E63946',
-          'soft-black': '#212529',
-          'steel-blue': '#457B9D',
-          'sky-blue': '#A8DADC',
-          'brand-white': '#f5f5f5',
-          'background-light': '#f5f5f5',
-          'background-dark': '#101622',
-        },
-        accent: {
-          DEFAULT: '#E63946', // Stitch Accent
-        },
         'background-light': '#f5f5f5',
         'background-dark': '#101622',
+        primary: {
+          DEFAULT: '#0A2463',
+        },
+        accent: {
+          DEFAULT: '#E63946',
+        },
       },
       fontFamily: {
         'sans': ['Inter', 'sans-serif'],
@@ -39,11 +32,15 @@ export default {
         'display': ['Inter', 'sans-serif'],
       },
       borderRadius: {
-        DEFAULT: '1rem',
-        'lg': '2rem',
-        'xl': '3rem',
-        '2xl': '1rem',
-        '3xl': '1.5rem',
+        // 8px grid system compliant
+        'sm': '0.25rem',   // 4px
+        DEFAULT: '0.5rem', // 8px
+        'md': '0.75rem',   // 12px
+        'lg': '1rem',      // 16px
+        'xl': '1.5rem',    // 24px
+        '2xl': '2rem',     // 32px
+        '3xl': '3rem',     // 48px
+        'full': '9999px',  // pills
       },
     },
   },

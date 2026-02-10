@@ -22,15 +22,14 @@ export const CurrencyProvider = ({ children }) => {
 
         // 1. Try Private Google Script API (Primary)
         try {
-            // Check vite.config.js for /google-api proxy
-            const response = await fetch('/google-api/macros/s/AKfycbxT9sKz_XWRWuQx_XP-BJ33T0hoAgJsLwhZA00v6nPt4Ij4jRjq-90mDGLVCsS6FXwW9Q/exec?token=Lvbp1994');
+            const bcvToken = import.meta.env.VITE_BCV_TOKEN || '';
+            const response = await fetch(`/google-api/macros/s/AKfycbxT9sKz_XWRWuQx_XP-BJ33T0hoAgJsLwhZA00v6nPt4Ij4jRjq-90mDGLVCsS6FXwW9Q/exec?token=${bcvToken}`);
             const data = await response.json();
             if (data.bcv && data.bcv.price) {
                 rate = data.bcv.price;
-                console.log('Using Private BCV API Rate:', rate);
             }
-        } catch (error) {
-            console.warn('Private API failed, trying public API...', error);
+        } catch {
+            // Private API failed, try public API
         }
 
         // 2. Try Public API (Fallback 1)
@@ -43,16 +42,14 @@ export const CurrencyProvider = ({ children }) => {
                 } else if (data.bcv) {
                     rate = data.bcv.price || data.bcv.rate;
                 }
-                if (rate) console.log('Using Public BCV API Rate:', rate);
-            } catch (error) {
-                console.warn('Public API failed, using hardcoded fallback...', error);
+            } catch {
+                // Public API failed, using hardcoded fallback
             }
         }
 
         // 3. Hardcoded Fallback (Fallback 2)
         if (!rate || isNaN(rate)) {
             rate = 55.00; // Safe fallback
-            console.warn('Using Hardcoded Fallback Rate:', rate);
         }
 
         setExchangeRate(rate);

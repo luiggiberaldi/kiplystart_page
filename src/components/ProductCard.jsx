@@ -1,13 +1,14 @@
 /**
  * ProductCard Component
  * @description
- * Individual product display card.
- * Implements Von Restorff (ONLY button in red), Progressive Disclosure (hide specs).
+ * Individual product display card with risk-reversal CTA.
+ * Implements Von Restorff (green CTA stands out), Progressive Disclosure.
  * 
- * Brain Validation:
- * - ✅ Von Restorff: Solo botón rojo
+ * Brain Validation (Product Bible 2026):
+ * - ✅ Von Restorff: Green CTA button (risk-reversal)
  * - ✅ Tipografía: Inter para título/precio, Open Sans descripción
  * - ✅ Touch target: botón 48px mínimo
+ * - ✅ CTA: Risk-reversal copy "Pedir · Pagas al Recibir"
  * 
  * @param {Object} props
  * @param {Object} props.product - Product object
@@ -21,8 +22,11 @@
  */
 
 import { Link } from 'react-router-dom';
+import { useCurrency } from '../context/CurrencyContext';
 
 export default function ProductCard({ product, loading = false }) {
+    const { formatPrice } = useCurrency();
+
     // Skeleton Loading State (24% más rápido percibido que spinner)
     if (loading) {
         return (
@@ -52,6 +56,8 @@ export default function ProductCard({ product, loading = false }) {
                         alt={product.name}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         loading="lazy"
+                        width="300"
+                        height="300"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -63,23 +69,32 @@ export default function ProductCard({ product, loading = false }) {
                         Quedan {product.stock}
                     </div>
                 )}
+                {product.stock === 0 && (
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <span className="bg-white text-soft-black text-sm font-bold px-4 py-2 rounded-full">Agotado</span>
+                    </div>
+                )}
             </div>
 
             <div className="flex-grow">
-                <h3 className="text-[18px] font-semibold text-soft-black leading-tight mb-1 font-display line-clamp-2">
+                <h3 className="text-[16px] md:text-[18px] font-semibold text-soft-black leading-tight mb-1 font-display line-clamp-2">
                     {product.name}
                 </h3>
-                <p className="text-[24px] font-medium text-brand-blue mb-1">
-                    ${product.price?.toFixed(2)}
+                <p className="text-[22px] md:text-[24px] font-bold text-brand-blue mb-1">
+                    {formatPrice(product.price)}
                 </p>
-                {/* Optional description or extra info if needed, keeping it clean as per Stitch */}
+                <p className="text-xs text-gray-500 mb-2">
+                    Envío Gratis · Tasa BCV
+                </p>
             </div>
 
             <Link
                 to={`/producto/${product.id}`}
-                className="w-full h-[44px] bg-brand-blue hover:bg-brand-blue/90 text-white font-bold rounded-lg transition-colors text-sm flex items-center justify-center mt-auto"
+                className="w-full h-[48px] bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-colors text-sm flex items-center justify-center mt-auto gap-1.5 active:scale-[0.98] shadow-md shadow-green-600/20"
+                aria-label={`Pedir ${product.name} con pago al recibir`}
             >
-                Ver Detalles
+                <span className="material-symbols-outlined text-[18px]">shopping_cart_checkout</span>
+                Pedir · Pagas al Recibir
             </Link>
         </div>
     );

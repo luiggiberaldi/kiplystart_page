@@ -20,6 +20,8 @@ import { supabase } from '../lib/supabaseClient';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
+const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '584241234567';
+
 export default function Checkout() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
@@ -33,6 +35,7 @@ export default function Checkout() {
         address: ''
     });
     const [loading, setLoading] = useState(false);
+    const [orderError, setOrderError] = useState(null);
 
     // Fetch product details
     useEffect(() => {
@@ -80,6 +83,7 @@ export default function Checkout() {
         setLoading(true);
 
         try {
+            setOrderError(null);
             // 1. Insert order into Supabase
             const { data, error } = await supabase
                 .from('orders')
@@ -100,12 +104,11 @@ export default function Checkout() {
             const message = `Hola! Quiero confirmar mi pedido:\n\n- Producto: ${product.name}\n- Cantidad: ${quantity}\n- Precio Total: $${(product.price * quantity).toFixed(2)}\n- Nombre: ${formData.name}\n- Dirección: ${formData.address}\n\nNúmero de orden: ${data.id.substring(0, 8)}`;
 
             // 3. Redirect to WhatsApp
-            const whatsappUrl = `https://wa.me/584241234567?text=${encodeURIComponent(message)}`;
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
             window.location.href = whatsappUrl;
 
-        } catch (err) {
-            console.error('Error creating order:', err);
-            alert('Error al crear el pedido. Inténtalo de nuevo.');
+        } catch {
+            setOrderError('Error al crear el pedido. Por favor, inténtalo de nuevo.');
             setLoading(false);
         }
     };
@@ -165,6 +168,7 @@ export default function Checkout() {
                                 <button
                                     onClick={decrementQuantity}
                                     className="bg-gray-200 w-12 h-12 rounded hover:bg-gray-300 transition"
+                                    aria-label="Reducir cantidad"
                                     type="button"
                                 >
                                     −
@@ -175,6 +179,7 @@ export default function Checkout() {
                                 <button
                                     onClick={incrementQuantity}
                                     className="bg-gray-200 w-12 h-12 rounded hover:bg-gray-300 transition"
+                                    aria-label="Aumentar cantidad"
                                     type="button"
                                 >
                                     +
@@ -252,6 +257,14 @@ export default function Checkout() {
                                     className="w-full border border-gray-300 rounded-lg px-4 py-3 font-body focus:outline-none focus:ring-2 focus:ring-brand-blue resize-none"
                                 />
                             </div>
+
+                            {/* Error Message (replaces native alert) */}
+                            {orderError && (
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2" role="alert">
+                                    <span className="material-symbols-outlined text-brand-red text-[20px]">error</span>
+                                    <p className="text-brand-red text-sm font-medium">{orderError}</p>
+                                </div>
+                            )}
 
                             {/* Submit Button (Von Restorff: ÚNICO rojo) */}
                             <button

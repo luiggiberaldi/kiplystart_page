@@ -35,7 +35,7 @@ export default function ProductDescription({ description }) {
                     inList = false;
                 }
                 elements.push(
-                    <h1 key={`h1-${i}`} className="text-[#1a202c] text-[28px] md:text-[36px] font-bold leading-tight mb-4">
+                    <h1 key={`h1-${i}`} className="text-[#1a202c] text-[22px] md:text-[36px] font-bold leading-tight mb-3 md:mb-4">
                         {line.substring(2)}
                     </h1>
                 );
@@ -141,7 +141,7 @@ export default function ProductDescription({ description }) {
     };
 
     return (
-        <div className="product-description border-t border-gray-100 pt-4">
+        <div className="product-description border-t border-gray-100 pt-4 overflow-hidden break-words">
             {renderContent()}
         </div>
     );

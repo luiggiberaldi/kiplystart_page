@@ -1,6 +1,14 @@
 {
     "rewrites": [
         {
+            "source": "/api/:path*",
+            "destination": "https://pydolarvenezuela-api.vercel.app/api/:path*"
+        },
+        {
+            "source": "/google-api/:path*",
+            "destination": "https://script.google.com/:path*"
+        },
+        {
             "source": "/(.*)",
             "destination": "/index.html"
         }

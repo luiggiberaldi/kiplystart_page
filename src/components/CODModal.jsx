@@ -130,38 +130,38 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
             ></div>
 
             {/* Modal Content */}
-            <div className="relative bg-white w-full max-w-lg sm:rounded-2xl rounded-t-2xl shadow-2xl max-h-[90vh] overflow-y-auto animate-slideUp">
+            <div className="relative bg-white w-full max-w-lg sm:rounded-2xl rounded-t-2xl shadow-2xl max-h-[90vh] overflow-y-auto animate-slideUp" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
 
                 {/* Header */}
-                <div className="sticky top-0 bg-brand-blue text-white p-4 flex justify-between items-center z-10">
-                    <div className="flex items-center gap-2">
-                        <span className="material-symbols-outlined">local_shipping</span>
-                        <h3 className="font-display font-bold text-lg">Envío Rápido y Seguro</h3>
+                <div className="sticky top-0 bg-brand-blue text-white p-3 md:p-4 flex justify-between items-center z-10">
+                    <div className="flex items-center gap-1.5 md:gap-2 min-w-0">
+                        <span className="material-symbols-outlined text-[20px] md:text-[24px] shrink-0">local_shipping</span>
+                        <h3 className="font-display font-bold text-base md:text-lg truncate">Envío Rápido y Seguro</h3>
                     </div>
-                    <button onClick={onClose} className="text-white/80 hover:text-white">
+                    <button onClick={onClose} className="text-white/80 hover:text-white shrink-0 ml-2">
                         <span className="material-symbols-outlined">close</span>
                     </button>
                 </div>
 
                 {/* Form Body */}
-                <div className="p-6">
+                <div className="p-4 md:p-6">
                     {/* Product Summary */}
-                    <div className="flex gap-4 mb-6 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                        <div className="w-16 h-16 bg-white rounded-md border border-gray-200 p-1 flex-shrink-0">
+                    <div className="flex gap-3 md:gap-4 mb-4 md:mb-6 bg-gray-50 p-2.5 md:p-3 rounded-lg border border-gray-100">
+                        <div className="w-14 h-14 md:w-16 md:h-16 bg-white rounded-md border border-gray-200 p-1 flex-shrink-0">
                             <img src={product.image_url} alt={product.name} className="w-full h-full object-contain" />
                         </div>
-                        <div>
-                            <p className="font-bold text-sm text-brand-blue line-clamp-1">{product.name}</p>
-                            <p className="text-xs text-gray-500">Cantidad: {quantity} {selectedBundle > 1 && `(${selectedBundle}x Bundle)`}</p>
-                            <p className="font-bold text-brand-red text-lg">${totalPrice.toFixed(2)}</p>
+                        <div className="min-w-0 flex-1">
+                            <p className="font-bold text-sm text-brand-blue truncate">{product.name}</p>
+                            <p className="text-[11px] md:text-xs text-gray-500">Cantidad: {quantity} {selectedBundle > 1 && `(${selectedBundle}x)`}</p>
+                            <p className="font-bold text-brand-red text-base md:text-lg">${totalPrice.toFixed(2)}</p>
                         </div>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4 font-body">
-                        <h4 className="font-bold text-gray-800 border-b pb-2 mb-4">Datos de Entrega</h4>
+                        <h4 className="font-bold text-sm md:text-base text-gray-800 border-b pb-2 mb-3 md:mb-4">Datos de Entrega</h4>
 
                         {/* Name & CI row */}
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label className="block text-xs font-bold text-gray-700 mb-1">Nombre Completo *</label>
                                 <input
@@ -203,7 +203,7 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
                         </div>
 
                         {/* City & State row */}
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label className="block text-xs font-bold text-gray-700 mb-1">Estado</label>
                                 <select
@@ -263,11 +263,11 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
                         </div>
 
                         {/* Submit Button */}
-                        <div className="pt-4 pb-2">
+                        <div className="pt-3 md:pt-4 pb-2">
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full bg-brand-red text-white font-display font-bold text-lg py-4 rounded-xl shadow-lg shadow-brand-red/30 active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
+                                className="w-full bg-brand-red text-white font-display font-bold text-base md:text-lg py-3.5 md:py-4 rounded-xl shadow-lg shadow-brand-red/30 active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
                             >
                                 {loading ? (
                                     <span className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>

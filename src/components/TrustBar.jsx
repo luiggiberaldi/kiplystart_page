@@ -2,11 +2,12 @@
  * TrustBar Component
  * @description
  * Visual 3-step process: Pides → Recibes → Pagas.
- * Implements Progressive Disclosure and builds trust.
+ * Uses Material Symbols for cross-device consistency.
  * 
  * Brain Validation:
  * - ✅ 3 pasos claros (cognitive load reduction)
- * - ✅ Iconografía simple (reconocimiento rápido)
+ * - ✅ Material Symbols (consistencia visual cross-device)
+ * - ✅ Brand-blue sobre fondo brand-blue/10 (paleta Safety-First)
  * 
  * @returns {JSX.Element} TrustBar component
  */
@@ -14,19 +15,19 @@
 export default function TrustBar() {
     const steps = [
         {
-            icon: '🛍️',
+            icon: 'shopping_bag',
             number: '1',
             title: 'Pides',
             desc: 'Selecciona tu producto'
         },
         {
-            icon: '📦',
+            icon: 'package_2',
             number: '2',
             title: 'Recibes',
             desc: 'Entrega en tu puerta'
         },
         {
-            icon: '💵',
+            icon: 'payments',
             number: '3',
             title: 'Pagas',
             desc: 'Solo cuando lo recibas'
@@ -34,27 +35,27 @@ export default function TrustBar() {
     ];
 
     return (
-        <section className="bg-white py-12 px-4">
-            <div className="max-w-4xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {steps.map((step) => (
-                        <div key={step.number} className="text-center">
-                            {/* Icon */}
-                            <div className="text-5xl mb-4">{step.icon}</div>
-
-                            {/* Step number + title */}
-                            <h3 className="font-sans font-semibold text-xl text-brand-blue mb-2">
-                                {step.number}. {step.title}
-                            </h3>
-
-                            {/* Description */}
-                            <p className="font-body text-sm text-soft-black">
-                                {step.desc}
-                            </p>
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div className="flex justify-between items-start gap-2">
+                {steps.map((step, i) => (
+                    <div key={step.number} className="contents">
+                        <div className="flex flex-col items-center flex-1 text-center gap-3">
+                            <div className="w-12 h-12 rounded-full bg-brand-blue/10 flex items-center justify-center text-brand-blue">
+                                <span className="material-symbols-outlined text-[28px]">{step.icon}</span>
+                            </div>
+                            <div>
+                                <p className="text-sm font-bold text-brand-blue">{step.number}. {step.title}</p>
+                                <p className="text-xs text-gray-500 mt-1">{step.desc}</p>
+                            </div>
                         </div>
-                    ))}
-                </div>
+                        {i < steps.length - 1 && (
+                            <div className="pt-4 text-gray-300 shrink-0">
+                                <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+                            </div>
+                        )}
+                    </div>
+                ))}
             </div>
-        </section>
+        </div>
     );
 }

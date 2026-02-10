@@ -23,6 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 
+# Environment variables (CRITICAL: never commit secrets)
+.env
+.env.local
+.env.*.local
+
 # Project specific ignores
 tema shopify/
 *.py
@@ -38,3 +43,20 @@ trim_hero_webp.py
 verify_mcp.py
 branding_research_script*.py
 VERCEL_DEPLOYMENT.md
+
+# Large media files
+*.mp4
+temp_cookies.txt
+admin-update.html
+typography-mockup.html
+
+# DroPanas auth & reports (SENSITIVE — contains session cookies)
+state.json
+reporte_dropanas_*.json
+productos_facebook_manual/
+productos_facebook.csv
+
+# Generated / heavy folders
+remotion-studio/
+.antigravity-skills/
+scripts/
