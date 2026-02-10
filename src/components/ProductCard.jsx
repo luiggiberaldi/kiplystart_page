@@ -90,11 +90,14 @@ export default function ProductCard({ product, loading = false }) {
 
             <Link
                 to={`/producto/${product.id}`}
-                className="w-full h-[48px] bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-colors text-sm flex items-center justify-center mt-auto gap-1.5 active:scale-[0.98] shadow-md shadow-green-600/20"
+                className="w-full min-h-[40px] sm:min-h-[48px] py-1.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-colors flex items-center justify-center mt-auto active:scale-[0.98] shadow-md shadow-green-600/20 px-2 gap-1"
                 aria-label={`Pedir ${product.name} con pago al recibir`}
             >
-                <span className="material-symbols-outlined text-[18px]">shopping_cart_checkout</span>
-                Pedir · Pagas al Recibir
+                <span className="material-symbols-outlined text-[14px] sm:text-[18px]">shopping_cart_checkout</span>
+                <span className="flex flex-col sm:flex-row sm:gap-1 items-center leading-tight">
+                    <span className="text-[11px] sm:text-sm">Pedir ·</span>
+                    <span className="text-[10px] sm:text-sm font-semibold">Pagas al Recibir</span>
+                </span>
             </Link>
         </div>
     );
