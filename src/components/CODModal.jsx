@@ -111,7 +111,8 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
                 `_Espero confirmación para el envío. Gracias!_`;
 
             // 3. Redirect
-            const whatsappUrl = `https://wa.me/584241234567?text=${encodeURIComponent(message)}`;
+            const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '584241234567';
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
             window.location.href = whatsappUrl;
 
         } catch (err) {

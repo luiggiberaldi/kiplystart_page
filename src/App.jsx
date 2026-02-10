@@ -9,7 +9,6 @@
  * - / → Home (landing page)
  * - /catalogo → Product catalog
  * - /producto/:id → Product detail
- * - /checkout → Checkout flow
  * - /terminos → Terms & Conditions
  * - /privacidad → Privacy Policy
  * - /soporte → Support / Help Center
@@ -25,7 +24,7 @@ import Home from './views/Home';
 // Lazy-loaded routes for code splitting
 const Catalogo = React.lazy(() => import('./views/Catalogo'));
 const ProductDetail = React.lazy(() => import('./views/ProductDetail'));
-const Checkout = React.lazy(() => import('./views/Checkout'));
+
 const Terminos = React.lazy(() => import('./views/Terminos'));
 const Privacidad = React.lazy(() => import('./views/Privacidad'));
 const Soporte = React.lazy(() => import('./views/Soporte'));
@@ -51,7 +50,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/catalogo" element={<Catalogo />} />
           <Route path="/producto/:id" element={<ProductDetail />} />
-          <Route path="/checkout" element={<Checkout />} />
+
           <Route path="/terminos" element={<Terminos />} />
           <Route path="/privacidad" element={<Privacidad />} />
           <Route path="/soporte" element={<Soporte />} />
