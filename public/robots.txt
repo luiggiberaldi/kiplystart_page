@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Allow: /catalogo
+Allow: /producto/
+Allow: /terminos
+Allow: /privacidad
+Allow: /soporte
+
+# Block admin and internal paths
+Disallow: /admin-portal-2026
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://www.kiplystart.com/sitemap.xml
