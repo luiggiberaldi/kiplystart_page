@@ -22,6 +22,7 @@ export default function ProductTable({
     onEdit,
     onDelete,
     onToggleStatus,
+    onToggleFeatured,
     onClone,
     formatPrice
 }) {
@@ -79,6 +80,7 @@ export default function ProductTable({
                             onEdit={onEdit}
                             onDelete={onDelete}
                             onToggleStatus={onToggleStatus}
+                            onToggleFeatured={onToggleFeatured}
                             onClone={onClone}
                             formatPrice={formatPrice}
                             productSlug={productSlug}
@@ -128,6 +130,7 @@ export default function ProductTable({
             onEdit={onEdit}
             onDelete={onDelete}
             onToggleStatus={onToggleStatus}
+            onToggleFeatured={onToggleFeatured}
             onClone={onClone}
             formatPrice={formatPrice}
             productSlug={productSlug}

@@ -10,7 +10,7 @@ export default function AdminLogin({ onSuccess }) {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const ADMIN_PASSWORD = 'kiplystart2026'; // Change this
+    const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || '';
 
     function handleSubmit(e) {
         e.preventDefault();
@@ -20,6 +20,7 @@ export default function AdminLogin({ onSuccess }) {
         setTimeout(() => {
             if (password === ADMIN_PASSWORD) {
                 sessionStorage.setItem('admin_auth', 'true');
+                localStorage.setItem('kp_admin_device', 'true');
                 onSuccess();
             } else {
                 setError('Contraseña incorrecta');

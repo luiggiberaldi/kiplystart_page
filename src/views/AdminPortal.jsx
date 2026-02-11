@@ -146,6 +146,20 @@ export default function AdminPortal() {
         }
     }
 
+    async function handleToggleFeatured(product) {
+        try {
+            const { error } = await supabase
+                .from("products")
+                .update({ featured: !product.featured })
+                .eq('id', product.id);
+            if (error) throw error;
+            showMessage('success', `${!product.featured ? '⭐ Destacado' : 'Destacado removido'}`);
+            fetchProducts();
+        } catch (err) {
+            showMessage('error', `Error: ${err.message}`);
+        }
+    }
+
     function handleEdit(product) {
         setEditingProduct(product);
         setDrawerOpen(true);
@@ -324,6 +338,7 @@ export default function AdminPortal() {
                                         onDelete={handleDelete}
                                         onRefresh={fetchProducts}
                                         onToggleStatus={handleToggleStatus}
+                                        onToggleFeatured={handleToggleFeatured}
                                         onClone={handleClone}
                                     />
                                 )}

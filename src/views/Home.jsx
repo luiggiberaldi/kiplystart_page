@@ -30,6 +30,7 @@ const Home = () => {
                 .from('products')
                 .select('*')
                 .eq('is_active', true)
+                .eq('featured', true)
                 .limit(4)
                 .order('created_at', { ascending: false });
 

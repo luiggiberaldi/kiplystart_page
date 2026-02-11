@@ -8,7 +8,7 @@ import ProductTable from './product-list/ProductTable';
  * ProductList v3.0 (Modularized)
  * Contains state management and composition of sub-components.
  */
-export default function ProductList({ products, onEdit, onDelete, onRefresh, onToggleStatus, onClone }) {
+export default function ProductList({ products, onEdit, onDelete, onRefresh, onToggleStatus, onToggleFeatured, onClone }) {
     const { formatPrice } = useCurrency();
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCategory, setFilterCategory] = useState('all');
@@ -150,6 +150,7 @@ export default function ProductList({ products, onEdit, onDelete, onRefresh, onT
                 onEdit={onEdit}
                 onDelete={onDelete}
                 onToggleStatus={onToggleStatus}
+                onToggleFeatured={onToggleFeatured}
                 onClone={onClone}
                 formatPrice={formatPrice}
             />

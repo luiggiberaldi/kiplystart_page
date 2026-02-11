@@ -12,6 +12,10 @@ export default function usePageTracker() {
     const sessionId = useRef(getOrCreateSessionId());
 
     useEffect(() => {
+        // Skip tracking for admin devices and admin pages
+        if (localStorage.getItem('kp_admin_device')) return;
+        if (window.location.pathname.startsWith('/admin')) return;
+
         const path = window.location.pathname;
 
         // 1. Record page view

@@ -2,6 +2,7 @@
  * ProductTableDesktop
  * Renders the full product table for desktop/tablet view.
  */
+import { useSettings } from '../../../context/SettingsContext';
 export default function ProductTableDesktop({
     products,
     totalCount,
@@ -19,10 +20,13 @@ export default function ProductTableDesktop({
     onEdit,
     onDelete,
     onToggleStatus,
+    onToggleFeatured,
     onClone,
     formatPrice,
     productSlug
 }) {
+    const { settings } = useSettings();
+    const shippingCost = settings.shipping_cost || 8;
 
     const SortIcon = ({ col }) => {
         if (sortBy !== col) return <span className="material-symbols-outlined text-[14px] text-gray-300">unfold_more</span>;
@@ -66,9 +70,6 @@ export default function ProductTableDesktop({
                             </tr>
                         ) : (
                             products.map((product) => {
-                                const margin = product.dropanas_price
-                                    ? { amount: product.price - product.dropanas_price, pct: (((product.price - product.dropanas_price) / product.price) * 100).toFixed(0) }
-                                    : null;
 
                                 return (
                                     <tr key={product.id}
@@ -101,14 +102,21 @@ export default function ProductTableDesktop({
                                             )}
                                         </td>
                                         <td className="p-3">
-                                            {margin ? (
-                                                <div className="space-y-0.5">
-                                                    <p className="text-[10px] text-gray-400 font-mono">${product.dropanas_price}</p>
-                                                    <span className={`text-xs font-bold ${parseFloat(margin.pct) >= 25 ? 'text-green-600' : parseFloat(margin.pct) >= 15 ? 'text-yellow-600' : 'text-red-500'}`}>
-                                                        +${margin.amount} ({margin.pct}%)
-                                                    </span>
-                                                </div>
-                                            ) : (
+                                            {product.dropanas_price ? (() => {
+                                                const totalCost = product.dropanas_price + shippingCost;
+                                                const marginAmt = product.price - totalCost;
+                                                const marginPct = ((marginAmt / product.price) * 100).toFixed(0);
+                                                return (
+                                                    <div className="space-y-0.5">
+                                                        <p className="text-[10px] text-gray-400 font-mono">
+                                                            ${product.dropanas_price} + ${shippingCost} = <span className="font-bold text-gray-600">${totalCost}</span>
+                                                        </p>
+                                                        <span className={`text-xs font-bold ${parseFloat(marginPct) >= 25 ? 'text-green-600' : parseFloat(marginPct) >= 15 ? 'text-yellow-600' : 'text-red-500'}`}>
+                                                            +${marginAmt.toFixed(0)} ({marginPct}%)
+                                                        </span>
+                                                    </div>
+                                                );
+                                            })() : (
                                                 <span className="text-[10px] text-gray-300">—</span>
                                             )}
                                         </td>
@@ -160,6 +168,13 @@ export default function ProductTableDesktop({
                                                         {product.is_active ? 'visibility' : 'visibility_off'}
                                                     </span>
                                                 </button>
+                                                <button onClick={() => onToggleFeatured(product)}
+                                                    className={`p-1.5 rounded-lg transition-colors ${product.featured ? 'text-yellow-500 hover:bg-yellow-50' : 'text-gray-300 hover:text-yellow-500 hover:bg-yellow-50'}`}
+                                                    title={product.featured ? 'Quitar de destacados' : 'Destacar'}>
+                                                    <span className="material-symbols-outlined text-[18px]" style={product.featured ? { fontVariationSettings: "'FILL' 1" } : {}}>
+                                                        star
+                                                    </span>
+                                                </button>
                                                 <button onClick={() => onEdit(product)}
                                                     className="p-1.5 text-steel-blue hover:text-brand-blue hover:bg-blue-50 rounded-lg transition-colors"
                                                     title="Editar">
@@ -188,32 +203,34 @@ export default function ProductTableDesktop({
             </div>
 
             {/* Pagination Controls */}
-            {totalPages > 1 && (
-                <div className="flex items-center justify-between border-t border-gray-200 pt-4 px-2 pb-2">
-                    <div className="text-xs text-gray-500 pl-2">
-                        Mostrando {((currentPage - 1) * itemsPerPage) + 1} a {Math.min(currentPage * itemsPerPage, totalCount)} de {totalCount} productos
+            {
+                totalPages > 1 && (
+                    <div className="flex items-center justify-between border-t border-gray-200 pt-4 px-2 pb-2">
+                        <div className="text-xs text-gray-500 pl-2">
+                            Mostrando {((currentPage - 1) * itemsPerPage) + 1} a {Math.min(currentPage * itemsPerPage, totalCount)} de {totalCount} productos
+                        </div>
+                        <div className="flex items-center gap-2 pr-2">
+                            <button
+                                onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+                                disabled={currentPage === 1}
+                                className="p-2 hover:bg-gray-100 rounded-lg disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                            >
+                                <span className="material-symbols-outlined text-[18px]">chevron_left</span>
+                            </button>
+                            <span className="text-sm font-medium text-gray-700">
+                                Página {currentPage} de {totalPages}
+                            </span>
+                            <button
+                                onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+                                disabled={currentPage === totalPages}
+                                className="p-2 hover:bg-gray-100 rounded-lg disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                            >
+                                <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+                            </button>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-2 pr-2">
-                        <button
-                            onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-                            disabled={currentPage === 1}
-                            className="p-2 hover:bg-gray-100 rounded-lg disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
-                        >
-                            <span className="material-symbols-outlined text-[18px]">chevron_left</span>
-                        </button>
-                        <span className="text-sm font-medium text-gray-700">
-                            Página {currentPage} de {totalPages}
-                        </span>
-                        <button
-                            onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-                            disabled={currentPage === totalPages}
-                            className="p-2 hover:bg-gray-100 rounded-lg disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
-                        >
-                            <span className="material-symbols-outlined text-[18px]">chevron_right</span>
-                        </button>
-                    </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 }
