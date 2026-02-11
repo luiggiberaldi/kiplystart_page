@@ -16,7 +16,7 @@ import PASBlock from '../components/PASBlock';
  * Now reads bundle_2_discount, bundle_3_discount, compare_at_price, additional_images from Supabase.
  */
 export default function ProductDetail() {
-    const { id } = useParams();
+    const { slug } = useParams();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -80,14 +80,14 @@ export default function ProductDetail() {
             canonical.rel = 'canonical';
             document.head.appendChild(canonical);
         }
-        canonical.href = `https://kiplystart.com/producto/${id}`;
+        canonical.href = `https://kiplystart.com/producto/${product.slug || slug}`;
 
         // Open Graph Tags (use isProperty = true)
         updateMetaTag('og:type', 'product', true);
         updateMetaTag('og:title', product.name, true);
         updateMetaTag('og:description', metaDescription, true);
         updateMetaTag('og:image', product.image_url || 'https://kiplystart.com/default-product.jpg', true);
-        updateMetaTag('og:url', `https://kiplystart.com/producto/${id}`, true);
+        updateMetaTag('og:url', `https://kiplystart.com/producto/${product.slug || slug}`, true);
         updateMetaTag('og:site_name', 'KiplyStart', true);
         updateMetaTag('og:locale', 'es_VE', true);
 
@@ -121,7 +121,7 @@ export default function ProductDetail() {
             },
             "offers": {
                 "@type": "Offer",
-                "url": `https://kiplystart.com/producto/${id}`,
+                "url": `https://kiplystart.com/producto/${product.slug || slug}`,
                 "priceCurrency": "USD",
                 "price": product.price?.toString() || "0",
                 "priceValidUntil": "2026-12-31",
@@ -150,10 +150,13 @@ export default function ProductDetail() {
     async function fetchProduct() {
         try {
             setLoading(true);
+            // Try by slug first, then fallback to UUID for backward compatibility
+            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+            const column = isUUID ? 'id' : 'slug';
             const { data, error } = await supabase
                 .from('products')
                 .select('*')
-                .eq('id', id)
+                .eq(column, slug)
                 .single();
 
             if (error) throw error;

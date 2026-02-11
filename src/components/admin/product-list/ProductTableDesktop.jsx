@@ -148,7 +148,7 @@ export default function ProductTableDesktop({
                                         </td>
                                         <td className="p-3">
                                             <div className="flex justify-end gap-1">
-                                                <a href={`/producto/${product.id}`} target="_blank" rel="noopener noreferrer"
+                                                <a href={`/producto/${product.slug || product.id}`} target="_blank" rel="noopener noreferrer"
                                                     className="p-1.5 text-gray-400 hover:text-brand-blue hover:bg-blue-50 rounded-lg transition-colors"
                                                     title="Ver en tienda">
                                                     <span className="material-symbols-outlined text-[18px]">open_in_new</span>

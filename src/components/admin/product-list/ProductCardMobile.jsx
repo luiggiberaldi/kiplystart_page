@@ -81,7 +81,7 @@ export default function ProductCardMobile({
 
             {/* Card Actions */}
             <div className="flex items-center justify-end gap-1 px-2 py-1.5 bg-gray-50/50 border-t border-gray-100">
-                <a href={`/producto/${product.id}`} target="_blank" rel="noopener noreferrer"
+                <a href={`/producto/${product.slug || product.id}`} target="_blank" rel="noopener noreferrer"
                     className="p-2 text-gray-400 hover:text-brand-blue rounded-lg transition-colors">
                     <span className="material-symbols-outlined text-[18px]">open_in_new</span>
                 </a>

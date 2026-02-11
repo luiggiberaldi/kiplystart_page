@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabaseClient";
+import { slugify } from "../utils/slugify";
 
 // Admin Components
 import AdminLogin from "../components/admin/AdminLogin";
@@ -70,6 +71,11 @@ export default function AdminPortal() {
 
     async function handleProductSubmit(productData) {
         try {
+            // Auto-generate SEO slug from product name
+            if (productData.name) {
+                productData.slug = slugify(productData.name);
+            }
+
             if (editingProduct) {
                 const { error } = await supabase
                     .from("products")
