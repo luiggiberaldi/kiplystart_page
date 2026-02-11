@@ -13,7 +13,11 @@ import CustomersManager from "../components/admin/CustomersManager"; // New Comp
 import AdminAnalytics from "../components/admin/AdminAnalytics";
 import ActivityLog from "../components/admin/ActivityLog";
 import AdminSettings from "../components/admin/AdminSettings";
+import AdminMobileNav from "../components/admin/AdminMobileNav";
+import ConfirmModal from "../components/admin/ConfirmModal";
 import { SettingsProvider } from "../context/SettingsContext";
+import useIsMobile from "../hooks/useIsMobile";
+import useOrderNotifications from "../hooks/useOrderNotifications";
 
 /**
  * AdminPortal v2.0
@@ -32,6 +36,15 @@ export default function AdminPortal() {
     const [editingProduct, setEditingProduct] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [message, setMessage] = useState(null);
+    const [orderNotification, setOrderNotification] = useState(null);
+    const isMobile = useIsMobile();
+
+    // ── New order real-time notifications ──
+    useOrderNotifications((newOrder) => {
+        setOrderNotification(newOrder);
+        // Auto-dismiss after 8s
+        setTimeout(() => setOrderNotification(null), 8000);
+    }, authenticated);
 
     useEffect(() => {
         if (authenticated && (activeTab === 'productos' || activeTab === 'dashboard')) {
@@ -89,18 +102,27 @@ export default function AdminPortal() {
         }
     }
 
-    async function handleDelete(id) {
-        if (!window.confirm("¿Seguro que quieres eliminar este producto?")) return;
+    // ── Delete confirmation flow ──
+    const [deleteTarget, setDeleteTarget] = useState(null);
+
+    function handleDelete(id) {
+        const product = products.find(p => p.id === id);
+        setDeleteTarget(product || { id });
+    }
+
+    async function confirmDelete() {
+        if (!deleteTarget) return;
         try {
-            const product = products.find(p => p.id === id);
-            const { error } = await supabase.from("products").delete().eq("id", id);
+            const { error } = await supabase.from("products").delete().eq("id", deleteTarget.id);
             if (error) throw error;
 
-            await logActivity('product_delete', 'product', id, { name: product?.name });
-            showMessage('success', '✅ Producto eliminado');
+            await logActivity('product_delete', 'product', deleteTarget.id, { name: deleteTarget?.name });
+            showMessage('success', '✅ Producto eliminado permanentemente');
             fetchProducts();
         } catch (err) {
             showMessage('error', `Error: ${err.message}`);
+        } finally {
+            setDeleteTarget(null);
         }
     }
 
@@ -182,13 +204,21 @@ export default function AdminPortal() {
 
                 {/* Main Content Area */}
                 <div
-                    className="transition-all duration-300"
-                    style={{ marginLeft: sidebarWidth }}
+                    className="transition-all duration-300 min-h-screen"
+                    style={{
+                        marginLeft: isMobile ? 0 : sidebarWidth,
+                        paddingBottom: isMobile ? '72px' : 0
+                    }}
                 >
                     {/* Top Bar */}
-                    <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 py-3 flex items-center justify-between">
-                        <div>
-                            <h1 className="text-lg font-bold font-display text-brand-blue capitalize">
+                    <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-4 md:px-6 py-3 flex items-center justify-between">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                            {isMobile && (
+                                <div className="w-8 h-8 bg-[#0A2463] rounded-lg flex items-center justify-center shrink-0">
+                                    <span className="material-symbols-outlined text-white text-[18px]">admin_panel_settings</span>
+                                </div>
+                            )}
+                            <h1 className="text-base md:text-lg font-bold font-display text-brand-blue capitalize truncate">
                                 {activeTab === 'dashboard' && 'Panel de Control'}
                                 {activeTab === 'productos' && 'Productos'}
                                 {activeTab === 'pedidos' && 'Pedidos COD'}
@@ -224,7 +254,7 @@ export default function AdminPortal() {
                     )}
 
                     {/* Page Content */}
-                    <main className="p-6 max-w-7xl">
+                    <main className="p-4 md:p-6 max-w-7xl">
 
                         {/* ===== DASHBOARD ===== */}
                         {activeTab === 'dashboard' && (
@@ -263,14 +293,14 @@ export default function AdminPortal() {
                         {/* ===== PRODUCTOS ===== */}
                         {activeTab === 'productos' && (
                             <div className="space-y-4">
-                                <div className="flex justify-between items-center">
+                                <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
                                     <div>
-                                        <h2 className="text-2xl font-bold font-display text-brand-blue mb-1">Catálogo</h2>
-                                        <p className="text-gray-500 text-sm">{products.length} productos en tu tienda</p>
+                                        <h2 className="text-xl md:text-2xl font-bold font-display text-brand-blue mb-0.5">Catálogo</h2>
+                                        <p className="text-gray-500 text-xs md:text-sm">{products.length} productos en tu tienda</p>
                                     </div>
                                     <button
                                         onClick={openNewProduct}
-                                        className="flex items-center gap-2 px-4 py-2.5 bg-[#E63946] hover:bg-red-700 text-white rounded-xl font-bold text-sm transition-colors shadow-lg shadow-red-500/20"
+                                        className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#E63946] hover:bg-red-700 text-white rounded-xl font-bold text-sm transition-colors shadow-lg shadow-red-500/20 w-full md:w-auto"
                                     >
                                         <span className="material-symbols-outlined text-[18px]">add</span>
                                         Nuevo Producto
@@ -319,6 +349,57 @@ export default function AdminPortal() {
                         {/* ===== CONFIG ===== */}
                         {activeTab === 'config' && <AdminSettings />}
                     </main>
+
+                    {/* Delete Confirmation Modal */}
+                    <ConfirmModal
+                        isOpen={!!deleteTarget}
+                        onClose={() => setDeleteTarget(null)}
+                        onConfirm={confirmDelete}
+                        title="Eliminar producto"
+                        message={`"${deleteTarget?.name || ''}" será eliminado permanentemente de tu catálogo. Esta acción no se puede deshacer.`}
+                        confirmText="Eliminar permanentemente"
+                        icon="delete_forever"
+                    />
+
+                    {/* New Order Notification Toast */}
+                    {orderNotification && (
+                        <div
+                            className="fixed top-4 right-4 z-[300] max-w-sm w-full animate-slideUp cursor-pointer"
+                            onClick={() => { setActiveTab('pedidos'); setOrderNotification(null); }}
+                        >
+                            <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+                                <div className="h-1 bg-gradient-to-r from-green-400 to-emerald-500" />
+                                <div className="p-4 flex items-start gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                                        <span className="material-symbols-outlined text-green-600 text-[22px]">shopping_bag</span>
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <p className="font-bold text-sm text-gray-900">🎉 ¡Nuevo Pedido!</p>
+                                        <p className="text-xs text-gray-500 mt-0.5 truncate">
+                                            {orderNotification.user_name} — {orderNotification.product_name}
+                                        </p>
+                                        <p className="text-xs font-bold text-green-600 mt-0.5">
+                                            ${orderNotification.total_price?.toFixed(2)} USD
+                                        </p>
+                                    </div>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setOrderNotification(null); }}
+                                        className="text-gray-300 hover:text-gray-500 transition-colors"
+                                    >
+                                        <span className="material-symbols-outlined text-[18px]">close</span>
+                                    </button>
+                                </div>
+                                <div className="px-4 pb-3">
+                                    <p className="text-[10px] text-gray-400">Toca para ver pedidos</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Mobile Bottom Navigation */}
+                    {isMobile && (
+                        <AdminMobileNav activeTab={activeTab} setActiveTab={setActiveTab} />
+                    )}
                 </div>
             </div >
         </SettingsProvider >

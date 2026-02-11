@@ -109,10 +109,10 @@ export default function SyncDashboard() {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                 <div>
-                    <h2 className="text-2xl font-bold font-display text-brand-blue">Sincronización DroPanas</h2>
-                    <p className="text-gray-500 text-sm">Carga el reporte del scraper para sincronizar precios y stock</p>
+                    <h2 className="text-xl md:text-2xl font-bold font-display text-brand-blue">Sincronización DroPanas</h2>
+                    <p className="text-gray-500 text-xs md:text-sm">Carga el reporte del scraper para sincronizar precios y stock</p>
                 </div>
             </div>
 
@@ -171,10 +171,10 @@ export default function SyncDashboard() {
                     {/* Price Discrepancies */}
                     {report.precios_desactualizados?.length > 0 && (
                         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+                            <div className="px-4 md:px-5 py-3 md:py-4 border-b border-gray-100 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                                 <div className="flex items-center gap-2">
                                     <span className="material-symbols-outlined text-red-500">price_change</span>
-                                    <h3 className="font-bold text-gray-900">Precios Desactualizados ({report.precios_desactualizados.length})</h3>
+                                    <h3 className="font-bold text-gray-900 text-sm md:text-base">Precios Desactualizados ({report.precios_desactualizados.length})</h3>
                                 </div>
                                 <button
                                     onClick={applyPriceUpdates}
@@ -234,10 +234,10 @@ export default function SyncDashboard() {
                     {/* Stock Discrepancies */}
                     {report.stock_desactualizados?.length > 0 && (
                         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+                            <div className="px-4 md:px-5 py-3 md:py-4 border-b border-gray-100 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                                 <div className="flex items-center gap-2">
                                     <span className="material-symbols-outlined text-yellow-500">inventory</span>
-                                    <h3 className="font-bold text-gray-900">Stock Desactualizado ({report.stock_desactualizados.length})</h3>
+                                    <h3 className="font-bold text-gray-900 text-sm md:text-base">Stock Desactualizado ({report.stock_desactualizados.length})</h3>
                                 </div>
                                 <button
                                     onClick={applyStockUpdates}

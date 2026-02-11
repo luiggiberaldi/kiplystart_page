@@ -43,7 +43,12 @@ function PageLoader() {
   );
 }
 
+import usePageTracker from './hooks/usePageTracker';
+
 function App() {
+  // Track page views + join presence for live visitor count
+  usePageTracker();
+
   return (
     <Router>
       <Suspense fallback={<PageLoader />}>

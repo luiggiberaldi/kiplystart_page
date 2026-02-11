@@ -1,0 +1,25 @@
+{
+    "name": "KiplyStart Admin",
+    "short_name": "KiplyAdmin",
+    "description": "Panel de Administración KiplyStart",
+    "start_url": "/admin-portal-2026",
+    "scope": "/admin-portal-2026",
+    "display": "standalone",
+    "background_color": "#F9FAFB",
+    "theme_color": "#0A2463",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "/favicon.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/favicon.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}

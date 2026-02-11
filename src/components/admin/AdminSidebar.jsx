@@ -16,7 +16,7 @@ export default function AdminSidebar({ activeTab, setActiveTab, collapsed, setCo
     const { exchangeRate, rateSource } = useCurrency();
 
     return (
-        <aside className={`fixed left-0 top-0 h-full bg-[#0A2463] text-white z-40 transition-all duration-300 flex flex-col ${collapsed ? 'w-[68px]' : 'w-[240px]'}`}>
+        <aside className={`fixed left-0 top-0 h-full bg-[#0A2463] text-white z-40 transition-all duration-300 hidden md:flex flex-col ${collapsed ? 'w-[68px]' : 'w-[240px]'}`}>
             {/* Header */}
             <div className="p-4 border-b border-white/10 flex items-center gap-3">
                 <div className="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center shrink-0">
