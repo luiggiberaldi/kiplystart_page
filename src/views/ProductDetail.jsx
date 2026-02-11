@@ -46,7 +46,7 @@ export default function ProductDetail() {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [id]);
+    }, [slug]);
 
     // SEO Meta Tags - Dynamic updates based on product data
     useEffect(() => {
@@ -145,7 +145,7 @@ export default function ProductDetail() {
         return () => {
             document.title = 'KiplyStart - Accesorios Premium para Auto';
         };
-    }, [product, id]);
+    }, [product, slug]);
 
     async function fetchProduct() {
         try {
