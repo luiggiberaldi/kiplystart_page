@@ -51,6 +51,20 @@ export default function ProductDetail() {
         return () => clearInterval(timer);
     }, [slug]);
 
+    // Load TikTok Embed Script
+    useEffect(() => {
+        if (!product?.tiktok_url) return;
+
+        const scriptId = 'tiktok-embed-script';
+        if (!document.getElementById(scriptId)) {
+            const script = document.createElement('script');
+            script.id = scriptId;
+            script.src = 'https://www.tiktok.com/embed.js';
+            script.async = true;
+            document.body.appendChild(script);
+        }
+    }, [product]);
+
     // SEO Meta Tags - Dynamic updates based on product data
     useEffect(() => {
         if (!product) return;
@@ -317,6 +331,24 @@ export default function ProductDetail() {
                     />
 
                     <ProductDescription description={product.description} />
+
+                    {/* Product Video Section - WebM/MP4 */}
+                    {product.video_url && (
+                        <div className="w-full my-6 flex justify-center">
+                            <video
+                                src={product.video_url}
+                                className="rounded-xl shadow-lg w-auto max-w-full max-h-[80vh] object-contain"
+                                controls
+                                autoPlay
+                                muted
+                                playsInline
+                                loop
+                                preload="metadata"
+                            >
+                                Tu navegador no soporta el elemento de video.
+                            </video>
+                        </div>
+                    )}
 
                     {/* PAS Block - Product Bible 2026 Standard */}
                     <PASBlock product={product} />

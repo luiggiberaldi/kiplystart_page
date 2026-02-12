@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { supabase } from '../../lib/supabaseClient';
 import ProductImageManager from './ProductImageManager';
 import ProductFormPricing from './ProductFormPricing';
 import ProductFormDropanas from './ProductFormDropanas';
@@ -16,11 +17,14 @@ export default function ProductForm({ onSuccess, editingProduct = null, onCancel
         bundle_type: 'discount', bundle_2_discount: '10', bundle_3_discount: '20',
         image_url: '', additional_images: ['', '', '', ''],
         stock: '0', is_active: true, featured: false,
-        tags: '', dropanas_url: '',
+        stock: '0', is_active: true, featured: false,
+        stock: '0', is_active: true, featured: false,
+        tags: '', dropanas_url: '', video_url: '',
     };
 
     const [formData, setFormData] = useState(defaultState);
     const [loading, setLoading] = useState(false);
+    const [uploadingVideo, setUploadingVideo] = useState(false);
 
     const categories = ['General', 'Electrónica', 'Accesorios', 'Hogar', 'Deportes', 'Belleza', 'Moda', 'Tecnología'];
 
@@ -51,7 +55,9 @@ export default function ProductForm({ onSuccess, editingProduct = null, onCancel
                 additional_images: editingProduct.additional_images?.length > 0
                     ? [...editingProduct.additional_images, '', '', '', ''].slice(0, 4) : ['', '', '', ''],
                 tags: Array.isArray(editingProduct.tags) ? editingProduct.tags.join(', ') : editingProduct.tags || '',
+                tags: Array.isArray(editingProduct.tags) ? editingProduct.tags.join(', ') : editingProduct.tags || '',
                 dropanas_url: editingProduct.dropanas_url || '',
+                video_url: editingProduct.video_url || '',
             });
         } else {
             setFormData(defaultState);
@@ -79,7 +85,9 @@ export default function ProductForm({ onSuccess, editingProduct = null, onCancel
                 price: parseFloat(formData.price),
                 compare_at_price: formData.compare_at_price ? parseFloat(formData.compare_at_price) : null,
                 dropanas_price: formData.dropanas_price ? parseFloat(formData.dropanas_price) : null,
+                dropanas_price: formData.dropanas_price ? parseFloat(formData.dropanas_price) : null,
                 dropanas_url: formData.dropanas_url || null,
+                video_url: formData.video_url || null,
                 bundle_type: formData.bundle_type,
                 bundle_2_discount: parseInt(formData.bundle_2_discount),
                 bundle_3_discount: parseInt(formData.bundle_3_discount),
@@ -93,6 +101,50 @@ export default function ProductForm({ onSuccess, editingProduct = null, onCancel
             console.error('Error:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleVideoUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validate file type (mp4, webm) matching bucket config
+        if (!['video/mp4', 'video/webm'].includes(file.type)) {
+            alert('Solo se permiten archivos MP4 y WebM.');
+            return;
+        }
+
+        // Validate file size (max 100MB)
+        const maxSize = 100 * 1024 * 1024; // 100MB
+        if (file.size > maxSize) {
+            alert('El archivo es demasiado grande. El límite es 100MB.');
+            return;
+        }
+
+        setUploadingVideo(true);
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+            const filePath = `videos/${fileName}`;
+
+            // Upload to 'product-images' bucket (renamed from 'products')
+            const { error: uploadError } = await supabase.storage
+                .from('product-images')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            // Get Public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from('product-images')
+                .getPublicUrl(filePath);
+
+            setFormData(prev => ({ ...prev, video_url: publicUrl }));
+        } catch (error) {
+            console.error('Error uploading video:', error);
+            alert(`Error al subir el video: ${error.message || 'Error desconocido'}`);
+        } finally {
+            setUploadingVideo(false);
         }
     };
 
@@ -134,6 +186,39 @@ export default function ProductForm({ onSuccess, editingProduct = null, onCancel
                     <textarea name="description" value={formData.description} onChange={handleChange} rows="3"
                         className="w-full border border-gray-200 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-brand-blue outline-none text-sm"
                         placeholder="Descripción detallada del producto..." />
+                </div>
+                <div>
+                    <label className="block text-xs font-bold text-gray-600 mb-1">Video del Producto (MP4 / WebM)</label>
+
+                    {formData.video_url ? (
+                        <div className="relative rounded-lg overflow-hidden border border-gray-200 bg-black aspect-video mb-2 group">
+                            <video src={formData.video_url} className="w-full h-full object-cover" controls muted />
+                            <button type="button"
+                                onClick={() => setFormData(prev => ({ ...prev, video_url: '' }))}
+                                className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                                <span className="material-symbols-outlined text-sm">close</span>
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center hover:border-brand-blue transition-colors relative">
+                            {uploadingVideo ? (
+                                <div className="flex flex-col items-center">
+                                    <div className="w-8 h-8 border-4 border-brand-blue border-t-transparent rounded-full animate-spin mb-2"></div>
+                                    <span className="text-xs text-gray-500">Subiendo video...</span>
+                                </div>
+                            ) : (
+                                <>
+                                    <input type="file" accept="video/mp4,video/webm" onChange={handleVideoUpload}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                                    <span className="material-symbols-outlined text-gray-400 text-3xl mb-1">movie</span>
+                                    <p className="text-xs text-gray-500">Click para subir video</p>
+                                    <p className="text-[10px] text-gray-400 mt-1">MP4 o WebM (Max 100MB)</p>
+                                </>
+                            )}
+                        </div>
+                    )}
+                    {/* Hidden input to store URL just in case */}
+                    <input type="hidden" name="video_url" value={formData.video_url} />
                 </div>
             </section>
 
