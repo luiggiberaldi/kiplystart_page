@@ -11,6 +11,7 @@ export default function AdminLogin({ onSuccess }) {
     const [loading, setLoading] = useState(false);
 
     const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || '';
+    console.log('Admin Password Expected:', ADMIN_PASSWORD); // Debugging
 
     function handleSubmit(e) {
         e.preventDefault();

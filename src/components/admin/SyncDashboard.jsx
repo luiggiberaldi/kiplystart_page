@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { useCurrency } from '../../context/CurrencyContext';
+import { slugify } from '../../utils/slugify';
 
 /**
  * SyncDashboard Component
@@ -14,6 +15,7 @@ export default function SyncDashboard() {
     const [message, setMessage] = useState(null);
     const [selectedPrices, setSelectedPrices] = useState([]);
     const [selectedStock, setSelectedStock] = useState([]);
+    const [selectedNew, setSelectedNew] = useState([]);
 
     function handleFileLoad(e) {
         const file = e.target.files[0];
@@ -26,6 +28,7 @@ export default function SyncDashboard() {
                 setReport(data);
                 setSelectedPrices(data.precios_desactualizados?.map((_, i) => i) || []);
                 setSelectedStock(data.stock_desactualizados?.map((_, i) => i) || []);
+                setSelectedNew(data.nuevos?.map((_, i) => i) || []);
                 showMsg('success', `✅ Reporte cargado: ${data.total_dropanas || 0} productos escaneados`);
             } catch (err) {
                 showMsg('error', 'Error al parsear el archivo JSON');
@@ -89,6 +92,60 @@ export default function SyncDashboard() {
         setApplying(false);
     }
 
+    async function importNewProducts() {
+        if (!report?.nuevos) return;
+        setApplying(true);
+
+        const items = report.nuevos.filter((_, i) => selectedNew.includes(i));
+        let imported = 0, errors = 0;
+
+        for (const item of items) {
+            // Validate required fields (scraper must provide images/prices)
+            // Fallback for missing fields if old report
+            const productData = {
+                name: item.name,
+                slug: slugify(item.name) + '-' + Math.floor(Math.random() * 1000), // Ensure uniqueness
+                description: item.description || '<p>Descripción pendiente...</p>',
+                price: item.precio_venta_ideal || 0,
+                compare_at_price: item.compare_at_ideal || 0,
+                stock: item.stock || 0,
+                images: item.images || [], // Uses images from scraper if available
+                category: 'Nuevos',
+                is_active: item.stock > 0,
+                dropanas_price: item.precio_proveedor || 0,
+                dropanas_url: item.url,
+                featured: false
+            };
+
+            const { error } = await supabase
+                .from('products')
+                .insert(productData);
+
+            if (error) {
+                console.error('Import error:', error);
+                errors++;
+            } else {
+                imported++;
+            }
+        }
+
+        await supabase.from('activity_log').insert({
+            action: 'bulk_import_products',
+            entity_type: 'product',
+            details: { imported, errors, total: items.length, source: 'scraper_sync' }
+        });
+
+        // Remove imported items from the list in state
+        setReport(prev => ({
+            ...prev,
+            nuevos: prev.nuevos.filter((_, i) => !selectedNew.includes(i))
+        }));
+        setSelectedNew([]);
+
+        showMsg('success', `✅ ${imported} productos importados${errors > 0 ? `, ${errors} errores` : ''}`);
+        setApplying(false);
+    }
+
     function showMsg(type, text) {
         setMessage({ type, text });
         setTimeout(() => setMessage(null), 5000);
@@ -102,6 +159,12 @@ export default function SyncDashboard() {
 
     function toggleStock(idx) {
         setSelectedStock(prev =>
+            prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
+        );
+    }
+
+    function toggleNew(idx) {
+        setSelectedNew(prev =>
             prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
         );
     }
@@ -153,12 +216,44 @@ export default function SyncDashboard() {
                                     <span className="material-symbols-outlined text-purple-500">new_releases</span>
                                     <h3 className="font-bold text-gray-900">Productos Nuevos en DroPanas ({report.nuevos.length})</h3>
                                 </div>
+                                <button
+                                    onClick={importNewProducts}
+                                    disabled={applying || selectedNew.length === 0}
+                                    className="flex items-center gap-1.5 px-4 py-2 bg-purple-600 text-white rounded-lg text-xs font-bold hover:bg-purple-700 transition-colors disabled:opacity-50"
+                                >
+                                    <span className="material-symbols-outlined text-[16px]">download</span>
+                                    Importar {selectedNew.length} Productos
+                                </button>
                             </div>
                             <div className="divide-y divide-gray-50 max-h-60 overflow-y-auto">
+                                {/* Header Row */}
+                                <div className="px-5 py-2 bg-gray-50 flex items-center gap-3 text-xs font-bold text-gray-500 uppercase">
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedNew.length === report.nuevos.length}
+                                        onChange={() => {
+                                            if (selectedNew.length === report.nuevos.length) setSelectedNew([]);
+                                            else setSelectedNew(report.nuevos.map((_, i) => i));
+                                        }}
+                                        className="rounded"
+                                    />
+                                    <span>Seleccionar Todos</span>
+                                </div>
                                 {report.nuevos.map((p, i) => (
-                                    <div key={i} className="px-5 py-3 flex items-center justify-between text-sm hover:bg-gray-50">
-                                        <span className="text-gray-700">{p.name}</span>
-                                        <div className="flex items-center gap-3">
+                                    <div key={i} className={`px-5 py-3 flex items-center justify-between text-sm hover:bg-gray-50 ${selectedNew.includes(i) ? 'bg-purple-50/50' : ''}`}>
+                                        <div className="flex items-center gap-3 overflow-hidden">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedNew.includes(i)}
+                                                onChange={() => toggleNew(i)}
+                                                className="rounded"
+                                            />
+                                            {p.images && p.images[0] && (
+                                                <img src={p.images[0]} alt="" className="w-8 h-8 rounded object-cover border border-gray-200" />
+                                            )}
+                                            <span className="text-gray-700 truncate">{p.name}</span>
+                                        </div>
+                                        <div className="flex items-center gap-3 shrink-0">
                                             <span className="text-brand-blue font-bold">${p.precio_venta_ideal}</span>
                                             <span className="text-xs text-gray-400">Stock: {p.stock}</span>
                                         </div>

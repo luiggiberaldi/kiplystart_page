@@ -45,28 +45,34 @@ function PageLoader() {
 
 import usePageTracker from './hooks/usePageTracker';
 
+import { CartProvider } from './context/CartContext';
+import CartDrawer from './components/cart/CartDrawer';
+
 function App() {
   // Track page views + join presence for live visitor count
   usePageTracker();
 
   return (
-    <Router>
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/catalogo" element={<Catalogo />} />
-          <Route path="/producto/:slug" element={<ProductDetail />} />
+    <CartProvider>
+      <Router>
+        <Suspense fallback={<PageLoader />}>
+          <CartDrawer />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/catalogo" element={<Catalogo />} />
+            <Route path="/producto/:slug" element={<ProductDetail />} />
 
-          <Route path="/terminos" element={<Terminos />} />
-          <Route path="/privacidad" element={<Privacidad />} />
-          <Route path="/soporte" element={<Soporte />} />
-          <Route path="/admin-portal-2026" element={<AdminPortal />} />
+            <Route path="/terminos" element={<Terminos />} />
+            <Route path="/privacidad" element={<Privacidad />} />
+            <Route path="/soporte" element={<Soporte />} />
+            <Route path="/admin-portal-2026" element={<AdminPortal />} />
 
-          {/* 404 Fallback */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
-    </Router>
+            {/* 404 Fallback */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </Router>
+    </CartProvider>
   );
 }
 

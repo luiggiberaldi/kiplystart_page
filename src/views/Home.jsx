@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import ProductCard from '../components/ProductCard';
+import FeaturedCarousel from '../components/FeaturedCarousel';
 import VideoHero from '../components/VideoHero';
 import TrustBar from '../components/TrustBar';
 import { Link } from 'react-router-dom';
@@ -31,7 +31,6 @@ const Home = () => {
                 .select('*')
                 .eq('is_active', true)
                 .eq('featured', true)
-                .limit(4)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
@@ -69,24 +68,13 @@ const Home = () => {
                     </div>
 
                     {loading ? (
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="flex gap-4 overflow-hidden">
                             {[1, 2, 3, 4].map((n) => (
-                                <div key={n} className="bg-white rounded-lg h-80 animate-pulse"></div>
+                                <div key={n} className="bg-white rounded-lg h-80 w-[72%] sm:w-[48%] md:w-[32%] lg:w-[24%] shrink-0 animate-pulse"></div>
                             ))}
                         </div>
                     ) : (
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {featuredProducts.length > 0 ? (
-                                featuredProducts.map((product) => (
-                                    <ProductCard key={product.id} product={product} />
-                                ))
-                            ) : (
-                                <div className="col-span-full text-center py-10 bg-white rounded-xl">
-                                    <span className="text-4xl">📦</span>
-                                    <p className="text-gray-500 mt-2">No hay productos destacados por ahora.</p>
-                                </div>
-                            )}
-                        </div>
+                        <FeaturedCarousel products={featuredProducts} />
                     )}
                 </section>
             </main>

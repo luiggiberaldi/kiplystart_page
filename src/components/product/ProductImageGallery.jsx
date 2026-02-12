@@ -32,8 +32,8 @@ export default function ProductImageGallery({ allImages, productName, viewersCou
                     </div>
                 )}
 
-                {/* Floating Scarcity Pill */}
-                <div className="absolute top-3 md:top-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm px-2.5 md:px-3 py-1 md:py-1.5 rounded-full shadow-lg border border-gray-100 flex items-center gap-1 md:gap-1.5 animate-bounce-subtle max-w-[90%]">
+                {/* Floating Scarcity Pill - Centered but Higher */}
+                <div className="absolute top-1 md:top-2 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm px-2.5 md:px-3 py-1 md:py-1.5 rounded-full shadow-lg border border-gray-100 flex items-center gap-1 md:gap-1.5 animate-bounce-subtle max-w-[90%] z-10">
                     <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shrink-0"></div>
                     <span className="text-[10px] md:text-xs font-bold text-soft-black whitespace-nowrap">{viewersCount} personas viendo esto</span>
                 </div>

@@ -1,13 +1,14 @@
 import { useState, useRef } from 'react';
 import { uploadProductImage, deleteProductImage } from '../../lib/imageUpload';
+import { convertImageToWebP } from '../../lib/imageUtils';
 
 /**
  * ProductImageManager - Upload images directly to Supabase Storage
- * Supports drag-and-drop, click-to-upload, and manual URL input
+ * Supports drag-and-drop, click-to-upload, manual URL input, and image reordering
  */
-export default function ProductImageManager({ mainImage, additionalImages, onMainChange, onAdditionalChange }) {
-    const [uploading, setUploading] = useState(null); // 'main' | 0-3 index | null
-    const [dragOver, setDragOver] = useState(null);   // 'main' | 0-3 index | null
+export default function ProductImageManager({ mainImage, additionalImages, onMainChange, onAdditionalChange, onReorder }) {
+    const [uploading, setUploading] = useState(null);
+    const [dragOver, setDragOver] = useState(null);
     const [error, setError] = useState('');
     const [showUrlInput, setShowUrlInput] = useState(false);
     const mainFileRef = useRef(null);
@@ -19,7 +20,10 @@ export default function ProductImageManager({ mainImage, additionalImages, onMai
         setUploading(target);
 
         try {
-            const url = await uploadProductImage(file);
+            // Convert to WebP for optimization
+            const webpFile = await convertImageToWebP(file);
+            const url = await uploadProductImage(webpFile);
+
             if (target === 'main') {
                 onMainChange(url);
             } else {
@@ -44,14 +48,12 @@ export default function ProductImageManager({ mainImage, additionalImages, onMai
     const handleFileSelect = (e, target) => {
         const file = e.target.files[0];
         if (file) handleUpload(file, target);
-        e.target.value = ''; // Reset so same file can be re-selected
+        e.target.value = '';
     };
 
     const handleRemoveImage = async (target) => {
         const url = target === 'main' ? mainImage : additionalImages[target];
-        // Delete from storage
         await deleteProductImage(url);
-        // Clear URL from form
         if (target === 'main') {
             onMainChange('');
         } else {
@@ -59,7 +61,48 @@ export default function ProductImageManager({ mainImage, additionalImages, onMai
         }
     };
 
-    const ImageUploadSlot = ({ target, currentUrl, label, isMain = false }) => {
+    // ─── REORDER FUNCTIONS ──────────────────────────────────
+    // Promote an additional image to main (old main goes to that slot)
+    const handlePromoteToMain = (idx) => {
+        const oldMain = mainImage;
+        const newMain = additionalImages[idx];
+        if (!newMain) return;
+        onMainChange(newMain);
+        onAdditionalChange(idx, oldMain || '');
+    };
+
+    // Move additional image left (to earlier position)
+    const handleMoveLeft = (idx) => {
+        if (idx === 0) {
+            // Moving to position 0 means swap with main
+            handlePromoteToMain(0);
+            return;
+        }
+        const newAdditional = [...additionalImages];
+        [newAdditional[idx - 1], newAdditional[idx]] = [newAdditional[idx], newAdditional[idx - 1]];
+        // Update all changed positions
+        newAdditional.forEach((url, i) => onAdditionalChange(i, url));
+    };
+
+    // Move additional image right (to later position)
+    const handleMoveRight = (idx) => {
+        if (idx >= additionalImages.length - 1) return;
+        const newAdditional = [...additionalImages];
+        [newAdditional[idx], newAdditional[idx + 1]] = [newAdditional[idx + 1], newAdditional[idx]];
+        newAdditional.forEach((url, i) => onAdditionalChange(i, url));
+    };
+
+    // Demote main image to a specific additional slot
+    const handleDemoteMain = () => {
+        // Find first empty additional slot
+        const emptyIdx = additionalImages.findIndex(url => !url || url.trim() === '');
+        if (emptyIdx >= 0) {
+            onAdditionalChange(emptyIdx, mainImage);
+            onMainChange('');
+        }
+    };
+
+    const ImageUploadSlot = ({ target, currentUrl, label, isMain = false, idx }) => {
         const isUploading = uploading === target;
         const isDraggedOver = dragOver === target;
         const hasImage = currentUrl && currentUrl.trim() !== '';
@@ -84,24 +127,59 @@ export default function ProductImageManager({ mainImage, additionalImages, onMai
                             }}
                         />
                         {/* Overlay on hover */}
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    const ref = isMain ? mainFileRef : { current: additionalFileRefs.current[target] };
-                                    ref.current?.click();
-                                }}
-                                className="bg-white text-gray-800 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-100 transition-colors"
-                            >
-                                📷 Cambiar
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => handleRemoveImage(target)}
-                                className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-600 transition-colors"
-                            >
-                                🗑️ Eliminar
-                            </button>
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                            {/* Reorder buttons */}
+                            {!isMain && (
+                                <button
+                                    type="button"
+                                    onClick={() => handlePromoteToMain(idx)}
+                                    className="bg-yellow-400 text-gray-900 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-yellow-300 transition-colors flex items-center gap-1"
+                                    title="Hacer imagen principal"
+                                >
+                                    ⭐ Hacer Principal
+                                </button>
+                            )}
+                            <div className="flex gap-2">
+                                {!isMain && idx !== undefined && (
+                                    <>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleMoveLeft(idx)}
+                                            disabled={idx === 0 && !mainImage}
+                                            className="bg-white/90 text-gray-800 px-2 py-1.5 rounded-lg text-xs font-bold hover:bg-white transition-colors disabled:opacity-40"
+                                            title="Mover a la izquierda"
+                                        >
+                                            ◀
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleMoveRight(idx)}
+                                            disabled={idx >= additionalImages.length - 1}
+                                            className="bg-white/90 text-gray-800 px-2 py-1.5 rounded-lg text-xs font-bold hover:bg-white transition-colors disabled:opacity-40"
+                                            title="Mover a la derecha"
+                                        >
+                                            ▶
+                                        </button>
+                                    </>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const ref = isMain ? mainFileRef : { current: additionalFileRefs.current[target] };
+                                        ref.current?.click();
+                                    }}
+                                    className="bg-white text-gray-800 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-100 transition-colors"
+                                >
+                                    📷 Cambiar
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleRemoveImage(target)}
+                                    className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-600 transition-colors"
+                                >
+                                    🗑️
+                                </button>
+                            </div>
                         </div>
                     </div>
                 ) : (
@@ -225,6 +303,11 @@ export default function ProductImageManager({ mainImage, additionalImages, onMai
                         isMain={true}
                     />
 
+                    {/* Reorder hint */}
+                    <p className="text-[10px] text-gray-400 italic text-center -mt-2">
+                        💡 Pasa el cursor sobre una imagen para moverla o hacerla principal
+                    </p>
+
                     {/* Additional Images */}
                     <div>
                         <p className="text-xs text-gray-500 mb-2">Imágenes Adicionales (Opcional):</p>
@@ -235,6 +318,7 @@ export default function ProductImageManager({ mainImage, additionalImages, onMai
                                     target={idx}
                                     currentUrl={url}
                                     label={`Imagen ${idx + 2}`}
+                                    idx={idx}
                                 />
                             ))}
                         </div>

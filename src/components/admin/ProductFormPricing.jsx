@@ -5,6 +5,7 @@ import ProductPricePreview from './ProductPricePreview';
  * ProductFormPricing - Dropshipping pricing section with auto-calculation
  * Formula: price = ceil(max(dropanas_price + 14, sugerido))
  * Compare at: floor(price * 1.4) + 0.90
+ * Supports bundle types: 'discount' (% off) and 'quantity' (buy X get Y free)
  */
 export default function ProductFormPricing({ formData, onChange, calculatedPrice, calculatedCompareAt, effectivePrice }) {
     const margin = useMemo(() => {
@@ -14,6 +15,8 @@ export default function ProductFormPricing({ formData, onChange, calculatedPrice
         const pct = ((amount / effectivePrice) * 100).toFixed(1);
         return { amount, pct };
     }, [formData.dropanas_price, effectivePrice]);
+
+    const isQuantityBundle = formData.bundle_type === 'quantity';
 
     return (
         <section className="bg-white rounded-xl p-5 border border-gray-200 space-y-4">
@@ -100,26 +103,75 @@ export default function ProductFormPricing({ formData, onChange, calculatedPrice
                 </p>
             </div>
 
-            {/* Bundle discounts */}
-            <div className="grid grid-cols-2 gap-3">
-                <div>
-                    <label className="block text-xs font-bold text-gray-600 mb-1">Bundle 2x (%)</label>
-                    <input type="number" name="bundle_2_discount" value={formData.bundle_2_discount}
-                        onChange={onChange} min="0" max="100"
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-brand-blue outline-none text-sm" />
-                </div>
-                <div>
-                    <label className="block text-xs font-bold text-gray-600 mb-1">Bundle 3x (%)</label>
-                    <input type="number" name="bundle_3_discount" value={formData.bundle_3_discount}
-                        onChange={onChange} min="0" max="100"
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-brand-blue outline-none text-sm" />
+            {/* Bundle Type Selector */}
+            <div className="space-y-3">
+                <label className="block text-xs font-bold text-gray-600 mb-1">Tipo de Bundle</label>
+                <div className="grid grid-cols-2 gap-2">
+                    <button
+                        type="button"
+                        onClick={() => onChange({ target: { name: 'bundle_type', value: 'discount', type: 'text' } })}
+                        className={`p-3 rounded-xl border-2 text-left transition-all ${!isQuantityBundle
+                                ? 'border-brand-blue bg-blue-50 shadow-sm'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                    >
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="material-symbols-outlined text-[16px]">percent</span>
+                            <span className="font-bold text-xs text-soft-black">Descuento %</span>
+                        </div>
+                        <p className="text-[10px] text-gray-500 leading-tight">2u = 10% off, 3u = 20% off</p>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => onChange({ target: { name: 'bundle_type', value: 'quantity', type: 'text' } })}
+                        className={`p-3 rounded-xl border-2 text-left transition-all ${isQuantityBundle
+                                ? 'border-brand-blue bg-blue-50 shadow-sm'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                    >
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="material-symbols-outlined text-[16px]">redeem</span>
+                            <span className="font-bold text-xs text-soft-black">Cantidad Gratis</span>
+                        </div>
+                        <p className="text-[10px] text-gray-500 leading-tight">Compra 2 llévate 3</p>
+                    </button>
                 </div>
             </div>
+
+            {/* Bundle config — depends on type */}
+            {isQuantityBundle ? (
+                <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-4 space-y-2">
+                    <p className="text-xs font-bold text-purple-600 uppercase tracking-wide flex items-center gap-1.5">
+                        <span className="material-symbols-outlined text-[14px]">redeem</span>
+                        Compra 2, Llévate 3
+                    </p>
+                    <p className="text-[11px] text-gray-600 leading-relaxed">
+                        El cliente paga <strong>2 unidades</strong> y recibe <strong>3</strong>. El precio del bundle será <strong>${(effectivePrice * 2).toFixed(2)}</strong> por 3 unidades.
+                    </p>
+                    <p className="text-[10px] text-purple-400">Los campos de descuento % se ignoran en este modo.</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-2 gap-3">
+                    <div>
+                        <label className="block text-xs font-bold text-gray-600 mb-1">Bundle 2x (%)</label>
+                        <input type="number" name="bundle_2_discount" value={formData.bundle_2_discount}
+                            onChange={onChange} min="0" max="100"
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-brand-blue outline-none text-sm" />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold text-gray-600 mb-1">Bundle 3x (%)</label>
+                        <input type="number" name="bundle_3_discount" value={formData.bundle_3_discount}
+                            onChange={onChange} min="0" max="100"
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-brand-blue outline-none text-sm" />
+                    </div>
+                </div>
+            )}
 
             <ProductPricePreview
                 basePrice={effectivePrice}
                 bundle2Discount={formData.bundle_2_discount}
                 bundle3Discount={formData.bundle_3_discount}
+                bundleType={formData.bundle_type}
             />
         </section>
     );

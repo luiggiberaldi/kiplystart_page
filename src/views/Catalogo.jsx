@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import Navbar from '../components/Navbar';
 import ProductCard from '../components/ProductCard';
@@ -7,25 +7,32 @@ import { Link } from 'react-router-dom';
 /**
  * Catalogo View
  * @description
- * Product catalog with functional category filter.
- * Features:
- * - Mobile-first grid (2 columns)
- * - Premium Skeleton Loading
- * - Category filtering
- * - Responsive bottom nav
+ * Product catalog with search bar, category filter, and pagination.
  */
 export default function Catalogo() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState('Todas');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
     const [page, setPage] = useState(1);
     const [totalCount, setTotalCount] = useState(0);
     const PRODUCTS_PER_PAGE = 8;
+    const searchInputRef = useRef(null);
+
+    // Debounce search input (300ms)
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchQuery.trim());
+            setPage(1);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
 
     useEffect(() => {
         fetchProducts();
-    }, [selectedCategory, page]);
+    }, [selectedCategory, debouncedSearch, page]);
 
     async function fetchProducts() {
         try {
@@ -38,6 +45,10 @@ export default function Catalogo() {
 
             if (selectedCategory !== 'Todas') {
                 query = query.eq('category', selectedCategory);
+            }
+
+            if (debouncedSearch) {
+                query = query.ilike('name', `%${debouncedSearch}%`);
             }
 
             const from = (page - 1) * PRODUCTS_PER_PAGE;
@@ -59,7 +70,6 @@ export default function Catalogo() {
 
     const [categories, setCategories] = useState(['Todas']);
 
-    // Fetch all distinct categories from DB on mount
     useEffect(() => {
         async function fetchCategories() {
             const { data } = await supabase
@@ -85,6 +95,33 @@ export default function Catalogo() {
                     <h1 className="text-brand-blue text-[28px] md:text-[32px] font-bold leading-tight mb-6">
                         Catálogo de Productos
                     </h1>
+
+                    {/* Search Bar */}
+                    <div className="relative mb-4">
+                        <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 pointer-events-none">
+                            <span className="material-symbols-outlined text-[20px]">search</span>
+                        </span>
+                        <input
+                            ref={searchInputRef}
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Buscar productos..."
+                            className="w-full bg-white border border-gray-300 rounded-xl pl-10 pr-10 py-3 text-sm font-medium placeholder:text-gray-400 focus:ring-2 focus:ring-brand-blue focus:border-brand-blue outline-none transition-shadow shadow-sm"
+                            aria-label="Buscar productos"
+                        />
+                        {searchQuery && (
+                            <button
+                                onClick={() => { setSearchQuery(''); searchInputRef.current?.focus(); }}
+                                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 transition-colors"
+                                aria-label="Limpiar búsqueda"
+                            >
+                                <span className="material-symbols-outlined text-[18px]">close</span>
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Category Filter */}
                     {categories.length > 1 && (
                         <div className="flex flex-col gap-2">
                             <label htmlFor="category-filter" className="text-xs font-bold uppercase tracking-wider text-gray-500">
@@ -96,7 +133,7 @@ export default function Catalogo() {
                                     value={selectedCategory}
                                     onChange={(e) => {
                                         setSelectedCategory(e.target.value);
-                                        setPage(1); // Reset to page 1 when category changes
+                                        setPage(1);
                                     }}
                                     className="appearance-none w-full bg-white border border-gray-300 rounded-lg px-4 py-3 pr-10 focus:ring-2 focus:ring-brand-blue focus:border-brand-blue outline-none text-sm font-medium"
                                     aria-label="Filtrar por categoría"
@@ -146,12 +183,22 @@ export default function Catalogo() {
                             ))}
                             {products.length === 0 && (
                                 <div className="col-span-full text-center py-20">
-                                    <span className="text-4xl">📦</span>
+                                    <span className="text-4xl">{debouncedSearch ? '🔍' : '📦'}</span>
                                     <p className="text-gray-500 mt-2">
-                                        {selectedCategory !== 'Todas'
-                                            ? `No hay productos en la categoría "${selectedCategory}".`
-                                            : 'No hay productos disponibles.'}
+                                        {debouncedSearch
+                                            ? `No se encontraron productos para "${debouncedSearch}".`
+                                            : selectedCategory !== 'Todas'
+                                                ? `No hay productos en la categoría "${selectedCategory}".`
+                                                : 'No hay productos disponibles.'}
                                     </p>
+                                    {debouncedSearch && (
+                                        <button
+                                            onClick={() => setSearchQuery('')}
+                                            className="mt-3 text-brand-blue text-sm font-bold hover:underline"
+                                        >
+                                            Limpiar búsqueda
+                                        </button>
+                                    )}
                                 </div>
                             )}
                         </div>

@@ -8,15 +8,18 @@ import BundleSelector from '../components/product/BundleSelector';
 import ProductDescription from '../components/ProductDescription';
 import TrustBarSticky from '../components/TrustBarSticky';
 import PASBlock from '../components/PASBlock';
+import { useCart } from '../context/CartContext';
 
 /**
  * ProductDetail View (High Conversion - Enhanced)
  * @description
  * Optimized with urgency triggers, dynamic bundles from DB, and direct COD modal.
  * Now reads bundle_2_discount, bundle_3_discount, compare_at_price, additional_images from Supabase.
+ * Cart integration: adds product to cart from the sticky bottom bar.
  */
 export default function ProductDetail() {
     const { slug } = useParams();
+    const { addToCart } = useCart();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -114,7 +117,7 @@ export default function ProductDetail() {
             "@type": "Product",
             "name": product.name,
             "image": product.image_url || 'https://kiplystart.com/default-product.jpg',
-            "description": metaDescription, // Use optimized meta description
+            "description": metaDescription,
             "brand": {
                 "@type": "Brand",
                 "name": "KiplyStart"
@@ -150,7 +153,6 @@ export default function ProductDetail() {
     async function fetchProduct() {
         try {
             setLoading(true);
-            // Try by slug first, then fallback to UUID for backward compatibility
             const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
             const column = isUUID ? 'id' : 'slug';
             const { data, error } = await supabase
@@ -171,6 +173,15 @@ export default function ProductDetail() {
     const getPrice = (bundle = selectedBundle) => {
         if (!product) return 0;
         const basePrice = product.price;
+        const isQuantity = product.bundle_type === 'quantity';
+
+        if (isQuantity) {
+            // Quantity mode: buy 2 get 1 free → pay for 2, receive 3
+            if (bundle === 3) return Math.ceil(basePrice * 2);
+            return basePrice;
+        }
+
+        // Discount mode (default)
         const discount2 = product.bundle_2_discount || 10;
         const discount3 = product.bundle_3_discount || 20;
 
@@ -182,11 +193,21 @@ export default function ProductDetail() {
     const getSavings = (bundle) => {
         if (!product) return 0;
         const basePrice = product.price;
-        // Savings = Regular Price - Bundle Price
-        // Regular Price for 2 = base * 2
-        // Bundle Price for 2 = ceil(base * 2 * 0.9)
         const bundlePrice = getPrice(bundle);
         return (basePrice * bundle) - bundlePrice;
+    };
+
+    const handleAddToCart = () => {
+        if (!product) return;
+        const bundleSize = selectedBundle;
+        const bundleTotal = getPrice(bundleSize);
+        const isQuantity = product.bundle_type === 'quantity';
+        const discount2 = product.bundle_2_discount || 10;
+        const discount3 = product.bundle_3_discount || 20;
+        const discountPct = isQuantity
+            ? (bundleSize === 3 ? Math.round((1 / 3) * 100) : 0)
+            : (bundleSize === 3 ? discount3 : bundleSize === 2 ? discount2 : 0);
+        addToCart(product, bundleSize, { bundleSize, bundleTotal, discountPct, bundleType: product.bundle_type || 'discount' });
     };
 
     const allImages = product ? [
@@ -360,16 +381,16 @@ export default function ProductDetail() {
                     </div>
                     <div className="flex flex-col items-center w-full md:w-auto">
                         <button
-                            onClick={() => setIsModalOpen(true)}
+                            onClick={handleAddToCart}
                             className="w-full md:w-auto md:min-w-[300px] h-[46px] md:h-14 bg-green-600 hover:bg-green-700 text-white font-display font-bold text-[14px] md:text-[18px] rounded-xl flex items-center justify-center gap-1.5 md:gap-2 active:scale-[0.98] transition-all shadow-lg shadow-green-600/25 relative overflow-hidden px-3 md:px-4"
                         >
                             <span className="absolute inset-0 bg-white/20 animate-pulse-slow"></span>
-                            <span className="material-symbols-outlined relative z-10 text-[18px] md:text-[20px]">shopping_cart_checkout</span>
-                            <span className="relative z-10 truncate">Reservar · Pagas al Recibir - ${Math.ceil(getPrice())}</span>
+                            <span className="material-symbols-outlined relative z-10 text-[18px] md:text-[20px]">shopping_cart</span>
+                            <span className="relative z-10 truncate">Añadir al Carrito - ${Math.ceil(getPrice())}</span>
                         </button>
                         {/* Risk Reversal Microcopy - Product Bible 2026 */}
                         <p className="text-center text-gray-500 text-[10px] md:text-xs mt-1">
-                            ✓ Verificas antes de pagar · ✓ Devolución gratis 30 días
+                            ✓ Añade varios artículos y paga al recibir
                         </p>
                     </div>
                 </div>
