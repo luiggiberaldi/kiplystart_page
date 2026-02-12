@@ -8,7 +8,10 @@ import BundleSelector from '../components/product/BundleSelector';
 import ProductDescription from '../components/ProductDescription';
 import TrustBarSticky from '../components/TrustBarSticky';
 import PASBlock from '../components/PASBlock';
+import SocialProofChat from '../components/social/SocialProofChat';
+import TrustBadges from '../components/social/TrustBadges';
 import { useCart } from '../context/CartContext';
+import { getSocialProof } from '../data/socialProofData';
 
 /**
  * ProductDetail View (High Conversion - Enhanced)
@@ -21,6 +24,7 @@ export default function ProductDetail() {
     const { slug } = useParams();
     const { addToCart } = useCart();
     const [product, setProduct] = useState(null);
+    const socialProof = product ? getSocialProof(product.slug) : null;
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -322,6 +326,9 @@ export default function ProductDetail() {
                         </div>
                     )}
 
+                    {/* Trust Badges - Social Proof 2026 */}
+                    <TrustBadges badges={socialProof.badges} />
+
                     <BundleSelector
                         product={product}
                         selectedBundle={selectedBundle}
@@ -331,6 +338,8 @@ export default function ProductDetail() {
                     />
 
                     <ProductDescription description={product.description} />
+
+
 
                     {/* Product Video Section - WebM/MP4 */}
                     {product.video_url && (
@@ -352,6 +361,9 @@ export default function ProductDetail() {
 
                     {/* PAS Block - Product Bible 2026 Standard */}
                     <PASBlock product={product} />
+
+                    {/* Chat Simulation - Social Proof 2026 */}
+                    <SocialProofChat messages={socialProof.chatMessages} />
 
                     {product.tags && product.tags.length > 0 && (
                         <div className="flex flex-wrap gap-2">
