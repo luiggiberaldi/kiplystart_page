@@ -55,8 +55,14 @@ const CoverageSection = () => {
                             Tranquilo, hacemos envíos a toda Venezuela por <strong>MRW, Zoom y Tealca</strong>.
                         </p>
                     </div>
-                    <a href="#contact" className="bg-[#E63946] hover:bg-red-600 text-white px-8 py-3 rounded-full font-bold transition-transform transform hover:scale-105 shadow-lg shadow-red-900/20 whitespace-nowrap">
-                        Consultar envío
+                    <a
+                        href={`https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER}?text=Hola,%20quisiera%20consultar%20si%20hacen%20envíos%20a%20mi%20ciudad`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-[#E63946] hover:bg-red-600 text-white px-8 py-3 rounded-full font-bold transition-transform transform hover:scale-105 shadow-lg shadow-red-900/20 whitespace-nowrap flex items-center gap-2"
+                    >
+                        <span>Consultar envío</span>
+                        <span className="text-xl">💬</span>
                     </a>
                 </div>
             </div>
