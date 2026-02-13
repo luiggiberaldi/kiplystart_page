@@ -16,7 +16,7 @@ export default function Soporte() {
         },
         {
             q: '¿Cuándo y cómo pago?',
-            a: 'Pagas cuando recibes el producto en tu puerta. Aceptamos efectivo (USD o Bs), transferencia bancaria, Pago Móvil y Binance (USDT).'
+            a: 'Pagas cuando recibes el producto en tu puerta. Aceptamos efectivo (USD o Bs), transferencia bancaria y Pago Móvil.'
         },
         {
             q: '¿Puedo verificar el producto antes de pagar?',

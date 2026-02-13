@@ -26,7 +26,7 @@ export default function TrustBar() {
             number: '3',
             title: 'Pagas',
             desc: 'Solo cuando lo verifiques',
-            sub: 'Efectivo · Zelle · Pago Móvil · Binance'
+            sub: 'Efectivo · Zelle · Pago Móvil'
         }
     ];
 

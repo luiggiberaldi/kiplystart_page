@@ -42,7 +42,6 @@ export default function Terminos() {
                         <ul className="list-disc pl-5 space-y-1">
                             <li><strong>Pago al Recibir (Contra Entrega):</strong> Efectivo en USD o Bolívares al momento de la entrega.</li>
                             <li><strong>Transferencia Bancaria / Pago Móvil:</strong> Previo a la entrega, con comprobante enviado por WhatsApp.</li>
-                            <li><strong>Binance (USDT):</strong> Pago en criptomoneda previo a la entrega.</li>
                         </ul>
                     </section>
 

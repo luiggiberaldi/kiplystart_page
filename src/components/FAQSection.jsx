@@ -11,7 +11,7 @@ const faqs = [
     },
     {
         q: '¿Qué métodos de pago aceptan al momento de recibir?',
-        a: 'Efectivo (USD y Bs), Pago Móvil, Zelle, Binance y Zinli. Todos los precios se calculan a Tasa BCV del día.'
+        a: 'Efectivo (USD y Bs), Pago Móvil, Zelle y Zinli. Todos los precios se calculan a Tasa BCV del día.'
     },
     {
         q: '¿Puedo devolver el producto si no me gusta?',

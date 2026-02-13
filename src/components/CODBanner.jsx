@@ -7,7 +7,7 @@ const steps = [
     { icon: 'verified', text: 'Lo abres, lo verificas, y LUEGO pagas' },
 ];
 
-const methods = ['Efectivo USD/Bs', 'Pago Móvil', 'Zelle', 'Binance', 'Zinli'];
+const methods = ['Efectivo USD/Bs', 'Pago Móvil', 'Zelle', 'Zinli'];
 
 /**
  * CODBanner — Educational banner explaining Cash on Delivery process
