@@ -12,6 +12,7 @@ import SocialProofChat from '../components/social/SocialProofChat';
 import TrustBadges from '../components/social/TrustBadges';
 import { useCart } from '../context/CartContext';
 import { getSocialProof } from '../data/socialProofData';
+import { trackViewContent, trackAddToCart } from '../lib/fbPixelEvents';
 
 /**
  * ProductDetail View (High Conversion - Enhanced)
@@ -181,6 +182,7 @@ export default function ProductDetail() {
 
             if (error) throw error;
             setProduct(data);
+            trackViewContent(data);
         } catch (err) {
             setError(err.message);
         } finally {
@@ -226,6 +228,7 @@ export default function ProductDetail() {
             ? (bundleSize === 3 ? Math.round((1 / 3) * 100) : 0)
             : (bundleSize === 3 ? discount3 : bundleSize === 2 ? discount2 : 0);
         addToCart(product, bundleSize, { bundleSize, bundleTotal, discountPct, bundleType: product.bundle_type || 'discount' });
+        trackAddToCart(product, bundleSize, bundleTotal);
     };
 
     const allImages = product ? [

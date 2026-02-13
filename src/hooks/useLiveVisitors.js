@@ -19,7 +19,9 @@ export default function useLiveVisitors() {
         channel
             .on('presence', { event: 'sync' }, () => {
                 const state = channel.presenceState();
+                console.log('Admin Presence State:', state); // Debug log
                 const allPresences = Object.values(state).flat();
+                console.log('Admin Flattened Visitors (JSON):', JSON.stringify(allPresences, null, 2)); // Deep Debug log
                 setLiveCount(allPresences.length);
                 setVisitors(allPresences);
             })

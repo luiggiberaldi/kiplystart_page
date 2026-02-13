@@ -6,6 +6,7 @@ import { X, Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
 import PriceDual from '../PriceDual';
 import CODField from '../cod/CODField';
 import { ZONES, getSavedCustomer, saveCustomer, clearSavedCustomer } from '../cod/codData';
+import { trackInitiateCheckout, trackPurchase } from '../../lib/fbPixelEvents';
 
 const EMPTY_FORM = { name: '', ci: '', phone: '', state: '', city: '', address: '', ref: '' };
 
@@ -140,6 +141,7 @@ export default function CartDrawer() {
             }
 
             setSuccess(true);
+            trackPurchase(orderId, cartItems, cartTotal);
 
             // Build WhatsApp message with all cart items
             const bsLine = exchangeRate ? `\n💱 *En Bs:* ${formatBs(cartTotal)}` : '';
@@ -537,7 +539,7 @@ export default function CartDrawer() {
                             </div>
                         </div>
                         <button
-                            onClick={() => setStep(1)}
+                            onClick={() => { trackInitiateCheckout(cartItems, cartTotal); setStep(1); }}
                             className="w-full bg-brand-blue hover:brightness-110 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-brand-blue/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-[15px]"
                         >
                             <span className="material-symbols-outlined text-[20px]">local_shipping</span>

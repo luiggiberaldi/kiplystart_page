@@ -1,4 +1,5 @@
 import { createContext, useState, useContext, useEffect } from 'react';
+import { supabase } from '../lib/supabaseClient';
 
 const CartContext = createContext();
 
@@ -41,6 +42,15 @@ export function CartProvider({ children }) {
         const bundleType = bundleInfo.bundleType || 'discount';
         const discountPct = bundleInfo.discountPct || (bundleSize === 3 ? 20 : bundleSize === 2 ? 10 : 0);
         const bundleTotal = bundleInfo.bundleTotal || calcBundleTotal(product.price, bundleSize, discountPct);
+
+        // Track add to cart event (fire and forget)
+        supabase.from('cart_events').insert({
+            product_id: product.id,
+            price: product.price,
+            currency: 'USD'
+        }).then(({ error }) => {
+            if (error) console.error('Error tracking cart event:', error);
+        });
 
         setCartItems(prev => {
             // Check if same product with same bundle size already exists

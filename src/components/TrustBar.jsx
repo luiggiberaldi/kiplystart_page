@@ -1,15 +1,8 @@
 /**
- * TrustBar Component
+ * TrustBar 2.0 Component
  * @description
  * Visual 3-step process: Pides → Recibes → Pagas.
- * Uses Material Symbols for cross-device consistency.
- * 
- * Brain Validation:
- * - ✅ 3 pasos claros (cognitive load reduction)
- * - ✅ Material Symbols (consistencia visual cross-device)
- * - ✅ Brand-blue sobre fondo brand-blue/10 (paleta Safety-First)
- * 
- * @returns {JSX.Element} TrustBar component
+ * Upgraded with payment method sub-lines for each step.
  */
 
 export default function TrustBar() {
@@ -18,19 +11,22 @@ export default function TrustBar() {
             icon: 'shopping_bag',
             number: '1',
             title: 'Pides',
-            desc: 'Selecciona tu producto'
+            desc: 'Selecciona tu producto',
+            sub: 'Sin registro · Sin tarjeta'
         },
         {
             icon: 'package_2',
             number: '2',
             title: 'Recibes',
-            desc: 'Entrega en tu puerta'
+            desc: 'Llega a tu puerta en 24-48h',
+            sub: 'Envío GRATIS · Contraentrega'
         },
         {
             icon: 'payments',
             number: '3',
             title: 'Pagas',
-            desc: 'Solo cuando lo recibas'
+            desc: 'Solo cuando lo verifiques',
+            sub: 'Efectivo · Zelle · Pago Móvil · Binance'
         }
     ];
 
@@ -39,13 +35,14 @@ export default function TrustBar() {
             <div className="flex justify-between items-start gap-2">
                 {steps.map((step, i) => (
                     <div key={step.number} className="contents">
-                        <div className="flex flex-col items-center flex-1 text-center gap-3">
+                        <div className="flex flex-col items-center flex-1 text-center gap-2.5">
                             <div className="w-12 h-12 rounded-full bg-brand-blue/10 flex items-center justify-center text-brand-blue">
                                 <span className="material-symbols-outlined text-[28px]">{step.icon}</span>
                             </div>
                             <div>
                                 <p className="text-sm font-bold text-brand-blue">{step.number}. {step.title}</p>
-                                <p className="text-xs text-gray-500 mt-1">{step.desc}</p>
+                                <p className="text-xs text-gray-600 mt-1 leading-snug">{step.desc}</p>
+                                <p className="text-[10px] text-gray-400 mt-1 leading-snug font-medium">{step.sub}</p>
                             </div>
                         </div>
                         {i < steps.length - 1 && (

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import Navbar from '../components/Navbar';
 import ProductCard from '../components/ProductCard';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 /**
  * Catalogo View
@@ -10,10 +10,17 @@ import { Link } from 'react-router-dom';
  * Product catalog with search bar, category filter, and pagination.
  */
 export default function Catalogo() {
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // Always scroll to top on mount (fixes SPA navigation landing mid-page)
+    useEffect(() => { window.scrollTo(0, 0); }, []);
+
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [selectedCategory, setSelectedCategory] = useState('Todas');
+    const [selectedCategory, setSelectedCategory] = useState(
+        searchParams.get('category') || 'Todas'
+    );
     const [searchQuery, setSearchQuery] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [page, setPage] = useState(1);
@@ -132,8 +139,15 @@ export default function Catalogo() {
                                     id="category-filter"
                                     value={selectedCategory}
                                     onChange={(e) => {
-                                        setSelectedCategory(e.target.value);
+                                        const cat = e.target.value;
+                                        setSelectedCategory(cat);
                                         setPage(1);
+                                        // Sync URL
+                                        if (cat === 'Todas') {
+                                            setSearchParams({});
+                                        } else {
+                                            setSearchParams({ category: cat });
+                                        }
                                     }}
                                     className="appearance-none w-full bg-white border border-gray-300 rounded-lg px-4 py-3 pr-10 focus:ring-2 focus:ring-brand-blue focus:border-brand-blue outline-none text-sm font-medium"
                                     aria-label="Filtrar por categoría"

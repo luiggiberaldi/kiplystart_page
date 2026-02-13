@@ -127,6 +127,25 @@ export default function VideoHero() {
                 </div>
 
             </div>
+
+            {/* Stats Bar — Value Proposition */}
+            <div className="absolute bottom-0 left-0 right-0 z-30 bg-black/60 backdrop-blur-md border-t border-white/10">
+                <div className="max-w-5xl mx-auto flex justify-around py-3 px-4">
+                    {[
+                        { icon: 'inventory_2', value: '+2,500', label: 'Pedidos' },
+                        { icon: 'local_shipping', value: '24-48h', label: 'Envío GRATIS' },
+                        { icon: 'currency_exchange', value: 'Tasa BCV', label: 'Del día' },
+                    ].map((stat, i) => (
+                        <div key={i} className="flex items-center gap-2 text-white">
+                            <span className="material-symbols-outlined text-xl text-brand-red opacity-90">{stat.icon}</span>
+                            <div>
+                                <p className="text-sm sm:text-base font-bold leading-tight">{stat.value}</p>
+                                <p className="text-[10px] sm:text-xs text-white/60 leading-tight">{stat.label}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 }
