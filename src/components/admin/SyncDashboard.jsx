@@ -16,6 +16,7 @@ export default function SyncDashboard() {
     const [selectedPrices, setSelectedPrices] = useState([]);
     const [selectedStock, setSelectedStock] = useState([]);
     const [selectedNew, setSelectedNew] = useState([]);
+    const [selectedEliminados, setSelectedEliminados] = useState([]);
 
     function handleFileLoad(e) {
         const file = e.target.files[0];
@@ -29,6 +30,7 @@ export default function SyncDashboard() {
                 setSelectedPrices(data.precios_desactualizados?.map((_, i) => i) || []);
                 setSelectedStock(data.stock_desactualizados?.map((_, i) => i) || []);
                 setSelectedNew(data.nuevos?.map((_, i) => i) || []);
+                setSelectedEliminados(data.eliminados?.map((_, i) => i) || []);
                 showMsg('success', `✅ Reporte cargado: ${data.total_dropanas || 0} productos escaneados`);
             } catch (err) {
                 showMsg('error', 'Error al parsear el archivo JSON');
@@ -146,6 +148,39 @@ export default function SyncDashboard() {
         setApplying(false);
     }
 
+    async function applyEliminadosUpdates() {
+        if (!report?.eliminados) return;
+        setApplying(true);
+
+        const items = report.eliminados.filter((_, i) => selectedEliminados.includes(i));
+        let updated = 0, errors = 0;
+
+        for (const item of items) {
+            const { error } = await supabase
+                .from('products')
+                .update({ is_active: false })
+                .eq('id', item.id);
+
+            if (error) errors++;
+            else updated++;
+        }
+
+        await supabase.from('activity_log').insert({
+            action: 'bulk_deactivate_products',
+            entity_type: 'product',
+            details: { updated, errors, total: items.length, source: 'scraper_sync' }
+        });
+
+        setReport(prev => ({
+            ...prev,
+            eliminados: prev.eliminados.filter((_, i) => !selectedEliminados.includes(i))
+        }));
+        setSelectedEliminados([]);
+
+        showMsg('success', `✅ ${updated} productos desactivados${errors > 0 ? `, ${errors} errores` : ''}`);
+        setApplying(false);
+    }
+
     function showMsg(type, text) {
         setMessage({ type, text });
         setTimeout(() => setMessage(null), 5000);
@@ -165,6 +200,12 @@ export default function SyncDashboard() {
 
     function toggleNew(idx) {
         setSelectedNew(prev =>
+            prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
+        );
+    }
+
+    function toggleEliminados(idx) {
+        setSelectedEliminados(prev =>
             prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
         );
     }
@@ -201,11 +242,12 @@ export default function SyncDashboard() {
             {report && (
                 <>
                     {/* Summary Cards */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
                         <SyncCard label="Escaneados" value={report.total_dropanas} icon="search" color="blue" />
-                        <SyncCard label="Sincronizados" value={report.sincronizados} icon="check_circle" color="green" />
-                        <SyncCard label="Precios Mal" value={report.precios_desactualizados?.length || 0} icon="price_change" color="red" />
+                        <SyncCard label="Nuevos" value={report.nuevos?.length || 0} icon="new_releases" color="blue" />
+                        <SyncCard label="Precios Mal" value={report.precios_desactualizados?.length || 0} icon="price_change" color="yellow" />
                         <SyncCard label="Stock Mal" value={report.stock_desactualizados?.length || 0} icon="inventory" color="yellow" />
+                        <SyncCard label="Agotados" value={report.eliminados?.length || 0} icon="block" color="red" />
                     </div>
 
                     {/* New Products */}
@@ -375,6 +417,61 @@ export default function SyncDashboard() {
                                                 <td className="px-4 py-3 text-gray-700 max-w-[250px] truncate">{p.name}</td>
                                                 <td className="px-4 py-3 text-right text-red-500 font-mono">{p.stock_kiplystart}</td>
                                                 <td className="px-4 py-3 text-right text-green-600 font-bold font-mono">{p.stock_dropanas}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Eliminados */}
+                    {report.eliminados?.length > 0 && (
+                        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                            <div className="px-4 md:px-5 py-3 md:py-4 border-b border-gray-100 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                                <div className="flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-red-600">block</span>
+                                    <h3 className="font-bold text-gray-900 text-sm md:text-base">Productos Agotados / Eliminados en DroPanas ({report.eliminados.length})</h3>
+                                </div>
+                                <button
+                                    onClick={applyEliminadosUpdates}
+                                    disabled={applying || selectedEliminados.length === 0}
+                                    className="flex items-center gap-1.5 px-4 py-2 bg-[#E63946] text-white rounded-lg text-xs font-bold hover:bg-red-700 transition-colors disabled:opacity-50"
+                                >
+                                    <span className="material-symbols-outlined text-[16px]">visibility_off</span>
+                                    Desactivar {selectedEliminados.length} Productos
+                                </button>
+                            </div>
+                            <div className="overflow-x-auto max-h-80 overflow-y-auto">
+                                <table className="w-full text-sm">
+                                    <thead className="bg-gray-50 text-xs text-gray-500 uppercase sticky top-0">
+                                        <tr>
+                                            <th className="px-4 py-3 text-left w-8">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedEliminados.length === report.eliminados.length}
+                                                    onChange={() => {
+                                                        if (selectedEliminados.length === report.eliminados.length) {
+                                                            setSelectedEliminados([]);
+                                                        } else {
+                                                            setSelectedEliminados(report.eliminados.map((_, i) => i));
+                                                        }
+                                                    }}
+                                                    className="rounded"
+                                                />
+                                            </th>
+                                            <th className="px-4 py-3 text-left">Producto</th>
+                                            <th className="px-4 py-3 text-right">Categoría</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                        {report.eliminados.map((p, i) => (
+                                            <tr key={i} className={`hover:bg-gray-50 ${selectedEliminados.includes(i) ? 'bg-red-50/50' : ''}`}>
+                                                <td className="px-4 py-3">
+                                                    <input type="checkbox" checked={selectedEliminados.includes(i)} onChange={() => toggleEliminados(i)} className="rounded" />
+                                                </td>
+                                                <td className="px-4 py-3 text-gray-700 max-w-[250px] truncate">{p.name}</td>
+                                                <td className="px-4 py-3 text-right text-gray-500 font-mono">{p.category}</td>
                                             </tr>
                                         ))}
                                     </tbody>

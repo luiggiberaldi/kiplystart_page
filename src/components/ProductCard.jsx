@@ -55,6 +55,12 @@ export default function ProductCard({ product, loading = false }) {
                             <span className="bg-white text-soft-black text-sm font-bold px-4 py-2 rounded-full">Agotado</span>
                         </div>
                     )}
+                    {product.category === 'Nuevos' && product.stock > 0 && (
+                        <div className="absolute top-2 left-2 bg-[#FDE68A] text-yellow-800 text-xs font-bold px-2 py-1 rounded-sm shadow-sm flex items-center gap-1">
+                            <span className="material-symbols-outlined text-[12px]">new_releases</span>
+                            NUEVO
+                        </div>
+                    )}
                 </div>
 
                 <div className="flex-grow">
