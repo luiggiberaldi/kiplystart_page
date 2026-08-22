@@ -10,8 +10,7 @@ export default function ProductCardMobile({
     onDelete,
     onToggleStatus,
     onClone,
-    formatPrice,
-    productSlug
+    formatPrice
 }) {
     const margin = product.dropanas_price
         ? { amount: product.price - product.dropanas_price, pct: (((product.price - product.dropanas_price) / product.price) * 100).toFixed(0) }

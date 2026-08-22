@@ -8,7 +8,7 @@ const BUCKET = 'product-images';
  * @param {function} onProgress - Optional progress callback (0-100)
  * @returns {Promise<string>} Public URL of the uploaded image
  */
-export async function uploadProductImage(file, onProgress) {
+export async function uploadProductImage(file) {
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     if (!allowedTypes.includes(file.type)) {

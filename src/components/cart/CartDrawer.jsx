@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useCurrency } from '../../context/CurrencyContext';
 import { supabase } from '../../lib/supabaseClient';
@@ -18,7 +18,6 @@ export default function CartDrawer() {
         removeFromCart,
         updateBundleSets,
         cartTotal,
-        cartCount,
         getCartKey,
         clearCart
     } = useCart();
@@ -27,29 +26,24 @@ export default function CartDrawer() {
 
     // COD Form state
     const [step, setStep] = useState(0); // 0=cart, 1=personal, 2=delivery
-    const [returning, setReturning] = useState(false);
-    const [formData, setFormData] = useState({ ...EMPTY_FORM });
+    const [returning, setReturning] = useState(() => !!getSavedCustomer()?.name);
+    const [formData, setFormData] = useState(() => {
+        const saved = getSavedCustomer();
+        return saved?.name ? { ...EMPTY_FORM, ...saved } : { ...EMPTY_FORM };
+    });
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
     const [touched, setTouched] = useState({});
     const [success, setSuccess] = useState(false);
     const formRef = useRef(null);
 
-    // Reset form when drawer closes
-    useEffect(() => {
-        if (isCartOpen) {
-            const saved = getSavedCustomer();
-            if (saved?.name) {
-                setFormData(prev => ({ ...prev, ...saved }));
-                setReturning(true);
-            }
-        } else {
-            setStep(0);
-            setSuccess(false);
-            setErrors({});
-            setTouched({});
-        }
-    }, [isCartOpen]);
+    const closeDrawer = () => {
+        setIsCartOpen(false);
+        setStep(0);
+        setSuccess(false);
+        setErrors({});
+        setTouched({});
+    };
 
     if (!isCartOpen) return null;
 
@@ -201,8 +195,6 @@ export default function CartDrawer() {
         setReturning(false);
     }
 
-    const fieldProps = { formData, errors, handleChange, handleBlur, fieldBorder, getFieldStatus };
-
     /* ===== Success overlay ===== */
     if (success) {
         return (
@@ -224,7 +216,7 @@ export default function CartDrawer() {
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/30 backdrop-blur-sm"
-                onClick={() => setIsCartOpen(false)}
+                onClick={closeDrawer}
             ></div>
 
             {/* Drawer */}
@@ -240,7 +232,7 @@ export default function CartDrawer() {
                         </h2>
                     </div>
                     <button
-                        onClick={() => setIsCartOpen(false)}
+                        onClick={closeDrawer}
                         className="p-1 hover:bg-white/20 rounded-full transition-colors shrink-0 ml-2"
                     >
                         <X size={22} />
@@ -250,7 +242,7 @@ export default function CartDrawer() {
                 {/* Stepper indicator (only when in form steps) */}
                 {step > 0 && (
                     <div className="flex items-center gap-2 px-4 py-2.5 bg-brand-blue/95 shrink-0">
-                        <StepPill active={step === 1} done={step > 1} icon={step > 1 ? 'check_circle' : 'person'} label="Tus datos" />
+                        <StepPill active={step === 1} icon={step > 1 ? 'check_circle' : 'person'} label="Tus datos" />
                         <div className={`h-[2px] flex-1 rounded ${step > 1 ? 'bg-white' : 'bg-white/20'}`} />
                         <StepPill active={step === 2} icon="location_on" label="Envío" />
                     </div>
@@ -266,7 +258,7 @@ export default function CartDrawer() {
                                     <ShoppingBag size={64} className="mb-4 text-gray-200" />
                                     <p className="text-lg font-medium">Tu carrito está vacío</p>
                                     <button
-                                        onClick={() => setIsCartOpen(false)}
+                                        onClick={closeDrawer}
                                         className="mt-4 text-brand-blue hover:underline"
                                     >
                                         Seguir comprando
@@ -557,7 +549,7 @@ export default function CartDrawer() {
 
 /* ===== Tiny helpers ===== */
 
-function StepPill({ active, done, icon, label }) {
+function StepPill({ active, icon, label }) {
     return (
         <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors
             ${active ? 'bg-white text-brand-blue' : 'bg-white/20 text-white/70'}`}>

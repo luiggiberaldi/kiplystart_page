@@ -1,24 +1,21 @@
 import { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 
 /**
  * usePageTracker — tracks page views + joins Realtime Presence channel.
- * Place this in App.jsx or the main public layout.
+ * Place this in App.jsx inside the <Router>.
  * 
- * - Inserts a row into page_views on first mount and on route change.
+ * - Inserts a row into page_views on route change.
  * - Joins a Presence channel so admin can count live visitors.
  */
 export default function usePageTracker() {
     const sessionId = useRef(getOrCreateSessionId());
+    const location = useLocation();
 
     useEffect(() => {
-        console.log("TRACKER V5.1 - ADMIN CHECK DISABLED"); // VERIFICATION LOG
-
-        // Skip tracking for admin devices and admin pages
-        // if (localStorage.getItem('kp_admin_device')) return; // COMMENTED OUT FOR DEBUGGING
-        if (window.location.pathname.startsWith('/admin')) return;
-
-        const path = window.location.pathname;
+        const path = location.pathname;
+        if (path.startsWith('/admin')) return;
 
         // 1. Record page view
         supabase.from('page_views').insert({
@@ -26,7 +23,7 @@ export default function usePageTracker() {
             referrer: document.referrer || null,
             user_agent: navigator.userAgent,
             session_id: sessionId.current,
-        }).then(); // fire-and-forget
+        }).then();
 
         // 2. Join Presence channel for live tracking
         const channel = supabase.channel('page-presence', {
@@ -150,7 +147,7 @@ export default function usePageTracker() {
             channel.untrack();
             supabase.removeChannel(channel);
         };
-    }, []);
+    }, [location.pathname]);
 }
 
 /** Generate or reuse a session ID for this browser tab session */

@@ -2,7 +2,7 @@
  * CODField — Reusable input wrapper with icon, validation border & checkmark
  */
 export default function CODField({
-    label, icon, name, error, status,
+    label, icon, error, status,
     borderClass, children, optional = false
 }) {
     return (

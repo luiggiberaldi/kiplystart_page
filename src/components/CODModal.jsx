@@ -17,8 +17,11 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
     const { formatUSD, formatBs, exchangeRate } = useCurrency();
 
     const [step, setStep] = useState(1);
-    const [returning, setReturning] = useState(false);
-    const [formData, setFormData] = useState({ ...EMPTY_FORM });
+    const [returning, setReturning] = useState(() => !!getSavedCustomer()?.name);
+    const [formData, setFormData] = useState(() => {
+        const saved = getSavedCustomer();
+        return saved?.name ? { ...EMPTY_FORM, ...saved } : { ...EMPTY_FORM };
+    });
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
     const [touched, setTouched] = useState({});
@@ -29,11 +32,8 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
-            const saved = getSavedCustomer();
-            if (saved?.name) { setFormData(prev => ({ ...prev, ...saved })); setReturning(true); }
         } else {
             document.body.style.overflow = 'unset';
-            setStep(1); setSuccess(false); setErrors({}); setTouched({});
         }
     }, [isOpen]);
 
@@ -42,9 +42,6 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
     if (!isOpen) return null;
 
     /* ===== Field helpers ===== */
-    const selectedZone = ZONES.find(z => z.state === formData.state);
-    const deliveryTime = selectedZone?.delivery || '';
-
     function handleChange(e) {
         const { name, value } = e.target;
         setFormData(prev => {
@@ -213,7 +210,7 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
 }
 
 /* ===== Tiny helper ===== */
-function StepPill({ active, done, icon, label }) {
+function StepPill({ active, icon, label }) {
     return (
         <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors
             ${active ? 'bg-white text-brand-blue' : 'bg-white/20 text-white/70'}`}>

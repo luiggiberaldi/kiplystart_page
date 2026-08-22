@@ -28,7 +28,7 @@ export function SettingsProvider({ children }) {
                     .eq('id', 1)
                     .single();
                 if (!error && data) {
-                    const { id, updated_at, ...rest } = data;
+                    const { id: _id, updated_at: _updated_at, ...rest } = data;
                     setSettings(prev => ({ ...prev, ...rest }));
                 }
             } catch (e) {
@@ -41,7 +41,7 @@ export function SettingsProvider({ children }) {
 
     async function saveSettings(newSettings) {
         setSettings(newSettings);
-        const { id, updated_at, ...payload } = newSettings;
+        const { id: _id, updated_at: _updated_at, ...payload } = newSettings;
         const { error } = await supabase
             .from('settings')
             .update(payload)

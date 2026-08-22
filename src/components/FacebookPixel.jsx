@@ -26,7 +26,6 @@ const FacebookPixel = () => {
         // Prevent duplicate injection
         if (window.fbq) return;
 
-        /* eslint-disable */
         !function (f, b, e, v, n, t, s) {
             if (f.fbq) return; n = f.fbq = function () {
                 n.callMethod ?
@@ -38,7 +37,6 @@ const FacebookPixel = () => {
             s.parentNode.insertBefore(t, s)
         }(window, document, 'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-        /* eslint-enable */
 
         // Init Pixel
         window.fbq('init', pixelId);

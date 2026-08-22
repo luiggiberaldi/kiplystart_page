@@ -1,8 +1,10 @@
-/**
- * ProductTableDesktop
- * Renders the full product table for desktop/tablet view.
- */
 import { useSettings } from '../../../context/SettingsContext';
+
+function SortIcon({ col, sortBy, sortDir }) {
+    if (sortBy !== col) return <span className="material-symbols-outlined text-[14px] text-gray-300">unfold_more</span>;
+    return <span className="material-symbols-outlined text-[14px] text-brand-blue">{sortDir === 'asc' ? 'expand_less' : 'expand_more'}</span>;
+}
+
 export default function ProductTableDesktop({
     products,
     totalCount,
@@ -22,16 +24,10 @@ export default function ProductTableDesktop({
     onToggleStatus,
     onToggleFeatured,
     onClone,
-    formatPrice,
-    productSlug
+    formatPrice
 }) {
     const { settings } = useSettings();
     const shippingCost = settings.shipping_cost || 8;
-
-    const SortIcon = ({ col }) => {
-        if (sortBy !== col) return <span className="material-symbols-outlined text-[14px] text-gray-300">unfold_more</span>;
-        return <span className="material-symbols-outlined text-[14px] text-brand-blue">{sortDir === 'asc' ? 'expand_less' : 'expand_more'}</span>;
-    };
 
     return (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -44,17 +40,17 @@ export default function ProductTableDesktop({
                                     className="w-3.5 h-3.5 text-brand-blue rounded cursor-pointer" />
                             </th>
                             <th className="p-3 cursor-pointer select-none" onClick={() => onSort('name')}>
-                                <span className="flex items-center gap-1">Producto <SortIcon col="name" /></span>
+                                <span className="flex items-center gap-1">Producto <SortIcon col="name" sortBy={sortBy} sortDir={sortDir} /></span>
                             </th>
                             <th className="p-3 cursor-pointer select-none" onClick={() => onSort('price')}>
-                                <span className="flex items-center gap-1">Precio <SortIcon col="price" /></span>
+                                <span className="flex items-center gap-1">Precio <SortIcon col="price" sortBy={sortBy} sortDir={sortDir} /></span>
                             </th>
                             <th className="p-3 cursor-pointer select-none" onClick={() => onSort('margin')}>
-                                <span className="flex items-center gap-1">DroPanas <SortIcon col="margin" /></span>
+                                <span className="flex items-center gap-1">DroPanas <SortIcon col="margin" sortBy={sortBy} sortDir={sortDir} /></span>
                             </th>
                             <th className="p-3">Bundles</th>
                             <th className="p-3 cursor-pointer select-none" onClick={() => onSort('stock')}>
-                                <span className="flex items-center gap-1">Stock <SortIcon col="stock" /></span>
+                                <span className="flex items-center gap-1">Stock <SortIcon col="stock" sortBy={sortBy} sortDir={sortDir} /></span>
                             </th>
                             <th className="p-3">Estado</th>
                             <th className="p-3 text-right">Acciones</th>

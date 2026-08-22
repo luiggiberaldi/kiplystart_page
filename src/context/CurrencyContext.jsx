@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { formatUSD as pureFormatUSD, formatBs as pureFormatBs } from '../utils/pricingCalculations';
 
 const CurrencyContext = createContext();
 export const useCurrency = () => useContext(CurrencyContext);
@@ -12,7 +13,9 @@ async function fetchRateFromAPIs() {
         const res = await fetch(`/google-api/macros/s/AKfycbxT9sKz_XWRWuQx_XP-BJ33T0hoAgJsLwhZA00v6nPt4Ij4jRjq-90mDGLVCsS6FXwW9Q/exec?token=${bcvToken}`);
         const data = await res.json();
         if (data.bcv?.price) return { rate: data.bcv.price, source: 'google-script' };
-    } catch { }
+    } catch {
+        // Fallback to public monitor
+    }
 
     // 2. Public API (pydolarve / bcv-api)
     try {
@@ -20,14 +23,18 @@ async function fetchRateFromAPIs() {
         const data = await res.json();
         const rate = data.monitors?.bcv?.price || data.bcv?.price || data.bcv?.rate;
         if (rate) return { rate, source: 'pydolarve' };
-    } catch { }
+    } catch {
+        // Fallback to rafnixg
+    }
 
     // 3. Fallback: rafnixg BCV API
     try {
         const res = await fetch('https://bcv-api.rafnixg.dev/rates/');
         const data = await res.json();
         if (data.usd) return { rate: parseFloat(data.usd), source: 'rafnixg' };
-    } catch { }
+    } catch {
+        // All remote APIs failed
+    }
 
     return null;
 }
@@ -37,7 +44,9 @@ function getCachedRate() {
     try {
         const cached = JSON.parse(localStorage.getItem('bcv_rate_cache'));
         if (cached?.rate && cached?.timestamp) return cached;
-    } catch { }
+    } catch {
+        // Cache parse failure
+    }
     return null;
 }
 
@@ -134,29 +143,12 @@ export const CurrencyProvider = ({ children }) => {
     }, [rateMode]);
 
     // === Formatters ===
-    const formatUSD = useCallback((amountUSD) => {
-        if (!amountUSD) return '$0';
-        const hasDecimals = amountUSD % 1 !== 0;
-        return `$${amountUSD.toLocaleString('en-US', {
-            minimumFractionDigits: hasDecimals ? 2 : 0,
-            maximumFractionDigits: 2
-        })}`;
-    }, []);
+    const formatUSD = useCallback((amountUSD) => pureFormatUSD(amountUSD), []);
 
-    const formatBs = useCallback((amountUSD) => {
-        if (!amountUSD || !exchangeRate) return '';
-        const amountVES = amountUSD * exchangeRate;
-        return `Bs ${amountVES.toLocaleString('es-VE', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        })}`;
-    }, [exchangeRate]);
+    const formatBs = useCallback((amountUSD) => pureFormatBs(amountUSD, exchangeRate), [exchangeRate]);
 
     // Legacy: returns formatted string based on selected currency
-    const formatPrice = useCallback((amountUSD) => {
-        if (!amountUSD) return '$0';
-        return formatUSD(amountUSD);
-    }, [formatUSD]);
+    const formatPrice = useCallback((amountUSD) => pureFormatUSD(amountUSD), []);
 
     const value = {
         exchangeRate,

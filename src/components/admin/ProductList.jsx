@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useCurrency } from '../../context/CurrencyContext';
 import ProductFilters from './product-list/ProductFilters';
 import ProductBulkActions from './product-list/ProductBulkActions';
@@ -21,10 +21,9 @@ export default function ProductList({ products, onEdit, onDelete, onRefresh, onT
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 20;
 
-    // Reset pagination when filters change
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchTerm, filterCategory, filterStatus]);
+    const handleSearchChange = (term) => { setSearchTerm(term); setCurrentPage(1); };
+    const handleCategoryChange = (cat) => { setFilterCategory(cat); setCurrentPage(1); };
+    const handleStatusChange = (status) => { setFilterStatus(status); setCurrentPage(1); };
 
     // Filtering
     const filteredProducts = useMemo(() => {
@@ -114,11 +113,11 @@ export default function ProductList({ products, onEdit, onDelete, onRefresh, onT
         <div className="space-y-3">
             <ProductFilters
                 searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
+                setSearchTerm={handleSearchChange}
                 filterCategory={filterCategory}
-                setFilterCategory={setFilterCategory}
+                setFilterCategory={handleCategoryChange}
                 filterStatus={filterStatus}
-                setFilterStatus={setFilterStatus}
+                setFilterStatus={handleStatusChange}
                 categories={categories}
                 onRefresh={onRefresh}
             />

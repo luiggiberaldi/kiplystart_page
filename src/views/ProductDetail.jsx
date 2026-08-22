@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import CODModal from '../components/CODModal';
@@ -35,26 +35,34 @@ export default function ProductDetail() {
 
     // Marketing State
     const [viewersCount, setViewersCount] = useState(24);
-    const [timeLeft, setTimeLeft] = useState({ m: 14, s: 59 });
     const [selectedBundle, setSelectedBundle] = useState(1);
+
+    const fetchProduct = useCallback(async () => {
+        try {
+            setLoading(true);
+            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+            const column = isUUID ? 'id' : 'slug';
+            const { data, error } = await supabase
+                .from('products')
+                .select('*')
+                .eq(column, slug)
+                .single();
+
+            if (error) throw error;
+            setProduct(data);
+            trackViewContent(data);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    }, [slug]);
 
     useEffect(() => {
         fetchProduct();
         window.scrollTo(0, 0);
         setViewersCount(Math.floor(Math.random() * (45 - 18 + 1)) + 18);
-
-        const timer = setInterval(() => {
-            setTimeLeft(prev => {
-                if (prev.s === 0) {
-                    if (prev.m === 0) return { m: 15, s: 0 };
-                    return { m: prev.m - 1, s: 59 };
-                }
-                return { m: prev.m, s: prev.s - 1 };
-            });
-        }, 1000);
-
-        return () => clearInterval(timer);
-    }, [slug]);
+    }, [fetchProduct]);
 
     // Load TikTok Embed Script
     useEffect(() => {
@@ -169,27 +177,6 @@ export default function ProductDetail() {
         };
     }, [product, slug]);
 
-    async function fetchProduct() {
-        try {
-            setLoading(true);
-            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
-            const column = isUUID ? 'id' : 'slug';
-            const { data, error } = await supabase
-                .from('products')
-                .select('*')
-                .eq(column, slug)
-                .single();
-
-            if (error) throw error;
-            setProduct(data);
-            trackViewContent(data);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    }
-
     const getPrice = (bundle = selectedBundle) => {
         if (!product) return 0;
         const basePrice = product.price;
@@ -268,7 +255,11 @@ export default function ProductDetail() {
                                 const url = window.location.href;
                                 const text = `${product.name} — ${url}`;
                                 if (navigator.share) {
-                                    try { await navigator.share({ title: product.name, url }); } catch { }
+                                    try {
+                                        await navigator.share({ title: product.name, url });
+                                    } catch {
+                                        // User cancelled or share dismissed
+                                    }
                                 } else {
                                     await navigator.clipboard.writeText(text);
                                     alert('¡Enlace copiado!');

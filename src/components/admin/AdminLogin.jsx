@@ -11,7 +11,6 @@ export default function AdminLogin({ onSuccess }) {
     const [loading, setLoading] = useState(false);
 
     const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || '';
-    console.log('Admin Password Expected:', ADMIN_PASSWORD); // Debugging
 
     function handleSubmit(e) {
         e.preventDefault();
@@ -19,7 +18,7 @@ export default function AdminLogin({ onSuccess }) {
         setError('');
 
         setTimeout(() => {
-            if (password === ADMIN_PASSWORD) {
+            if (ADMIN_PASSWORD && password === ADMIN_PASSWORD) {
                 sessionStorage.setItem('admin_auth', 'true');
                 localStorage.setItem('kp_admin_device', 'true');
                 onSuccess();
@@ -27,7 +26,7 @@ export default function AdminLogin({ onSuccess }) {
                 setError('Contraseña incorrecta');
             }
             setLoading(false);
-        }, 500);
+        }, 400);
     }
 
     return (

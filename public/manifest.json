@@ -1,11 +1,11 @@
 {
-    "name": "KiplyStart Admin",
-    "short_name": "KiplyAdmin",
-    "description": "Panel de Administración KiplyStart",
-    "start_url": "/admin-portal-2026",
-    "scope": "/admin-portal-2026",
+    "name": "KiplyStart - Accesorios Premium para Auto",
+    "short_name": "KiplyStart",
+    "description": "Tienda online de accesorios automotrices con Pago Contra Entrega en Venezuela.",
+    "start_url": "/",
+    "scope": "/",
     "display": "standalone",
-    "background_color": "#F9FAFB",
+    "background_color": "#F8FAFC",
     "theme_color": "#0A2463",
     "orientation": "portrait",
     "icons": [

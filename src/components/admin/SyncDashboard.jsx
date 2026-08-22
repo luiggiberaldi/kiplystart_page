@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
-import { useCurrency } from '../../context/CurrencyContext';
 import { slugify } from '../../utils/slugify';
 
 /**
@@ -8,9 +7,7 @@ import { slugify } from '../../utils/slugify';
  * @description Load scraper JSON report, show price/stock discrepancies, apply bulk updates.
  */
 export default function SyncDashboard() {
-    const { formatPrice } = useCurrency();
     const [report, setReport] = useState(null);
-    const [loading, setLoading] = useState(false);
     const [applying, setApplying] = useState(false);
     const [message, setMessage] = useState(null);
     const [selectedPrices, setSelectedPrices] = useState([]);
@@ -32,7 +29,7 @@ export default function SyncDashboard() {
                 setSelectedNew(data.nuevos?.map((_, i) => i) || []);
                 setSelectedEliminados(data.eliminados?.map((_, i) => i) || []);
                 showMsg('success', `✅ Reporte cargado: ${data.total_dropanas || 0} productos escaneados`);
-            } catch (err) {
+            } catch {
                 showMsg('error', 'Error al parsear el archivo JSON');
             }
         };
@@ -101,12 +98,13 @@ export default function SyncDashboard() {
         const items = report.nuevos.filter((_, i) => selectedNew.includes(i));
         let imported = 0, errors = 0;
 
+        let counter = 0;
         for (const item of items) {
-            // Validate required fields (scraper must provide images/prices)
-            // Fallback for missing fields if old report
+            counter++;
+            const baseSlug = slugify(item.name);
             const productData = {
                 name: item.name,
-                slug: slugify(item.name) + '-' + Math.floor(Math.random() * 1000), // Ensure uniqueness
+                slug: `${baseSlug}-${counter}`,
                 description: item.description || '<p>Descripción pendiente...</p>',
                 price: item.precio_venta_ideal || 0,
                 compare_at_price: item.compare_at_ideal || 0,

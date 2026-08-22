@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import Navbar from '../components/Navbar';
 import ProductCard from '../components/ProductCard';
@@ -37,11 +37,7 @@ export default function Catalogo() {
         return () => clearTimeout(timer);
     }, [searchQuery]);
 
-    useEffect(() => {
-        fetchProducts();
-    }, [selectedCategory, debouncedSearch, page]);
-
-    async function fetchProducts() {
+    const fetchProducts = useCallback(async () => {
         try {
             setLoading(true);
 
@@ -73,7 +69,11 @@ export default function Catalogo() {
         } finally {
             setLoading(false);
         }
-    }
+    }, [selectedCategory, debouncedSearch, page]);
+
+    useEffect(() => {
+        fetchProducts();
+    }, [fetchProducts]);
 
     const [categories, setCategories] = useState(['Todas']);
 

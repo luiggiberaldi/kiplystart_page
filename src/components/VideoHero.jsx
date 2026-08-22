@@ -61,11 +61,15 @@ export default function VideoHero() {
                 Conditionally rendered for performance (only load what's needed)
             */}
             {!isMobile ? (
-                /* DESKTOP: WebP */
-                <img
-                    src="/videos/hero.webp"
-                    alt="Entrega segura KiplyStart Desktop"
+                /* DESKTOP: MP4 Video with poster fallback */
+                <video
                     className="w-full h-full object-cover scale-[1.06] origin-top animate-fade-in"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    poster="/hero.png"
+                    src="/videos/hero.mp4"
                 />
             ) : (
                 /* MOBILE: MP4 Video */

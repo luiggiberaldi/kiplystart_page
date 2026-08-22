@@ -23,5 +23,9 @@ export default defineConfig({
       },
     },
   },
+  test: {
+    include: ['src/**/*.{test,spec}.{js,jsx}'],
+    globals: true,
+  },
 })
 

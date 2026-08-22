@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { slugify } from "../utils/slugify";
 
@@ -40,20 +40,15 @@ export default function AdminPortal() {
     const [orderNotification, setOrderNotification] = useState(null);
     const isMobile = useIsMobile();
 
-    // ── New order real-time notifications ──
-    useOrderNotifications((newOrder) => {
+    // ── New order real-time notifications (memoized to prevent WebSocket thrashing) ──
+    const handleNewOrder = useCallback((newOrder) => {
         setOrderNotification(newOrder);
-        // Auto-dismiss after 8s
         setTimeout(() => setOrderNotification(null), 8000);
-    }, authenticated);
+    }, []);
 
-    useEffect(() => {
-        if (authenticated && (activeTab === 'productos' || activeTab === 'dashboard')) {
-            fetchProducts();
-        }
-    }, [activeTab, authenticated]);
+    useOrderNotifications(handleNewOrder, authenticated);
 
-    async function fetchProducts() {
+    const fetchProducts = useCallback(async () => {
         try {
             setLoading(true);
             const { data, error } = await supabase
@@ -64,10 +59,17 @@ export default function AdminPortal() {
             setProducts(data || []);
         } catch (err) {
             console.error("Error fetching products:", err);
+            setMessage({ type: "error", text: "Error al cargar productos" });
         } finally {
             setLoading(false);
         }
-    }
+    }, []);
+
+    useEffect(() => {
+        if (authenticated && (activeTab === 'productos' || activeTab === 'dashboard')) {
+            fetchProducts();
+        }
+    }, [activeTab, authenticated, fetchProducts]);
 
     async function handleProductSubmit(productData) {
         try {

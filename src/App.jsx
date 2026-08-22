@@ -49,13 +49,16 @@ import { CartProvider } from './context/CartContext';
 import CartDrawer from './components/cart/CartDrawer';
 import FacebookPixel from './components/FacebookPixel';
 
-function App() {
-  // Track page views + join presence for live visitor count
+function PageTracker() {
   usePageTracker();
+  return null;
+}
 
+function App() {
   return (
     <CartProvider>
       <Router>
+        <PageTracker />
         <FacebookPixel />
         <Suspense fallback={<PageLoader />}>
           <CartDrawer />

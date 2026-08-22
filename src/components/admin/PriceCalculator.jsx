@@ -1,32 +1,33 @@
 import { useState } from 'react';
+import { useSettings } from '../../context/SettingsContext';
+import { calculateSellingPrice, calculateCompareAtPrice, calculateBundlePrice } from '../../utils/pricingCalculations';
 
 /**
  * PriceCalculator Component
  * @description
- * Real-time price calculator for dropshipping.
- * Formula: ceil(max(cost + $8 shipping + $6 profit, suggested_price))
+ * Real-time price calculator for dropshipping using dynamic database settings.
  */
 export default function PriceCalculator() {
+    const { settings } = useSettings();
+    const defaultShipping = settings?.shipping_cost ?? 8;
+    const defaultProfit = settings?.profit_margin ?? 6;
+
     const [cost, setCost] = useState('');
     const [suggested, setSuggested] = useState('');
-    const [d2, setD2] = useState(10);
-    const [d3, setD3] = useState(20);
-
-    const SHIPPING = 8;
-    const PROFIT = 6;
-    const COMPARE_MULT = 1.4;
+    const [d2, setD2] = useState(settings?.bundle_2_discount ?? 10);
+    const [d3, setD3] = useState(settings?.bundle_3_discount ?? 20);
 
     const costNum = parseFloat(cost) || 0;
     const suggestedNum = parseFloat(suggested) || 0;
-    const raw = costNum + SHIPPING + PROFIT;
-    const finalPrice = Math.ceil(Math.max(raw, suggestedNum));
-    const compareAt = finalPrice > 0 ? (finalPrice * COMPARE_MULT).toFixed(0) + '.90' : '0';
+    const raw = costNum + defaultShipping + defaultProfit;
+    const finalPrice = calculateSellingPrice(costNum, suggestedNum, defaultShipping, defaultProfit);
+    const compareAt = calculateCompareAtPrice(finalPrice);
     const margin = costNum > 0 ? finalPrice - costNum : 0;
-    const marginPct = costNum > 0 ? ((margin / finalPrice) * 100).toFixed(1) : 0;
+    const marginPct = (costNum > 0 && finalPrice > 0) ? ((margin / finalPrice) * 100).toFixed(1) : 0;
     const wasAdjusted = suggestedNum > 0 && suggestedNum > raw;
 
-    const price2 = Math.ceil((finalPrice * 2) * (1 - d2 / 100));
-    const price3 = Math.ceil((finalPrice * 3) * (1 - d3 / 100));
+    const price2 = calculateBundlePrice(finalPrice, 2, 'discount', d2, d3);
+    const price3 = calculateBundlePrice(finalPrice, 3, 'discount', d2, d3);
     const save2 = (finalPrice * 2) - price2;
     const save3 = (finalPrice * 3) - price3;
 
@@ -87,11 +88,11 @@ export default function PriceCalculator() {
                         </div>
                         <div className="flex justify-between text-gray-500">
                             <span>+ Envío fijo</span>
-                            <span>${SHIPPING.toFixed(2)}</span>
+                            <span>${defaultShipping.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between text-gray-500">
                             <span>+ Ganancia fija</span>
-                            <span>${PROFIT.toFixed(2)}</span>
+                            <span>${defaultProfit.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between font-bold text-gray-700 border-t border-gray-200 pt-2">
                             <span>= Costo crudo</span>

@@ -6,7 +6,7 @@ import { convertImageToWebP } from '../../lib/imageUtils';
  * ProductImageManager - Upload images directly to Supabase Storage
  * Supports drag-and-drop, click-to-upload, manual URL input, and image reordering
  */
-export default function ProductImageManager({ mainImage, additionalImages, onMainChange, onAdditionalChange, onReorder }) {
+export default function ProductImageManager({ mainImage, additionalImages, onMainChange, onAdditionalChange }) {
     const [uploading, setUploading] = useState(null);
     const [dragOver, setDragOver] = useState(null);
     const [error, setError] = useState('');
@@ -20,17 +20,19 @@ export default function ProductImageManager({ mainImage, additionalImages, onMai
         setUploading(target);
 
         try {
-            // Convert to WebP for optimization
-            const webpFile = await convertImageToWebP(file);
-            const url = await uploadProductImage(webpFile);
+            // Auto-convert to WebP for optimization
+            const optimizedFile = await convertImageToWebP(file);
+            const publicUrl = await uploadProductImage(optimizedFile);
 
             if (target === 'main') {
-                onMainChange(url);
+                onMainChange(publicUrl);
             } else {
-                onAdditionalChange(target, url);
+                const idx = parseInt(target.replace('add_', ''));
+                onAdditionalChange(idx, publicUrl);
             }
         } catch (err) {
-            setError(err.message || 'Error al subir imagen');
+            console.error('Error uploading image:', err);
+            setError(err.message || 'Error al subir la imagen');
         } finally {
             setUploading(null);
         }
@@ -90,16 +92,6 @@ export default function ProductImageManager({ mainImage, additionalImages, onMai
         const newAdditional = [...additionalImages];
         [newAdditional[idx], newAdditional[idx + 1]] = [newAdditional[idx + 1], newAdditional[idx]];
         newAdditional.forEach((url, i) => onAdditionalChange(i, url));
-    };
-
-    // Demote main image to a specific additional slot
-    const handleDemoteMain = () => {
-        // Find first empty additional slot
-        const emptyIdx = additionalImages.findIndex(url => !url || url.trim() === '');
-        if (emptyIdx >= 0) {
-            onAdditionalChange(emptyIdx, mainImage);
-            onMainChange('');
-        }
     };
 
     const ImageUploadSlot = ({ target, currentUrl, label, isMain = false, idx }) => {

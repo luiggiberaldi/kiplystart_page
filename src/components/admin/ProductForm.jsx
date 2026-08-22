@@ -1,45 +1,45 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../lib/supabaseClient';
+import { useSettings } from '../../context/SettingsContext';
+import { calculateSellingPrice, calculateCompareAtPrice } from '../../utils/pricingCalculations';
 import ProductImageManager from './ProductImageManager';
 import ProductFormPricing from './ProductFormPricing';
 import ProductFormDropanas from './ProductFormDropanas';
 import ProductFormTags from './ProductFormTags';
+
+const DEFAULT_STATE = {
+    name: '', description: '', category: 'General',
+    dropanas_price: '', precio_sugerido: '',
+    price: '', compare_at_price: '', price_override: false,
+    bundle_type: 'discount', bundle_2_discount: '10', bundle_3_discount: '20',
+    image_url: '', additional_images: ['', '', '', ''],
+    stock: '0', is_active: true, featured: false,
+    tags: '', dropanas_url: '', video_url: '',
+};
 
 /**
  * ProductForm v2.0 - Orchestrator
  * Delegates UI to sub-components, handles state + submit logic.
  */
 export default function ProductForm({ onSuccess, editingProduct = null, onCancel }) {
-    const defaultState = {
-        name: '', description: '', category: 'General',
-        dropanas_price: '', precio_sugerido: '',
-        price: '', compare_at_price: '', price_override: false,
-        bundle_type: 'discount', bundle_2_discount: '10', bundle_3_discount: '20',
-        image_url: '', additional_images: ['', '', '', ''],
-        stock: '0', is_active: true, featured: false,
-        stock: '0', is_active: true, featured: false,
-        stock: '0', is_active: true, featured: false,
-        tags: '', dropanas_url: '', video_url: '',
-    };
+    const { settings } = useSettings();
+    const shippingCost = settings?.shipping_cost ?? 8;
+    const profitMargin = settings?.profit_margin ?? 6;
 
-    const [formData, setFormData] = useState(defaultState);
+    const [formData, setFormData] = useState(DEFAULT_STATE);
     const [loading, setLoading] = useState(false);
     const [uploadingVideo, setUploadingVideo] = useState(false);
 
     const categories = ['General', 'Electrónica', 'Accesorios', 'Hogar', 'Deportes', 'Belleza', 'Moda', 'Tecnología'];
 
-    // === Auto-calculation ===
+    // === Auto-calculation using Settings ===
     const calculatedPrice = useMemo(() => {
-        const dp = parseFloat(formData.dropanas_price) || 0;
-        const sg = parseFloat(formData.precio_sugerido) || 0;
-        if (dp === 0 && sg === 0) return 0;
-        return Math.ceil(Math.max(dp + 14, sg));
-    }, [formData.dropanas_price, formData.precio_sugerido]);
+        return calculateSellingPrice(formData.dropanas_price, formData.precio_sugerido, shippingCost, profitMargin);
+    }, [formData.dropanas_price, formData.precio_sugerido, shippingCost, profitMargin]);
 
     const calculatedCompareAt = useMemo(() => {
         const p = formData.price_override ? parseFloat(formData.price) || 0 : calculatedPrice;
-        if (p === 0) return '';
-        return (Math.floor(p * 1.4)) + '.90';
+        return calculateCompareAtPrice(p);
     }, [calculatedPrice, formData.price, formData.price_override]);
 
     const effectivePrice = formData.price_override ? (parseFloat(formData.price) || 0) : calculatedPrice;
@@ -48,19 +48,18 @@ export default function ProductForm({ onSuccess, editingProduct = null, onCancel
     useEffect(() => {
         if (editingProduct) {
             setFormData({
-                ...defaultState, ...editingProduct,
+                ...DEFAULT_STATE, ...editingProduct,
                 dropanas_price: editingProduct.dropanas_price || '',
                 precio_sugerido: editingProduct.precio_sugerido || '',
                 price_override: false,
                 additional_images: editingProduct.additional_images?.length > 0
                     ? [...editingProduct.additional_images, '', '', '', ''].slice(0, 4) : ['', '', '', ''],
                 tags: Array.isArray(editingProduct.tags) ? editingProduct.tags.join(', ') : editingProduct.tags || '',
-                tags: Array.isArray(editingProduct.tags) ? editingProduct.tags.join(', ') : editingProduct.tags || '',
                 dropanas_url: editingProduct.dropanas_url || '',
                 video_url: editingProduct.video_url || '',
             });
         } else {
-            setFormData(defaultState);
+            setFormData(DEFAULT_STATE);
         }
     }, [editingProduct]);
 
@@ -85,7 +84,6 @@ export default function ProductForm({ onSuccess, editingProduct = null, onCancel
                 price: parseFloat(formData.price),
                 compare_at_price: formData.compare_at_price ? parseFloat(formData.compare_at_price) : null,
                 dropanas_price: formData.dropanas_price ? parseFloat(formData.dropanas_price) : null,
-                dropanas_price: formData.dropanas_price ? parseFloat(formData.dropanas_price) : null,
                 dropanas_url: formData.dropanas_url || null,
                 video_url: formData.video_url || null,
                 bundle_type: formData.bundle_type,
@@ -96,7 +94,7 @@ export default function ProductForm({ onSuccess, editingProduct = null, onCancel
                 stock: parseInt(formData.stock), is_active: formData.is_active, featured: formData.featured,
                 tags: formData.tags ? formData.tags.split(',').map(t => t.trim()) : []
             });
-            if (!editingProduct) setFormData(defaultState);
+            if (!editingProduct) setFormData(DEFAULT_STATE);
         } catch (error) {
             console.error('Error:', error);
         } finally {

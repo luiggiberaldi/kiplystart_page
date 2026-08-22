@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
-import { useCurrency } from '../../context/CurrencyContext';
 import useLiveVisitors from '../../hooks/useLiveVisitors';
 import VisitorMap from './VisitorMap';
 
@@ -10,7 +9,6 @@ import VisitorMap from './VisitorMap';
  * Overview metrics for dropshipping + live visitor analytics.
  */
 export default function DashboardStats() {
-    const { formatPrice } = useCurrency();
     const { liveCount, visitors } = useLiveVisitors();
     const [stats, setStats] = useState({
         total_products: 0,
