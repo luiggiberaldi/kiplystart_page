@@ -7,6 +7,7 @@ const DEFAULTS = {
     shipping_cost: 8, profit_margin: 6,
     compare_at_multiplier: 1.4, compare_at_suffix: '.90',
     bundle_2_discount: 10, bundle_3_discount: 20,
+    order_bump_discount_pct: 30,
     low_stock_threshold: 5,
     store_name: 'KiplyStart',
     whatsapp_number: '+584121234567',

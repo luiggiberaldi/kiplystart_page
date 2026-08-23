@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useCurrency } from '../context/CurrencyContext';
+import { useSettings } from '../context/SettingsContext';
 import { getSavedCustomer, saveCustomer, clearSavedCustomer } from './cod/codData';
 import CODProductSummary from './cod/CODProductSummary';
 import CODStepPersonal from './cod/CODStepPersonal';
 import CODStepDelivery from './cod/CODStepDelivery';
 import CODSuccess from './cod/CODSuccess';
-import CODOrderBump, { BUMP_OFFERS } from './cod/CODOrderBump';
+import CODOrderBump, { getBumpOffer } from './cod/CODOrderBump';
 import { trackInitiateCheckout, trackPurchase } from '../lib/fbPixelEvents';
 import { Truck, X, User, MapPin, CheckCircle2, ShieldCheck } from 'lucide-react';
 
@@ -14,14 +15,14 @@ const EMPTY_FORM = { name: '', ci: '', phone: '', state: '', city: '', address: 
 
 export default function CODModal({ isOpen, onClose, product, quantity, totalPrice, selectedBundle }) {
     const { formatUSD, formatBs, exchangeRate } = useCurrency();
+    const { settings } = useSettings();
 
     const [step, setStep] = useState(1);
     const [isBumpSelected, setIsBumpSelected] = useState(false);
     const [returning, setReturning] = useState(() => !!getSavedCustomer()?.name);
 
-    const category = (product?.category || '').toLowerCase();
-    const isCar = category.includes('carro') || category.includes('auto') || (product?.slug || '').includes('carro');
-    const bumpOffer = isCar ? BUMP_OFFERS.car : BUMP_OFFERS.general;
+    const bumpDiscountPct = parseInt(settings?.order_bump_discount_pct, 10) || 30;
+    const bumpOffer = getBumpOffer(product, bumpDiscountPct);
     const finalTotalPrice = isBumpSelected ? (totalPrice + bumpOffer.price) : totalPrice;
 
     const [formData, setFormData] = useState(() => {

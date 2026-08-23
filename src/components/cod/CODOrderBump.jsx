@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Zap, Check, Sparkles, Plus, Gift } from 'lucide-react';
 import { useCurrency } from '../../context/CurrencyContext';
+import { useSettings } from '../../context/SettingsContext';
 
 /**
  * Curated list of high-converting impulse order bumps by category
@@ -10,29 +11,40 @@ const BUMP_OFFERS = {
         id: 'bump-esponja-vidrios',
         name: 'Esponja Mágica Desengrasante de Vidrios',
         description: 'Elimina 100% la grasa y marcas de lluvia ácida del parabrisas. ¡Visibilidad cristalina de noche!',
-        price: 8,
-        originalPrice: 16,
-        image: 'https://app.dropanas.com/storage/images/sample.jpg' // fallback or dynamic
+        originalPrice: 18,
+        image: 'https://app.dropanas.com/storage/images/sample.jpg'
     },
     general: {
         id: 'bump-toalla-microfibra',
         name: 'Toalla Ultra Absorbente de Secado Rápido',
         description: 'Microfibra de alta densidad para secado y pulitura sin dejar marcas ni rayas.',
-        price: 7,
         originalPrice: 15,
         image: 'https://app.dropanas.com/storage/images/sample.jpg'
     }
 };
 
-export default function CODOrderBump({ product, isSelected, onToggle }) {
-    const { formatBs, exchangeRate } = useCurrency();
-
+/**
+ * Helper to get computed bump offer with dynamic discount
+ */
+export function getBumpOffer(product, discountPct = 30) {
     const category = (product?.category || '').toLowerCase();
     const isCarCategory = category.includes('carro') || category.includes('auto') || (product?.slug || '').includes('carro');
-    
-    // Choose appropriate bump item
-    const bump = isCarCategory ? BUMP_OFFERS.car : BUMP_OFFERS.general;
-    const discountPct = Math.round(((bump.originalPrice - bump.price) / bump.originalPrice) * 100);
+    const base = isCarCategory ? BUMP_OFFERS.car : BUMP_OFFERS.general;
+    const price = Math.round(base.originalPrice * (1 - (discountPct / 100)));
+
+    return {
+        ...base,
+        price,
+        discountPct
+    };
+}
+
+export default function CODOrderBump({ product, isSelected, onToggle }) {
+    const { formatBs, exchangeRate } = useCurrency();
+    const { settings } = useSettings();
+
+    const discountPct = parseInt(settings?.order_bump_discount_pct, 10) || 30;
+    const bump = getBumpOffer(product, discountPct);
     const bumpPriceBs = formatBs ? formatBs(bump.price) : `Bs. ${(bump.price * (exchangeRate || 1)).toFixed(2)}`;
 
     return (

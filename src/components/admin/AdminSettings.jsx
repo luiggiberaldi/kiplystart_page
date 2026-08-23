@@ -346,6 +346,37 @@ export default function AdminSettings() {
                         />
                     </div>
 
+                    {/* Order Bump Cross-Selling Discount */}
+                    <div className="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-black text-amber-950 flex items-center gap-1.5">
+                                <Zap className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                                <span>Descuento de Oferta Order Bump (Checkout COD)</span>
+                            </span>
+                            <span className="text-[11px] font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">
+                                {local.order_bump_discount_pct || 30}% OFF
+                            </span>
+                        </div>
+
+                        <SettingInput 
+                            label="Porcentaje de Descuento Order Bump" 
+                            value={local.order_bump_discount_pct ?? 30}
+                            onChange={v => handleChange('order_bump_discount_pct', v === '' ? '' : parseInt(v, 10) || 0)} 
+                            type="number" 
+                            suffix="%" 
+                        />
+
+                        <div className="text-[11px] text-gray-600 bg-white/80 p-2.5 rounded-xl border border-amber-100 space-y-1">
+                            <p className="font-bold text-gray-800">Simulación en vivo al cliente:</p>
+                            <p className="text-gray-600 font-mono">
+                                • Esponja de Vidrios: <span className="line-through text-gray-400">$18</span> → <strong className="text-emerald-700 font-black">+${Math.round(18 * (1 - ((local.order_bump_discount_pct || 30) / 100)))} USD</strong> (-{local.order_bump_discount_pct || 30}%)
+                            </p>
+                            <p className="text-gray-600 font-mono">
+                                • Toalla Microfibra: <span className="line-through text-gray-400">$15</span> → <strong className="text-emerald-700 font-black">+${Math.round(15 * (1 - ((local.order_bump_discount_pct || 30) / 100)))} USD</strong> (-{local.order_bump_discount_pct || 30}%)
+                            </p>
+                        </div>
+                    </div>
+
                     <SettingInput 
                         label="Umbral de Alerta de Stock Bajo" 
                         value={local.low_stock_threshold}
