@@ -236,7 +236,7 @@ export default function ProductDetail() {
                             "name": "¿Cuánto tarda la entrega y cuánto cuesta el envío?",
                             "acceptedAnswer": {
                                 "@type": "Answer",
-                                "text": "El envío es 100% GRATIS a los 24 estados de Venezuela. La entrega express en Caracas y zonas directas toma de < 2h a 24h, y a nivel nacional vía Tealca de 24 a 48 horas hábiles."
+                                "text": "El envío es 100% GRATIS a los 24 estados de Venezuela. La entrega express en Caracas y zonas directas toma de 2 a 24 horas hábiles (mismo día), y a nivel nacional vía Tealca de 24 a 48 horas hábiles."
                             }
                         },
                         {

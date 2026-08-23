@@ -3,8 +3,8 @@ import { MapPin, Truck, CheckCircle2, Clock, ShieldCheck, ArrowRight } from 'luc
 import { Link } from 'react-router-dom';
 
 const VENEZUELA_STATES = [
-    { state: 'Distrito Capital', time: '< 2h a 24 horas', type: 'Motorizado Express a Domicilio', operator: 'Mensajería Directa KiplyStart', fast: true },
-    { state: 'Miranda', time: 'Mismo día a 24 horas', type: 'Motorizado Express / Tealca', operator: 'Mensajería Directa / Tealca', fast: true },
+    { state: 'Distrito Capital', time: 'De 2 a 24 horas (Mismo Día)', type: 'Motorizado Express a Domicilio', operator: 'Mensajería Directa KiplyStart', fast: true },
+    { state: 'Miranda', time: 'De 2 a 24 horas (Mismo Día)', type: 'Motorizado Express / Tealca', operator: 'Mensajería Directa / Tealca', fast: true },
     { state: 'La Guaira (Vargas)', time: '24 horas', type: 'Entrega a Domicilio / Agencia', operator: 'Tealca Express', fast: true },
     { state: 'Carabobo', time: '24 a 48 horas hábiles', type: 'Entrega a Domicilio / Agencia', operator: 'Tealca', fast: false },
     { state: 'Aragua', time: '24 a 48 horas hábiles', type: 'Entrega a Domicilio / Agencia', operator: 'Tealca', fast: false },

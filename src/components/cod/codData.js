@@ -7,7 +7,7 @@ export const ZONES = [
     {
         state: 'Distrito Capital',
         cities: ['Caracas', 'Caracas (Municipio Libertador)', 'Caracas (Chacao / Baruta / Sucre / El Hatillo)'],
-        delivery: 'Entrega Express a Domicilio (< 2h / 24h)',
+        delivery: 'Entrega Express a Domicilio (2 a 24h)',
         hasHomeDelivery: true
     },
     {

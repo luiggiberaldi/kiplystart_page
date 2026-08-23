@@ -32,7 +32,7 @@ export default function CODStepDelivery({
                 <span className="text-[10px] font-extrabold text-gray-500 uppercase tracking-wider">Atajos Rápidos:</span>
                 <div className="flex flex-wrap gap-1.5">
                     {[
-                        { label: '⚡ Caracas (< 2h)', state: 'Distrito Capital', city: 'Caracas' },
+                        { label: '⚡ Caracas Express', state: 'Distrito Capital', city: 'Caracas' },
                         { label: 'Valencia', state: 'Carabobo', city: 'Valencia' },
                         { label: 'Maracay', state: 'Aragua', city: 'Maracay' },
                         { label: 'Barquisimeto', state: 'Lara', city: 'Barquisimeto' },
