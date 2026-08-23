@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Clock, Zap, Truck } from 'lucide-react';
+import { Clock, Zap, Truck, CalendarCheck, Sparkles } from 'lucide-react';
 
 /**
  * DeliveryUrgencyTimer
- * Neuromarketing urgency trigger tailored to Venezuelan logistics:
- * - Mon-Sat dispatch cut-off timer.
- * - Highlights Caracas < 2h express and national 24-48h Tealca shipping.
+ * Professional urgency trigger for Venezuelan logistics (No raw emojis, 100% SVG icons).
  */
 export default function DeliveryUrgencyTimer() {
     const [timeLeft, setTimeLeft] = useState({ hours: 3, minutes: 45, seconds: 20 });
@@ -51,7 +49,8 @@ export default function DeliveryUrgencyTimer() {
     const formatNum = (n) => String(n).padStart(2, '0');
 
     return (
-        <div className="bg-gradient-to-r from-amber-50 via-amber-100/50 to-orange-50 border border-amber-200/90 rounded-2xl p-3.5 space-y-2 shadow-2xs">
+        <div className="bg-gradient-to-r from-amber-50/90 via-orange-50/50 to-amber-50/90 border border-amber-200/90 rounded-2xl p-3.5 space-y-2.5 shadow-2xs">
+            {/* Top row */}
             <div className="flex items-center justify-between gap-2 flex-wrap">
                 <div className="flex items-center gap-1.5 text-xs font-black text-amber-950">
                     <span className="relative flex h-2 w-2">
@@ -62,39 +61,44 @@ export default function DeliveryUrgencyTimer() {
                 </div>
 
                 {!isSunday ? (
-                    <div className="flex items-center gap-1 text-[11px] font-black text-amber-900 bg-white/90 px-2 py-0.5 rounded-md border border-amber-300/60 shadow-2xs font-mono">
-                        <Clock className="w-3 h-3 text-amber-700" />
+                    <div className="flex items-center gap-1 text-[11px] font-black text-amber-900 bg-white/95 px-2 py-0.5 rounded-lg border border-amber-300/70 shadow-2xs font-mono">
+                        <Clock className="w-3.5 h-3.5 text-amber-700" />
                         <span>
                             {formatNum(timeLeft.hours)}h : {formatNum(timeLeft.minutes)}m : {formatNum(timeLeft.seconds)}s
                         </span>
                     </div>
                 ) : (
-                    <span className="text-[10px] font-black text-amber-900 bg-white/90 px-2 py-0.5 rounded-md">
-                        Ruta de Lunes
-                    </span>
+                    <div className="flex items-center gap-1 text-[10px] font-black text-amber-900 bg-white/95 px-2 py-0.5 rounded-lg border border-amber-200 shadow-2xs">
+                        <CalendarCheck className="w-3.5 h-3.5 text-amber-700" />
+                        <span>Ruta de Lunes</span>
+                    </div>
                 )}
             </div>
 
-            <p className="text-xs text-amber-900 leading-snug font-medium">
+            {/* Instruction line with clean SVG icon */}
+            <div className="flex items-center gap-1.5 text-xs text-amber-900 font-medium">
                 {!isSunday ? (
                     <>
-                        ⚡ Ordena antes de que cierre el contador para <strong>despacho hoy mismo</strong>.
+                        <Zap className="w-3.5 h-3.5 text-amber-600 fill-amber-500 shrink-0" />
+                        <span>Ordena antes del cierre del contador para <strong>despacho hoy mismo</strong>.</span>
                     </>
                 ) : (
                     <>
-                        🚚 Ordena hoy domingo y sal en la <strong>primera ruta express del lunes</strong>.
+                        <Truck className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                        <span>Ordena hoy domingo para salir en la <strong>primera ruta express del lunes</strong>.</span>
                     </>
                 )}
-            </p>
+            </div>
 
-            <div className="pt-1.5 border-t border-amber-200/60 flex items-center justify-between text-[10px] font-bold text-amber-950 flex-wrap gap-2">
-                <span className="flex items-center gap-1 text-emerald-800">
-                    <Zap className="w-3 h-3 text-emerald-600 fill-emerald-600" />
-                    <strong>Caracas &amp; Zonas Directas:</strong> Domicilio Express (&lt; 2h / 24h)
+            {/* Bottom info tags */}
+            <div className="pt-2 border-t border-amber-200/60 flex items-center justify-between text-[10px] font-bold text-amber-950 flex-wrap gap-2">
+                <span className="flex items-center gap-1 text-emerald-800 bg-emerald-100/60 px-2 py-0.5 rounded-md border border-emerald-200/50">
+                    <Zap className="w-3 h-3 text-emerald-600 fill-emerald-600 shrink-0" />
+                    <span><strong>Caracas &amp; Zonas Directas:</strong> Domicilio Express (&lt; 2h)</span>
                 </span>
-                <span className="flex items-center gap-1 text-blue-900">
-                    <Truck className="w-3 h-3 text-blue-700" />
-                    <strong>Nacional:</strong> Domicilio u Oficina Tealca (24-48h)
+                <span className="flex items-center gap-1 text-blue-900 bg-blue-100/60 px-2 py-0.5 rounded-md border border-blue-200/50">
+                    <Truck className="w-3 h-3 text-blue-700 shrink-0" />
+                    <span><strong>Nacional:</strong> Domicilio u Oficina Tealca (24-48h)</span>
                 </span>
             </div>
         </div>

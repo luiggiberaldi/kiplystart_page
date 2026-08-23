@@ -212,20 +212,26 @@ export default function ProductDetail() {
 
                         {/* Guarantee Badges */}
                         <div className="grid grid-cols-3 gap-3">
-                            <div className="bg-white p-4 rounded-2xl border border-gray-200/80 text-center flex flex-col items-center shadow-2xs">
-                                <Truck className="w-6 h-6 text-emerald-600 mb-1.5" />
+                            <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-gray-200/90 text-center flex flex-col items-center shadow-2xs hover:border-gray-300 transition-colors">
+                                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center mb-2 shadow-2xs">
+                                    <Truck className="w-5 h-5" />
+                                </div>
                                 <span className="text-xs font-black text-gray-950">Envío Gratis</span>
-                                <span className="text-[10px] text-gray-500">Toda Venezuela</span>
+                                <span className="text-[10px] text-gray-500 font-medium">Toda Venezuela</span>
                             </div>
-                            <div className="bg-white p-4 rounded-2xl border border-gray-200/80 text-center flex flex-col items-center shadow-2xs">
-                                <ShieldCheck className="w-6 h-6 text-[#0A2463] mb-1.5" />
+                            <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-gray-200/90 text-center flex flex-col items-center shadow-2xs hover:border-gray-300 transition-colors">
+                                <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#0A2463] border border-blue-100 flex items-center justify-center mb-2 shadow-2xs">
+                                    <ShieldCheck className="w-5 h-5" />
+                                </div>
                                 <span className="text-xs font-black text-gray-950">Pagas al Recibir</span>
-                                <span className="text-[10px] text-gray-500">Sin anticipos</span>
+                                <span className="text-[10px] text-gray-500 font-medium">Sin anticipos</span>
                             </div>
-                            <div className="bg-white p-4 rounded-2xl border border-gray-200/80 text-center flex flex-col items-center shadow-2xs">
-                                <RotateCcw className="w-6 h-6 text-amber-600 mb-1.5" />
+                            <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-gray-200/90 text-center flex flex-col items-center shadow-2xs hover:border-gray-300 transition-colors">
+                                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center mb-2 shadow-2xs">
+                                    <RotateCcw className="w-5 h-5" />
+                                </div>
                                 <span className="text-xs font-black text-gray-950">Garantía Total</span>
-                                <span className="text-[10px] text-gray-500">Revisión previa</span>
+                                <span className="text-[10px] text-gray-500 font-medium">Revisión previa</span>
                             </div>
                         </div>
 
@@ -244,6 +250,7 @@ export default function ProductDetail() {
                                     muted
                                     playsInline
                                     loop
+                                    aria-label={`Video demostrativo de ${product.name}`}
                                 />
                             </div>
                         )}
@@ -360,17 +367,23 @@ export default function ProductDetail() {
                         </div>
 
                         {/* Quick Trust Reassurance */}
-                        <div className="pt-4 border-t border-gray-100 space-y-2">
-                            <div className="flex items-center gap-2 text-xs font-bold text-gray-700">
-                                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <div className="pt-4 border-t border-gray-100 space-y-2.5">
+                            <div className="flex items-center gap-2.5 text-xs font-bold text-gray-700">
+                                <div className="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shrink-0">
+                                    <CheckCircle2 className="w-3.5 h-3.5" />
+                                </div>
                                 <span>Envío 100% Gratis a toda Venezuela</span>
                             </div>
-                            <div className="flex items-center gap-2 text-xs font-bold text-gray-700">
-                                <ShieldCheck className="w-4 h-4 text-[#0A2463] shrink-0" />
+                            <div className="flex items-center gap-2.5 text-xs font-bold text-gray-700">
+                                <div className="w-6 h-6 rounded-lg bg-blue-50 text-[#0A2463] border border-blue-100 flex items-center justify-center shrink-0">
+                                    <ShieldCheck className="w-3.5 h-3.5" />
+                                </div>
                                 <span>Pagas al Recibir en Efectivo o Pago Móvil (Tasa BCV)</span>
                             </div>
-                            <div className="flex items-center gap-2 text-xs font-bold text-gray-700">
-                                <RotateCcw className="w-4 h-4 text-amber-600 shrink-0" />
+                            <div className="flex items-center gap-2.5 text-xs font-bold text-gray-700">
+                                <div className="w-6 h-6 rounded-lg bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center shrink-0">
+                                    <RotateCcw className="w-3.5 h-3.5" />
+                                </div>
                                 <span>Garantía de Satisfacción: Revisas al llegar</span>
                             </div>
                         </div>

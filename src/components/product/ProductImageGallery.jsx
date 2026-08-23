@@ -23,10 +23,13 @@ export default function ProductImageGallery({ allImages = [], productName, viewe
                 )}
 
                 {/* Scarcity / Live Viewers Pill */}
-                <div className="absolute top-3.5 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full shadow-md border border-gray-200/60 flex items-center gap-2 z-10">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span className="text-[11px] sm:text-xs font-bold text-gray-900 whitespace-nowrap flex items-center gap-1">
-                        <Flame className="w-3.5 h-3.5 text-amber-500" />
+                <div className="absolute top-3.5 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full shadow-md border border-gray-200/70 flex items-center gap-2 z-10">
+                    <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span className="text-[11px] sm:text-xs font-black text-gray-900 whitespace-nowrap flex items-center gap-1.5">
+                        <Eye className="w-3.5 h-3.5 text-[#0A2463]" />
                         <span>{viewersCount} personas viendo esto</span>
                     </span>
                 </div>
