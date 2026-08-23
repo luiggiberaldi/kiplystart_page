@@ -49,8 +49,12 @@ export default function ProductDescription({ description }) {
         return parts.length > 0 ? parts : text;
     };
 
+    const cleanDescription = (description || '')
+        .replace(/dropshipping|proveedor|bodega central|dropanas|aliexpress|importaci[oó]n directa|china|f[aá]brica/gi, '')
+        .trim();
+
     const parseBlocks = () => {
-        const rawLines = description.split('\n');
+        const rawLines = cleanDescription.split('\n');
         const blocks = [];
         let currentBulletGroup = [];
         let currentNumberGroup = [];
