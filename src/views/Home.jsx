@@ -57,14 +57,30 @@ const Home = () => {
 
     async function fetchFeaturedProducts() {
         try {
-            const { data, error } = await supabase
+            let { data, error } = await supabase
                 .from('products')
                 .select('*')
                 .eq('is_active', true)
                 .eq('featured', true)
                 .order('created_at', { ascending: false });
 
-            if (error) throw error;
+            // If fewer than 8 featured products, complement with recent active products to fill all columns
+            if (!data || data.length < 8) {
+                const { data: allActive } = await supabase
+                    .from('products')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('created_at', { ascending: false })
+                    .limit(12);
+
+                if (allActive) {
+                    const existingIds = new Set((data || []).map(p => p.id));
+                    const extra = allActive.filter(p => !existingIds.has(p.id));
+                    data = [...(data || []), ...extra];
+                }
+            }
+
+            if (error && (!data || data.length === 0)) throw error;
             setFeaturedProducts(data || []);
         } catch {
             // Silently handle — featured section shows empty state
