@@ -288,7 +288,7 @@ export default function AdminPortal() {
                     )}
 
                     {/* Page Content */}
-                    <main className="p-5 sm:p-8 max-w-7xl w-full flex-1">
+                    <main className="p-5 sm:p-8 w-full min-w-0 flex-1">
 
                         {/* ===== DASHBOARD ===== */}
                         {activeTab === 'dashboard' && (

@@ -89,7 +89,7 @@ export default function ProductTableDesktop({
                                                         <Package className="w-6 h-6 text-gray-300" />
                                                     )}
                                                 </div>
-                                                <div className="min-w-0 max-w-[220px]">
+                                                <div className="min-w-0 flex-1 max-w-[420px] 2xl:max-w-none">
                                                     <p className="font-bold text-sm text-gray-950 truncate">{product.name}</p>
                                                     <div className="flex items-center gap-1.5 mt-0.5">
                                                         <span className="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md">{product.category || 'General'}</span>
