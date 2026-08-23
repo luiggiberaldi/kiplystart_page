@@ -1,55 +1,51 @@
 import { useState } from 'react';
+import { Flame, Eye, Package } from 'lucide-react';
 
-/**
- * ProductImageGallery Component
- * @description
- * Displays main product image with thumbnail navigation and scarcity indicators.
- * Fully responsive from 320px to desktop.
- */
-export default function ProductImageGallery({ allImages, productName, viewersCount }) {
+export default function ProductImageGallery({ allImages = [], productName, viewersCount = 24 }) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-    return (
-        <div className="bg-white border-b border-gray-100">
-            <div className="aspect-square w-full max-w-[500px] mx-auto overflow-hidden flex items-center justify-center p-4 md:p-6 relative">
-                <img
-                    src={allImages[currentImageIndex]}
-                    alt={productName}
-                    className="w-full h-full object-contain hover:scale-105 transition-transform duration-500"
-                />
+    const activeImage = allImages[currentImageIndex] || allImages[0];
 
-                {/* Image Navigation Dots */}
-                {allImages.length > 1 && (
-                    <div className="absolute bottom-3 md:bottom-4 left-1/2 transform -translate-x-1/2 flex gap-1.5 md:gap-2 bg-white/90 backdrop-blur-sm px-2.5 md:px-3 py-1.5 md:py-2 rounded-full">
-                        {allImages.map((_, idx) => (
-                            <button
-                                key={idx}
-                                onClick={() => setCurrentImageIndex(idx)}
-                                className={`w-2 h-2 rounded-full transition-all ${currentImageIndex === idx ? 'bg-brand-blue w-4' : 'bg-gray-300'
-                                    }`}
-                            />
-                        ))}
-                    </div>
+    return (
+        <div className="bg-white rounded-3xl p-4 sm:p-6 border border-gray-200/80 shadow-xs flex flex-col">
+            {/* Main Image Frame */}
+            <div className="aspect-square w-full bg-gradient-to-b from-gray-50/50 to-gray-100/60 rounded-2xl overflow-hidden flex items-center justify-center p-6 relative border border-gray-100">
+                {activeImage ? (
+                    <img
+                        src={activeImage}
+                        alt={productName}
+                        className="w-full h-full object-contain mix-blend-multiply transition-transform duration-500 hover:scale-105"
+                        width="500"
+                        height="500"
+                    />
+                ) : (
+                    <Package className="w-16 h-16 text-gray-300" />
                 )}
 
-                {/* Floating Scarcity Pill - Centered but Higher */}
-                <div className="absolute top-1 md:top-2 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm px-2.5 md:px-3 py-1 md:py-1.5 rounded-full shadow-lg border border-gray-100 flex items-center gap-1 md:gap-1.5 animate-bounce-subtle max-w-[90%] z-10">
-                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shrink-0"></div>
-                    <span className="text-[10px] md:text-xs font-bold text-soft-black whitespace-nowrap">{viewersCount} personas viendo esto</span>
+                {/* Scarcity / Live Viewers Pill */}
+                <div className="absolute top-3.5 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full shadow-md border border-gray-200/60 flex items-center gap-2 z-10">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span className="text-[11px] sm:text-xs font-bold text-gray-900 whitespace-nowrap flex items-center gap-1">
+                        <Flame className="w-3.5 h-3.5 text-amber-500" />
+                        <span>{viewersCount} personas viendo esto</span>
+                    </span>
                 </div>
             </div>
 
-            {/* Thumbnail Gallery */}
+            {/* Thumbnail Strip */}
             {allImages.length > 1 && (
-                <div className="px-4 md:px-6 pb-3 md:pb-4 flex gap-1.5 md:gap-2 overflow-x-auto scrollbar-hide">
+                <div className="pt-4 flex gap-2.5 overflow-x-auto no-scrollbar">
                     {allImages.map((img, idx) => (
                         <button
                             key={idx}
                             onClick={() => setCurrentImageIndex(idx)}
-                            className={`w-14 h-14 md:w-16 md:h-16 flex-shrink-0 border-2 rounded-lg overflow-hidden transition-all ${currentImageIndex === idx ? 'border-brand-blue' : 'border-gray-200'
-                                }`}
+                            className={`w-16 h-16 sm:w-20 sm:h-20 shrink-0 border-2 rounded-2xl p-1 bg-white overflow-hidden transition-all cursor-pointer ${
+                                currentImageIndex === idx
+                                    ? 'border-[#0A2463] ring-2 ring-[#0A2463]/20 scale-105'
+                                    : 'border-gray-200 hover:border-gray-300 opacity-70 hover:opacity-100'
+                            }`}
                         >
-                            <img src={img} alt={`${productName} ${idx + 1}`} className="w-full h-full object-contain" />
+                            <img src={img} alt={`${productName} ${idx + 1}`} className="w-full h-full object-contain mix-blend-multiply" />
                         </button>
                     ))}
                 </div>

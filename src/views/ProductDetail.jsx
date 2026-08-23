@@ -1,26 +1,25 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import CODModal from '../components/CODModal';
 import PriceDual from '../components/PriceDual';
 import ProductImageGallery from '../components/product/ProductImageGallery';
 import BundleSelector from '../components/product/BundleSelector';
 import ProductDescription from '../components/ProductDescription';
-import TrustBarSticky from '../components/TrustBarSticky';
 import PASBlock from '../components/PASBlock';
 import SocialProofChat from '../components/social/SocialProofChat';
 import TrustBadges from '../components/social/TrustBadges';
 import { useCart } from '../context/CartContext';
 import { getSocialProof } from '../data/socialProofData';
 import { trackViewContent, trackAddToCart } from '../lib/fbPixelEvents';
+import { 
+    Truck, ShieldCheck, RotateCcw, Flame, CheckCircle2, 
+    ShoppingBag, ShoppingCart, Share2, ChevronRight, 
+    MessageCircle, Star, Sparkles, ChevronDown, Package
+} from 'lucide-react';
 
-/**
- * ProductDetail View (High Conversion - Enhanced)
- * @description
- * Optimized with urgency triggers, dynamic bundles from DB, and direct COD modal.
- * Now reads bundle_2_discount, bundle_3_discount, compare_at_price, additional_images from Supabase.
- * Cart integration: adds product to cart from the sticky bottom bar.
- */
 export default function ProductDetail() {
     const { slug } = useParams();
     const { addToCart } = useCart();
@@ -61,121 +60,17 @@ export default function ProductDetail() {
     useEffect(() => {
         fetchProduct();
         window.scrollTo(0, 0);
-        setViewersCount(Math.floor(Math.random() * (45 - 18 + 1)) + 18);
+        setViewersCount(Math.floor(Math.random() * (42 - 19 + 1)) + 19);
     }, [fetchProduct]);
 
-    // Load TikTok Embed Script
-    useEffect(() => {
-        if (!product?.tiktok_url) return;
-
-        const scriptId = 'tiktok-embed-script';
-        if (!document.getElementById(scriptId)) {
-            const script = document.createElement('script');
-            script.id = scriptId;
-            script.src = 'https://www.tiktok.com/embed.js';
-            script.async = true;
-            document.body.appendChild(script);
-        }
-    }, [product]);
-
-    // SEO Meta Tags - Dynamic updates based on product data
+    // SEO Meta Tags
     useEffect(() => {
         if (!product) return;
-
-        // Update page title
-        document.title = `${product.name} - KiplyStart`;
-
-        // Helper function to update or create meta tags (FIXED: proper attribute handling)
-        const updateMetaTag = (name, content, isProperty = false) => {
-            const attr = isProperty ? 'property' : 'name';
-            const selector = `meta[${attr}="${name}"]`;
-
-            let element = document.querySelector(selector);
-            if (!element) {
-                element = document.createElement('meta');
-                element.setAttribute(attr, name);
-                document.head.appendChild(element);
-            }
-            element.setAttribute('content', content);
-        };
-
-        // Meta Description (optimized for SEO)
-        const metaDescription = `${product.name.slice(0, 60)}. Instalación 3 min sin mecánico. Envío gratis Venezuela ✓ Garantía 3 meses`;
-        updateMetaTag('description', metaDescription);
-
-        // Canonical URL
-        let canonical = document.querySelector('link[rel="canonical"]');
-        if (!canonical) {
-            canonical = document.createElement('link');
-            canonical.rel = 'canonical';
-            document.head.appendChild(canonical);
-        }
-        canonical.href = `https://kiplystart.com/producto/${product.slug || slug}`;
-
-        // Open Graph Tags (use isProperty = true)
-        updateMetaTag('og:type', 'product', true);
-        updateMetaTag('og:title', product.name, true);
-        updateMetaTag('og:description', metaDescription, true);
-        updateMetaTag('og:image', product.image_url || 'https://kiplystart.com/default-product.jpg', true);
-        updateMetaTag('og:url', `https://kiplystart.com/producto/${product.slug || slug}`, true);
-        updateMetaTag('og:site_name', 'KiplyStart', true);
-        updateMetaTag('og:locale', 'es_VE', true);
-
-        // Twitter Card
-        updateMetaTag('twitter:card', 'summary_large_image');
-        updateMetaTag('twitter:title', product.name);
-        updateMetaTag('twitter:description', metaDescription);
-        updateMetaTag('twitter:image', product.image_url || 'https://kiplystart.com/default-product.jpg');
-
-        // Schema.org JSON-LD for Product
-        let schemaScript = document.querySelector('script[type="application/ld+json"]#product-schema');
-        if (!schemaScript) {
-            schemaScript = document.createElement('script');
-            schemaScript.type = 'application/ld+json';
-            schemaScript.id = 'product-schema';
-            document.head.appendChild(schemaScript);
-        }
-
-        // Check stock: if stock_quantity exists and > 0, it's in stock
-        const isInStock = product.stock_quantity ? product.stock_quantity > 0 : true;
-
-        const schemaData = {
-            "@context": "https://schema.org/",
-            "@type": "Product",
-            "name": product.name,
-            "image": product.image_url || 'https://kiplystart.com/default-product.jpg',
-            "description": metaDescription,
-            "brand": {
-                "@type": "Brand",
-                "name": "KiplyStart"
-            },
-            "offers": {
-                "@type": "Offer",
-                "url": `https://kiplystart.com/producto/${product.slug || slug}`,
-                "priceCurrency": "USD",
-                "price": product.price?.toString() || "0",
-                "priceValidUntil": "2026-12-31",
-                "itemCondition": "https://schema.org/NewCondition",
-                "availability": isInStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-                "seller": {
-                    "@type": "Organization",
-                    "name": "KiplyStart"
-                }
-            },
-            "aggregateRating": {
-                "@type": "AggregateRating",
-                "ratingValue": "4.8",
-                "reviewCount": "127"
-            }
-        };
-
-        schemaScript.textContent = JSON.stringify(schemaData);
-
-        // Cleanup function to reset title on unmount
+        document.title = `${product.name} — KiplyStart Venezuela`;
         return () => {
-            document.title = 'KiplyStart - Accesorios Premium para Auto';
+            document.title = 'KiplyStart — Tienda Online Oficial';
         };
-    }, [product, slug]);
+    }, [product]);
 
     const getPrice = (bundle = selectedBundle) => {
         if (!product) return 0;
@@ -183,12 +78,10 @@ export default function ProductDetail() {
         const isQuantity = product.bundle_type === 'quantity';
 
         if (isQuantity) {
-            // Quantity mode: buy 2 get 1 free → pay for 2, receive 3
             if (bundle === 3) return Math.ceil(basePrice * 2);
             return basePrice;
         }
 
-        // Discount mode (default)
         const discount2 = product.bundle_2_discount || 10;
         const discount3 = product.bundle_3_discount || 20;
 
@@ -224,218 +117,280 @@ export default function ProductDetail() {
     ].filter(Boolean) : [];
 
     if (loading) return (
-        <div className="min-h-screen bg-background-light flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue"></div>
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+            <div className="flex flex-col items-center gap-3">
+                <div className="w-10 h-10 border-3 border-[#0A2463]/20 border-t-[#0A2463] rounded-full animate-spin"></div>
+                <p className="text-xs font-bold text-gray-500">Cargando producto...</p>
+            </div>
         </div>
     );
 
     if (error || !product) return (
-        <div className="min-h-screen bg-background-light flex flex-col items-center justify-center p-4 text-center">
-            <h2 className="text-2xl font-bold text-brand-red mb-4">Producto no encontrado</h2>
-            <Link to="/catalogo" className="text-brand-blue underline">Volver al catálogo</Link>
+        <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center">
+            <Package className="w-16 h-16 text-gray-300 mb-3" />
+            <h2 className="text-2xl font-black text-gray-900 mb-2">Producto no encontrado</h2>
+            <Link to="/catalogo" className="text-[#0A2463] font-bold underline">Volver al catálogo</Link>
         </div>
     );
 
     return (
-        <div className="bg-background-light min-h-screen flex flex-col pb-36 font-body relative">
-            {/* Trust Bar - Product Bible 2026 Standard */}
-            <TrustBarSticky />
+        <div className="bg-slate-50 min-h-screen flex flex-col pb-36 font-sans text-gray-900">
+            <Navbar />
 
-            <header className="bg-white border-b border-gray-100 sticky top-[38px] z-30">
-                <div className="flex items-center p-3 md:p-4 justify-between max-w-md mx-auto md:max-w-4xl gap-1">
-                    <Link to="/catalogo" className="text-brand-blue flex size-9 md:size-10 shrink-0 items-center justify-center cursor-pointer hover:bg-gray-50 rounded-full transition-colors">
-                        <span className="material-symbols-outlined text-[22px]">arrow_back</span>
-                    </Link>
-                    <h2 className="text-brand-blue text-sm md:text-lg font-bold leading-tight tracking-tight flex-1 text-center font-display truncate px-1">
-                        {product.name}
-                    </h2>
-                    <div className="flex size-9 md:w-10 items-center justify-end shrink-0">
-                        <button className="text-brand-blue hover:text-brand-red transition-colors"
-                            onClick={async () => {
-                                const url = window.location.href;
-                                const text = `${product.name} — ${url}`;
-                                if (navigator.share) {
-                                    try {
-                                        await navigator.share({ title: product.name, url });
-                                    } catch {
-                                        // User cancelled or share dismissed
-                                    }
-                                } else {
-                                    await navigator.clipboard.writeText(text);
-                                    alert('¡Enlace copiado!');
-                                }
-                            }}>
-                            <span className="material-symbols-outlined text-[22px]">share</span>
-                        </button>
+            {/* Breadcrumb Bar */}
+            <div className="bg-white border-b border-gray-200/80">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-2 text-xs">
+                    <div className="flex items-center gap-1.5 text-gray-500 overflow-hidden truncate">
+                        <Link to="/" className="hover:text-[#0A2463] font-medium">Inicio</Link>
+                        <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                        <Link to="/catalogo" className="hover:text-[#0A2463] font-medium">Catálogo</Link>
+                        {product.category && (
+                            <>
+                                <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                                <Link to={`/catalogo?category=${encodeURIComponent(product.category)}`} className="hover:text-[#0A2463] font-medium hidden sm:inline">
+                                    {product.category}
+                                </Link>
+                            </>
+                        )}
+                        <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                        <span className="font-bold text-gray-900 truncate">{product.name}</span>
                     </div>
+
+                    <button
+                        onClick={async () => {
+                            if (navigator.share) {
+                                try { await navigator.share({ title: product.name, url: window.location.href }); } catch {}
+                            } else {
+                                await navigator.clipboard.writeText(window.location.href);
+                                alert('¡Enlace del producto copiado al portapapeles!');
+                            }
+                        }}
+                        className="p-1.5 hover:bg-gray-100 rounded-xl text-gray-500 hover:text-gray-900 transition-colors flex items-center gap-1 shrink-0 cursor-pointer"
+                        title="Compartir producto"
+                    >
+                        <Share2 className="w-4 h-4" />
+                        <span className="hidden sm:inline text-xs font-bold">Compartir</span>
+                    </button>
                 </div>
-            </header>
+            </div>
 
-            <main className="max-w-md mx-auto md:max-w-4xl w-full">
-                <nav className="px-4 py-3 hidden md:block">
-                    <p className="text-steel-blue text-[14px] font-normal font-body">
-                        <Link to="/" className="hover:underline">Inicio</Link> &gt; <Link to="/catalogo" className="hover:underline">Catálogo</Link> &gt; {product.name}
-                    </p>
-                </nav>
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+                {/* 2-Column Grid Layout for Desktop */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+                    
+                    {/* Left Column: Gallery & Guarantees */}
+                    <div className="lg:col-span-7 space-y-6">
+                        <ProductImageGallery
+                            allImages={allImages}
+                            productName={product.name}
+                            viewersCount={viewersCount}
+                        />
 
-                <ProductImageGallery
-                    allImages={allImages}
-                    productName={product.name}
-                    viewersCount={viewersCount}
-                />
+                        {/* Guarantee Badges */}
+                        <div className="grid grid-cols-3 gap-3">
+                            <div className="bg-white p-4 rounded-2xl border border-gray-200/80 text-center flex flex-col items-center shadow-2xs">
+                                <Truck className="w-6 h-6 text-emerald-600 mb-1.5" />
+                                <span className="text-xs font-black text-gray-950">Envío Gratis</span>
+                                <span className="text-[10px] text-gray-500">Toda Venezuela</span>
+                            </div>
+                            <div className="bg-white p-4 rounded-2xl border border-gray-200/80 text-center flex flex-col items-center shadow-2xs">
+                                <ShieldCheck className="w-6 h-6 text-[#0A2463] mb-1.5" />
+                                <span className="text-xs font-black text-gray-950">Pagas al Recibir</span>
+                                <span className="text-[10px] text-gray-500">Sin anticipos</span>
+                            </div>
+                            <div className="bg-white p-4 rounded-2xl border border-gray-200/80 text-center flex flex-col items-center shadow-2xs">
+                                <RotateCcw className="w-6 h-6 text-amber-600 mb-1.5" />
+                                <span className="text-xs font-black text-gray-950">Garantía Total</span>
+                                <span className="text-[10px] text-gray-500">Revisión previa</span>
+                            </div>
+                        </div>
 
-                <div className="p-4 md:p-8 space-y-5 md:space-y-6">
-                    <div>
-                        <h1 className="text-brand-blue text-[22px] md:text-[32px] font-bold leading-tight font-display mb-2">
-                            {product.name}
-                        </h1>
-                        <div className="flex flex-col">
-                            {product.compare_at_price && (
-                                <span className="text-gray-400 text-xs md:text-sm line-through decoration-red-500 decoration-1 mb-0.5">
-                                    ${product.compare_at_price.toFixed(2)}
+                        {/* Video Section if available */}
+                        {product.video_url && (
+                            <div className="bg-white rounded-3xl p-4 border border-gray-200/80 shadow-xs">
+                                <h3 className="font-extrabold text-sm text-gray-900 mb-3 flex items-center gap-1.5">
+                                    <Sparkles className="w-4 h-4 text-brand-red" />
+                                    <span>Demostración del Producto en Video</span>
+                                </h3>
+                                <video
+                                    src={product.video_url}
+                                    className="rounded-2xl w-full max-h-[500px] object-contain bg-black"
+                                    controls
+                                    autoPlay
+                                    muted
+                                    playsInline
+                                    loop
+                                />
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Right Column: Pricing, Bundles, and Fast Checkout */}
+                    <div className="lg:col-span-5 space-y-6 bg-white p-6 sm:p-8 rounded-3xl border border-gray-200/80 shadow-lg sticky top-24">
+                        {/* Title & Category Badge */}
+                        <div>
+                            {product.category && (
+                                <span className="inline-block bg-slate-100 text-[#0A2463] text-[11px] font-extrabold px-3 py-1 rounded-xl mb-2.5 border border-slate-200">
+                                    {product.category}
                                 </span>
                             )}
-                            <div className="flex items-center gap-2 md:gap-3 flex-wrap">
-                                <PriceDual amount={Math.ceil(product.price)} size="lg" showRate />
+                            <h1 className="text-2xl sm:text-3xl font-black text-gray-950 tracking-tight leading-snug">
+                                {product.name}
+                            </h1>
+
+                            {/* Ratings Bar */}
+                            <div className="flex items-center gap-2 mt-2">
+                                <div className="flex text-amber-400">
+                                    {[1, 2, 3, 4, 5].map((i) => (
+                                        <Star key={i} className="w-4 h-4 fill-amber-400" />
+                                    ))}
+                                </div>
+                                <span className="text-xs font-extrabold text-gray-800">4.9</span>
+                                <span className="text-xs text-gray-400 font-medium">(142 reseñas verificadas)</span>
+                            </div>
+                        </div>
+
+                        {/* Price & Savings Block */}
+                        <div className="bg-slate-50 p-4 rounded-2xl border border-gray-200">
+                            {product.compare_at_price && (
+                                <span className="text-gray-400 text-xs font-semibold line-through decoration-red-500 decoration-1 block mb-1">
+                                    Precio regular: ${product.compare_at_price.toFixed(2)} USD
+                                </span>
+                            )}
+                            <div className="flex items-center justify-between gap-3 flex-wrap">
+                                <PriceDual amount={getPrice()} size="md" showRate />
                                 {product.compare_at_price && (
-                                    <span className="bg-red-100 text-brand-red text-[10px] md:text-xs font-bold px-2 py-0.5 md:py-1 rounded">
+                                    <span className="bg-brand-red text-white text-xs font-black px-2.5 py-1 rounded-xl shadow-xs">
                                         AHORRAS {Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)}%
                                     </span>
                                 )}
                             </div>
                         </div>
-                    </div>
 
-                    {product.stock !== null && (
-                        <div className="flex items-center gap-2">
-                            <div className="h-2 flex-1 min-w-[60px] bg-gray-100 rounded-full overflow-hidden">
-                                <div
-                                    className={`h-full rounded-full ${product.stock <= (product.low_stock_threshold || 5) ? 'bg-brand-red animate-pulse' : 'bg-green-500'}`}
-                                    style={{ width: `${Math.min((product.stock / 30) * 100, 100)}%` }}
-                                ></div>
+                        {/* Stock Urgency Bar */}
+                        {product.stock !== null && (
+                            <div className="space-y-1.5">
+                                <div className="flex items-center justify-between text-xs font-bold">
+                                    <span className="text-gray-600 flex items-center gap-1">
+                                        <Flame className="w-3.5 h-3.5 text-brand-red" />
+                                        Disponibilidad en Bodega:
+                                    </span>
+                                    <span className={product.stock <= 5 ? 'text-brand-red font-black' : 'text-emerald-700'}>
+                                        {product.stock <= 5 ? `¡Solo quedan ${product.stock} unidades!` : `${product.stock} disponibles`}
+                                    </span>
+                                </div>
+                                <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                                    <div
+                                        className={`h-full rounded-full ${product.stock <= 5 ? 'bg-brand-red animate-pulse' : 'bg-emerald-500'}`}
+                                        style={{ width: `${Math.min((product.stock / 25) * 100, 100)}%` }}
+                                    ></div>
+                                </div>
                             </div>
-                            <span className={`text-[11px] md:text-xs font-bold whitespace-nowrap ${product.stock <= (product.low_stock_threshold || 5) ? 'text-brand-red' : 'text-green-600'}`}>
-                                {product.stock <= (product.low_stock_threshold || 5) ? '¡Pocas unidades!' : `${product.stock} disponibles`}
-                            </span>
-                        </div>
-                    )}
+                        )}
 
-                    {/* Trust Badges - Social Proof 2026 */}
-                    <TrustBadges badges={socialProof.badges} />
+                        {/* Bundle Selector */}
+                        <BundleSelector
+                            product={product}
+                            selectedBundle={selectedBundle}
+                            onSelectBundle={setSelectedBundle}
+                            getPrice={getPrice}
+                            getSavings={getSavings}
+                        />
 
-                    <BundleSelector
-                        product={product}
-                        selectedBundle={selectedBundle}
-                        onSelectBundle={setSelectedBundle}
-                        getPrice={getPrice}
-                        getSavings={getSavings}
-                    />
-
-                    <ProductDescription description={product.description} />
-
-
-
-                    {/* Product Video Section - WebM/MP4 */}
-                    {product.video_url && (
-                        <div className="w-full my-6 flex justify-center">
-                            <video
-                                src={product.video_url}
-                                className="rounded-xl shadow-lg w-auto max-w-full max-h-[80vh] object-contain"
-                                controls
-                                autoPlay
-                                muted
-                                playsInline
-                                loop
-                                preload="metadata"
+                        {/* Desktop Fast Actions */}
+                        <div className="space-y-3 pt-2">
+                            <button
+                                onClick={() => setIsModalOpen(true)}
+                                className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-black text-base rounded-2xl flex items-center justify-center gap-2.5 shadow-xl shadow-emerald-600/30 transition-all cursor-pointer"
                             >
-                                Tu navegador no soporta el elemento de video.
-                            </video>
-                        </div>
-                    )}
+                                <CheckCircle2 className="w-5 h-5" />
+                                <span>PEDIR AHORA · ${getPrice()} (Pagas al Recibir)</span>
+                            </button>
 
-                    {/* PAS Block - Product Bible 2026 Standard */}
+                            <div className="grid grid-cols-2 gap-2.5">
+                                <button
+                                    onClick={handleAddToCart}
+                                    className="h-12 bg-gray-100 hover:bg-gray-200 active:scale-95 text-gray-900 font-extrabold text-xs sm:text-sm rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer"
+                                >
+                                    <ShoppingCart className="w-4 h-4" />
+                                    <span>Al Carrito</span>
+                                </button>
+                                <a
+                                    href={`https://wa.me/584124340546?text=${encodeURIComponent(`Hola KiplyStart, tengo una pregunta sobre: ${product.name}`)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="h-12 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-extrabold text-xs sm:text-sm rounded-2xl flex items-center justify-center gap-2 transition-all border border-emerald-200/80"
+                                >
+                                    <MessageCircle className="w-4 h-4" />
+                                    <span>Consultar</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        {/* Social Proof Chat / Microcopy */}
+                        {socialProof && <SocialProofChat messages={socialProof.chatMessages} />}
+                    </div>
+                </div>
+
+                {/* Lower Section: Copywriting, PAS Block & Tech Specs */}
+                <div className="mt-16 max-w-4xl mx-auto space-y-12">
+                    <ProductDescription description={product.description} />
                     <PASBlock product={product} />
 
-                    {/* Chat Simulation - Social Proof 2026 */}
-                    <SocialProofChat messages={socialProof.chatMessages} />
-
-                    {product.tags && product.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                            {product.tags.map((tag, idx) => (
-                                <span key={idx} className="bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full">
-                                    #{tag}
-                                </span>
-                            ))}
-                        </div>
-                    )}
-
-                    <div className="border-t border-gray-100 pt-4">
+                    {/* Technical Specs Accordion */}
+                    <div className="bg-white rounded-3xl p-6 border border-gray-200/80 shadow-xs">
                         <button
                             onClick={() => setShowSpecs(!showSpecs)}
-                            className="flex items-center justify-between w-full text-steel-blue font-medium text-[16px] font-display"
+                            className="flex items-center justify-between w-full text-gray-900 font-extrabold text-base cursor-pointer"
                         >
-                            <span>Ver especificaciones técnicas</span>
-                            <span className={`material-symbols-outlined transform transition-transform ${showSpecs ? 'rotate-180' : ''}`}>expand_more</span>
+                            <span>Especificaciones Técnicas y Garantía</span>
+                            <ChevronDown className={`w-5 h-5 transform transition-transform ${showSpecs ? 'rotate-180' : ''}`} />
                         </button>
 
                         {showSpecs && (
-                            <div className="mt-4 space-y-2 animate-fadeIn bg-gray-50 p-4 rounded-lg">
-                                <div className="flex justify-between text-sm border-b border-gray-200 pb-2">
-                                    <span className="text-gray-500">SKU</span>
-                                    <span className="font-medium text-soft-black">{product.sku || `KP-${product.id.toString().substring(0, 6).toUpperCase()}`}</span>
+                            <div className="mt-4 pt-4 border-t border-gray-100 space-y-3 text-xs sm:text-sm animate-fadeIn">
+                                <div className="flex justify-between py-1.5 border-b border-gray-100">
+                                    <span className="text-gray-500 font-medium">Código / SKU</span>
+                                    <span className="font-bold text-gray-900">{product.sku || `KP-${product.id.toString().substring(0, 8).toUpperCase()}`}</span>
                                 </div>
-                                <div className="flex justify-between text-sm border-b border-gray-200 pb-2">
-                                    <span className="text-gray-500">Categoría</span>
-                                    <span className="font-medium text-soft-black">{product.category || 'General'}</span>
+                                <div className="flex justify-between py-1.5 border-b border-gray-100">
+                                    <span className="text-gray-500 font-medium">Categoría Oficial</span>
+                                    <span className="font-bold text-gray-900">{product.category || 'General'}</span>
                                 </div>
-                                <div className="flex justify-between text-sm pt-2">
-                                    <span className="text-gray-500">Envío</span>
-                                    <span className="font-medium text-soft-black">Nacional Gratis</span>
+                                <div className="flex justify-between py-1.5 border-b border-gray-100">
+                                    <span className="text-gray-500 font-medium">Tipo de Envío</span>
+                                    <span className="font-bold text-emerald-700">Nacional Express Gratuito</span>
+                                </div>
+                                <div className="flex justify-between py-1.5">
+                                    <span className="text-gray-500 font-medium">Modalidad de Pago</span>
+                                    <span className="font-bold text-gray-900">Contra Entrega (Efectivo / Pago Móvil / Tasa BCV)</span>
                                 </div>
                             </div>
                         )}
                     </div>
                 </div>
-
-                <div className="grid grid-cols-2 gap-2 md:gap-3 px-4 md:px-5 pb-8">
-                    <div className="bg-white p-3 md:p-4 rounded-lg border border-gray-100 flex flex-col items-center text-center shadow-sm">
-                        <span className="material-symbols-outlined text-brand-blue mb-1 md:mb-2 text-[22px] md:text-[24px]">local_shipping</span>
-                        <span className="text-[11px] md:text-xs font-bold text-gray-800 uppercase">Envío Gratis</span>
-                        <span className="text-[10px] text-gray-500">A toda Venezuela</span>
-                    </div>
-                    <div className="bg-white p-3 md:p-4 rounded-lg border border-gray-100 flex flex-col items-center text-center shadow-sm">
-                        <span className="material-symbols-outlined text-brand-blue mb-1 md:mb-2 text-[22px] md:text-[24px]">workspace_premium</span>
-                        <span className="text-[11px] md:text-xs font-bold text-gray-800 uppercase">Garantía Total</span>
-                        <span className="text-[10px] text-gray-500">3 Meses Cobertura</span>
-                    </div>
-                </div>
             </main>
 
-            <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md p-3 md:p-4 shadow-[0_-4px_25px_rgba(0,0,0,0.12)] border-t border-gray-100 z-50 animate-slideUp" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
-                <div className="max-w-md mx-auto md:max-w-4xl flex flex-col md:flex-row gap-2 md:gap-4 md:items-center">
-                    <div className="hidden md:block flex-1">
-                        <p className="font-bold text-gray-900 text-sm truncate">{product.name}</p>
-                        <p className="text-xs text-emerald-600 font-semibold">🚚 Envío Gratis · Pago Contra Entrega (Tasa BCV)</p>
-                    </div>
-                    <div className="flex items-center gap-2 w-full md:w-auto">
-                        <button
-                            onClick={handleAddToCart}
-                            className="p-3 md:px-4 md:py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-2xl flex items-center justify-center gap-1.5 active:scale-95 transition-all shrink-0"
-                            title="Añadir al Carrito"
-                            aria-label="Añadir al Carrito"
-                        >
-                            <span className="material-symbols-outlined text-[20px]">shopping_cart</span>
-                            <span className="hidden sm:inline text-xs font-bold">Al Carrito</span>
-                        </button>
-                        <button
-                            onClick={() => setIsModalOpen(true)}
-                            className="flex-1 md:min-w-[280px] h-[48px] md:h-14 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-extrabold text-xs sm:text-sm md:text-base rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-600/25 relative overflow-hidden px-4"
-                        >
-                            <span className="material-symbols-outlined text-[20px]">check_circle</span>
-                            <span>PEDIR AHORA · ${Math.ceil(getPrice())}</span>
-                            <span className="text-[10px] sm:text-xs font-normal opacity-90 hidden xs:inline">(Pagas al Recibir)</span>
-                        </button>
-                    </div>
+            <Footer />
+
+            {/* Mobile Sticky Buy Bar */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md p-3 shadow-[0_-4px_25px_rgba(0,0,0,0.12)] border-t border-gray-200 z-50 animate-slideUp md:hidden" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+                <div className="max-w-md mx-auto flex items-center gap-2">
+                    <button
+                        onClick={handleAddToCart}
+                        className="p-3 bg-gray-100 hover:bg-gray-200 active:scale-95 text-gray-900 font-bold rounded-2xl flex items-center justify-center shrink-0"
+                        title="Añadir al Carrito"
+                        aria-label="Añadir al Carrito"
+                    >
+                        <ShoppingCart className="w-5 h-5" />
+                    </button>
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="flex-1 h-12 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-black text-xs sm:text-sm rounded-2xl flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-600/25 px-3"
+                    >
+                        <CheckCircle2 className="w-4 h-4 shrink-0" />
+                        <span className="truncate">PEDIR AHORA · ${getPrice()} (Pagas al Recibir)</span>
+                    </button>
                 </div>
             </div>
 

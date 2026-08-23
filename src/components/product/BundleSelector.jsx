@@ -1,118 +1,131 @@
-/**
- * BundleSelector Component
- * @description
- * Interactive bundle selector with pricing and savings display.
- * Supports both 'discount' (% off) and 'quantity' (buy 2 get 1 free) modes.
- * Responsive from 320px: larger touch targets, proper text scaling.
- */
+import { Sparkles, Gift, CheckCircle2 } from 'lucide-react';
+
 export default function BundleSelector({ product, selectedBundle, onSelectBundle, getPrice, getSavings }) {
     const isQuantity = product.bundle_type === 'quantity';
 
     if (isQuantity) {
-        // ===== QUANTITY MODE: 1 unit or buy 2 get 1 free =====
         const singlePrice = product.price;
-        const bundlePrice = singlePrice * 2; // pay for 2, get 3
-        const savings = singlePrice; // you save 1 full unit
+        const bundlePrice = singlePrice * 2;
+        const savings = singlePrice;
 
         return (
-            <div className="space-y-2.5 md:space-y-3">
-                <p className="font-bold text-xs md:text-sm text-gray-700">Selecciona tu Oferta:</p>
+            <div className="space-y-3">
+                <p className="font-extrabold text-xs uppercase tracking-wider text-gray-600">Elige tu Paquete de Ahorro:</p>
 
-                {/* Option: 1 Unit */}
+                {/* Option 1 */}
                 <div
                     onClick={() => onSelectBundle(1)}
-                    className={`border-2 rounded-xl p-3 md:p-3 flex items-center justify-between cursor-pointer transition-all min-h-[48px] ${selectedBundle === 1 ? 'border-brand-blue bg-blue-50/50 shadow-sm' : 'border-gray-200 hover:border-gray-300'}`}
+                    className={`border-2 rounded-2xl p-3.5 flex items-center justify-between cursor-pointer transition-all ${
+                        selectedBundle === 1 ? 'border-[#0A2463] bg-blue-50/40 shadow-sm ring-2 ring-[#0A2463]/10' : 'border-gray-200 hover:border-gray-300 bg-white'
+                    }`}
                 >
-                    <div className="flex items-center gap-2.5 md:gap-3">
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedBundle === 1 ? 'border-brand-blue' : 'border-gray-300'}`}>
-                            {selectedBundle === 1 && <div className="w-2.5 h-2.5 rounded-full bg-brand-blue"></div>}
+                    <div className="flex items-center gap-3">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedBundle === 1 ? 'border-[#0A2463] bg-[#0A2463]' : 'border-gray-300'}`}>
+                            {selectedBundle === 1 && <CheckCircle2 className="w-4 h-4 text-white" />}
                         </div>
-                        <span className="font-bold text-sm md:text-base text-soft-black">1 Unidad</span>
+                        <span className="font-bold text-sm sm:text-base text-gray-950">1 Unidad</span>
                     </div>
-                    <span className="font-bold text-sm md:text-base text-brand-blue">${singlePrice.toFixed(2)}</span>
+                    <span className="font-black text-base text-gray-950">${singlePrice.toFixed(0)}</span>
                 </div>
 
-                {/* Option: Buy 2 Get 1 Free */}
+                {/* Option 2: Buy 2 Get 1 Free */}
                 <div
                     onClick={() => onSelectBundle(3)}
-                    className={`relative border-2 rounded-xl p-3 md:p-3 flex items-center justify-between cursor-pointer transition-all min-h-[48px] ${selectedBundle === 3 ? 'border-brand-blue bg-blue-50/50 shadow-sm' : 'border-gray-200 hover:border-gray-300'}`}
+                    className={`relative border-2 rounded-2xl p-3.5 flex items-center justify-between cursor-pointer transition-all ${
+                        selectedBundle === 3 ? 'border-[#0A2463] bg-blue-50/40 shadow-sm ring-2 ring-[#0A2463]/10' : 'border-gray-200 hover:border-gray-300 bg-white'
+                    }`}
                 >
-                    <div className="absolute -top-2.5 left-3 md:left-4 bg-brand-red text-white text-[9px] md:text-[10px] font-bold px-1.5 md:px-2 py-0.5 rounded">🎁 ¡1 Gratis!</div>
-                    <div className="flex items-center gap-2.5 md:gap-3 min-w-0">
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedBundle === 3 ? 'border-brand-blue' : 'border-gray-300'}`}>
-                            {selectedBundle === 3 && <div className="w-2.5 h-2.5 rounded-full bg-brand-blue"></div>}
+                    <div className="absolute -top-2.5 right-4 bg-brand-red text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm flex items-center gap-1">
+                        <Gift className="w-3 h-3" />
+                        <span>¡1 GRATIS!</span>
+                    </div>
+                    <div className="flex items-center gap-3 min-w-0">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedBundle === 3 ? 'border-[#0A2463] bg-[#0A2463]' : 'border-gray-300'}`}>
+                            {selectedBundle === 3 && <CheckCircle2 className="w-4 h-4 text-white" />}
                         </div>
-                        <div className="min-w-0">
-                            <span className="font-bold text-sm md:text-base text-soft-black block">Compra 2, Llévate 3</span>
-                            <span className="text-[10px] text-green-600 font-bold">Ahorras ${savings.toFixed(2)}</span>
+                        <div>
+                            <span className="font-bold text-sm sm:text-base text-gray-950 block">Paga 2 y Llévate 3</span>
+                            <span className="text-xs text-emerald-700 font-extrabold">Ahorras ${savings.toFixed(0)} USD</span>
                         </div>
                     </div>
                     <div className="text-right shrink-0 ml-2">
-                        <span className="block text-[10px] md:text-xs text-gray-400 line-through">${(singlePrice * 3).toFixed(0)}</span>
-                        <span className="font-bold text-sm md:text-base text-brand-blue">${bundlePrice.toFixed(0)}</span>
+                        <span className="block text-xs text-gray-400 line-through">${(singlePrice * 3).toFixed(0)}</span>
+                        <span className="font-black text-base sm:text-lg text-[#0A2463]">${bundlePrice.toFixed(0)}</span>
                     </div>
                 </div>
             </div>
         );
     }
 
-    // ===== DISCOUNT MODE (default): percentage-based bundles =====
     return (
-        <div className="space-y-2.5 md:space-y-3">
-            <p className="font-bold text-xs md:text-sm text-gray-700">Selecciona tu Oferta:</p>
+        <div className="space-y-3">
+            <p className="font-extrabold text-xs uppercase tracking-wider text-gray-600">Elige tu Paquete de Ahorro:</p>
 
             {/* Option 1: 1 Unit */}
             <div
                 onClick={() => onSelectBundle(1)}
-                className={`border-2 rounded-xl p-3 md:p-3 flex items-center justify-between cursor-pointer transition-all min-h-[48px] ${selectedBundle === 1 ? 'border-brand-blue bg-blue-50/50 shadow-sm' : 'border-gray-200 hover:border-gray-300'}`}
+                className={`border-2 rounded-2xl p-3.5 flex items-center justify-between cursor-pointer transition-all ${
+                    selectedBundle === 1 ? 'border-[#0A2463] bg-blue-50/40 shadow-sm ring-2 ring-[#0A2463]/10' : 'border-gray-200 hover:border-gray-300 bg-white'
+                }`}
             >
-                <div className="flex items-center gap-2.5 md:gap-3">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedBundle === 1 ? 'border-brand-blue' : 'border-gray-300'}`}>
-                        {selectedBundle === 1 && <div className="w-2.5 h-2.5 rounded-full bg-brand-blue"></div>}
+                <div className="flex items-center gap-3">
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedBundle === 1 ? 'border-[#0A2463] bg-[#0A2463]' : 'border-gray-300'}`}>
+                        {selectedBundle === 1 && <CheckCircle2 className="w-4 h-4 text-white" />}
                     </div>
-                    <span className="font-bold text-sm md:text-base text-soft-black">1 Unidad</span>
+                    <span className="font-bold text-sm sm:text-base text-gray-950">1 Unidad Individual</span>
                 </div>
-                <span className="font-bold text-sm md:text-base text-brand-blue">${product.price.toFixed(2)}</span>
+                <span className="font-black text-base text-gray-950">${product.price.toFixed(0)}</span>
             </div>
 
             {/* Option 2: 2 Units */}
             <div
                 onClick={() => onSelectBundle(2)}
-                className={`relative border-2 rounded-xl p-3 md:p-3 flex items-center justify-between cursor-pointer transition-all min-h-[48px] ${selectedBundle === 2 ? 'border-brand-blue bg-blue-50/50 shadow-sm' : 'border-gray-200 hover:border-gray-300'}`}
+                className={`relative border-2 rounded-2xl p-3.5 flex items-center justify-between cursor-pointer transition-all ${
+                    selectedBundle === 2 ? 'border-[#0A2463] bg-blue-50/40 shadow-sm ring-2 ring-[#0A2463]/10' : 'border-gray-200 hover:border-gray-300 bg-white'
+                }`}
             >
-                <div className="absolute -top-2.5 left-3 md:left-4 bg-brand-red text-white text-[9px] md:text-[10px] font-bold px-1.5 md:px-2 py-0.5 rounded">Recomendado</div>
-                <div className="flex items-center gap-2.5 md:gap-3 min-w-0">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedBundle === 2 ? 'border-brand-blue' : 'border-gray-300'}`}>
-                        {selectedBundle === 2 && <div className="w-2.5 h-2.5 rounded-full bg-brand-blue"></div>}
+                <div className="absolute -top-2.5 right-4 bg-[#0A2463] text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-amber-400" />
+                    <span>MÁS POPULAR (-10%)</span>
+                </div>
+                <div className="flex items-center gap-3 min-w-0">
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedBundle === 2 ? 'border-[#0A2463] bg-[#0A2463]' : 'border-gray-300'}`}>
+                        {selectedBundle === 2 && <CheckCircle2 className="w-4 h-4 text-white" />}
                     </div>
-                    <div className="min-w-0">
-                        <span className="font-bold text-sm md:text-base text-soft-black block">2 Unidades</span>
-                        <span className="text-[10px] text-green-600 font-bold">Ahorras ${getSavings(2).toFixed(2)}</span>
+                    <div>
+                        <span className="font-bold text-sm sm:text-base text-gray-950 block">Pack x2 Unidades</span>
+                        <span className="text-xs text-emerald-700 font-extrabold">Ahorras ${getSavings(2).toFixed(0)} USD</span>
                     </div>
                 </div>
                 <div className="text-right shrink-0 ml-2">
-                    <span className="block text-[10px] md:text-xs text-gray-400 line-through">${Math.ceil(product.price * 2)}</span>
-                    <span className="font-bold text-sm md:text-base text-brand-blue">${getPrice(2)}</span>
+                    <span className="block text-xs text-gray-400 line-through">${Math.ceil(product.price * 2)}</span>
+                    <span className="font-black text-base sm:text-lg text-[#0A2463]">${getPrice(2)}</span>
                 </div>
             </div>
 
             {/* Option 3: 3 Units */}
             <div
                 onClick={() => onSelectBundle(3)}
-                className={`border-2 rounded-xl p-3 md:p-3 flex items-center justify-between cursor-pointer transition-all min-h-[48px] ${selectedBundle === 3 ? 'border-brand-blue bg-blue-50/50 shadow-sm' : 'border-gray-200 hover:border-gray-300'}`}
+                className={`relative border-2 rounded-2xl p-3.5 flex items-center justify-between cursor-pointer transition-all ${
+                    selectedBundle === 3 ? 'border-[#0A2463] bg-blue-50/40 shadow-sm ring-2 ring-[#0A2463]/10' : 'border-gray-200 hover:border-gray-300 bg-white'
+                }`}
             >
-                <div className="flex items-center gap-2.5 md:gap-3 min-w-0">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedBundle === 3 ? 'border-brand-blue' : 'border-gray-300'}`}>
-                        {selectedBundle === 3 && <div className="w-2.5 h-2.5 rounded-full bg-brand-blue"></div>}
+                <div className="absolute -top-2.5 right-4 bg-brand-red text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-amber-300" />
+                    <span>MÁXIMO AHORRO (-20%)</span>
+                </div>
+                <div className="flex items-center gap-3 min-w-0">
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedBundle === 3 ? 'border-[#0A2463] bg-[#0A2463]' : 'border-gray-300'}`}>
+                        {selectedBundle === 3 && <CheckCircle2 className="w-4 h-4 text-white" />}
                     </div>
-                    <div className="min-w-0">
-                        <span className="font-bold text-sm md:text-base text-soft-black block">3 Unidades</span>
-                        <span className="text-[10px] text-green-600 font-bold">Ahorras ${Math.ceil(getSavings(3))}</span>
+                    <div>
+                        <span className="font-bold text-sm sm:text-base text-gray-950 block">Pack x3 Unidades</span>
+                        <span className="text-xs text-emerald-700 font-extrabold">Ahorras ${Math.ceil(getSavings(3))} USD</span>
                     </div>
                 </div>
                 <div className="text-right shrink-0 ml-2">
-                    <span className="block text-[10px] md:text-xs text-gray-400 line-through">${Math.ceil(product.price * 3)}</span>
-                    <span className="font-bold text-sm md:text-base text-brand-blue">${getPrice(3)}</span>
+                    <span className="block text-xs text-gray-400 line-through">${Math.ceil(product.price * 3)}</span>
+                    <span className="font-black text-base sm:text-lg text-[#0A2463]">${getPrice(3)}</span>
                 </div>
             </div>
         </div>

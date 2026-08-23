@@ -1,42 +1,45 @@
 import { useCurrency } from '../context/CurrencyContext';
 
 /**
- * PriceDual — Shows USD price (large) + Bs equivalent (small)
- * 
- * Usage:
- *   <PriceDual amount={46} />
- *   <PriceDual amount={46} size="sm" />         // compact for cards
- *   <PriceDual amount={46} size="lg" />         // large for product detail
- *   <PriceDual amount={46} showRate />           // shows "tasa BCV" label
+ * PriceDual 2.0 — High-Contrast Bimonetary Price Display (USD + Bs BCV)
  */
 export default function PriceDual({ amount, size = 'md', showRate = false, className = '' }) {
     const { formatUSD, formatBs, exchangeRate, showBs, rateSource } = useCurrency();
 
-    if (!amount) return null;
+    if (!amount && amount !== 0) return null;
 
     const sizes = {
-        sm: { usd: 'text-lg md:text-xl', bs: 'text-[10px]', rate: 'text-[8px]' },
-        md: { usd: 'text-[22px] md:text-[24px]', bs: 'text-[11px]', rate: 'text-[9px]' },
-        lg: { usd: 'text-[26px] md:text-[32px]', bs: 'text-xs md:text-sm', rate: 'text-[10px]' },
+        sm: {
+            usd: 'text-xl font-black text-gray-950',
+            bs: 'text-xs font-extrabold text-slate-700 bg-slate-100/90 border border-slate-200/80 px-2 py-0.5 rounded-lg'
+        },
+        md: {
+            usd: 'text-2xl sm:text-3xl font-black text-gray-950',
+            bs: 'text-xs sm:text-sm font-extrabold text-slate-800 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-xl'
+        },
+        lg: {
+            usd: 'text-3xl sm:text-4xl font-black text-gray-950',
+            bs: 'text-sm sm:text-base font-extrabold text-slate-900 bg-slate-100 border border-slate-300 px-3 py-1.5 rounded-xl'
+        },
     };
     const s = sizes[size] || sizes.md;
 
     return (
-        <div className={`flex items-baseline gap-2 flex-wrap ${className}`}>
-            <span className={`${s.usd} font-bold font-display text-brand-blue`}>
+        <div className={`flex items-center gap-2.5 flex-wrap ${className}`}>
+            <span className={`${s.usd} tracking-tight tabular-nums`}>
                 {formatUSD(amount)}
             </span>
             {showBs && exchangeRate && (
-                <span className="flex flex-col">
-                    <span className={`${s.bs} text-gray-400 font-medium font-mono`}>
+                <div className="inline-flex items-center gap-1.5">
+                    <span className={`${s.bs} tabular-nums shadow-2xs`}>
                         {formatBs(amount)}
                     </span>
                     {showRate && (
-                        <span className={`${s.rate} text-gray-300`}>
-                            tasa BCV{rateSource === 'manual' ? ' (manual)' : ''}
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                            Tasa BCV{rateSource === 'manual' ? ' (manual)' : ''}
                         </span>
                     )}
-                </span>
+                </div>
             )}
         </div>
     );

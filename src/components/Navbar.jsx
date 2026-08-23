@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import Logo from './Logo';
 import { useCart } from '../context/CartContext';
 import { useCurrency } from '../context/CurrencyContext';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, Truck } from 'lucide-react';
 
 export default function Navbar() {
     const { setIsCartOpen, cartCount } = useCart();
@@ -38,7 +38,7 @@ export default function Navbar() {
                             to="/rastreo"
                             className="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white font-bold px-3 py-1 rounded-xl transition-all border border-white/20"
                         >
-                            <span className="material-symbols-outlined text-sm text-emerald-400">local_shipping</span>
+                            <Truck className="w-3.5 h-3.5 text-emerald-400" />
                             <span>Rastrear Pedido</span>
                         </Link>
                     </div>

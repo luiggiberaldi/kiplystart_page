@@ -1,19 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useCurrency } from '../context/CurrencyContext';
-import { ZONES, getSavedCustomer, saveCustomer, clearSavedCustomer } from './cod/codData';
+import { getSavedCustomer, saveCustomer, clearSavedCustomer } from './cod/codData';
 import CODProductSummary from './cod/CODProductSummary';
 import CODStepPersonal from './cod/CODStepPersonal';
 import CODStepDelivery from './cod/CODStepDelivery';
 import CODSuccess from './cod/CODSuccess';
 import { createDroPanasOrder } from '../lib/dropanasApi';
+import { Truck, X, User, MapPin, CheckCircle2, ShieldCheck } from 'lucide-react';
 
 const EMPTY_FORM = { name: '', ci: '', phone: '', state: '', city: '', address: '', ref: '' };
 
-/**
- * CODModal v2 — Stepper + Smart Autofill + Dual Currency
- * Orchestrator only — UI lives in sub-components under /cod
- */
 export default function CODModal({ isOpen, onClose, product, quantity, totalPrice, selectedBundle }) {
     const { formatUSD, formatBs, exchangeRate } = useCurrency();
 
@@ -66,17 +63,17 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
     function fieldBorder(name) {
         const s = getFieldStatus(name);
         if (s === 'error') return 'border-red-400 ring-2 ring-red-100';
-        if (s === 'valid') return 'border-green-400 ring-2 ring-green-50';
-        return 'border-gray-200 focus-within:border-brand-blue focus-within:ring-2 focus-within:ring-blue-50';
+        if (s === 'valid') return 'border-emerald-500 ring-2 ring-emerald-50';
+        return 'border-gray-300 focus-within:border-[#0A2463] focus-within:ring-2 focus-within:ring-blue-100';
     }
 
     /* ===== Validation ===== */
     function goToStep2() {
         const e = {};
-        if (!formData.name.trim()) e.name = 'Requerido';
-        if (!formData.ci.trim()) e.ci = 'Requerido';
-        if (!formData.phone.trim()) e.phone = 'Requerido';
-        else if (formData.phone.length < 10) e.phone = 'Verifica el número';
+        if (!formData.name.trim()) e.name = 'Ingresa tu nombre y apellido';
+        if (!formData.ci.trim()) e.ci = 'Ingresa tu número de cédula o ID';
+        if (!formData.phone.trim()) e.phone = 'Ingresa tu teléfono de WhatsApp';
+        else if (formData.phone.length < 10) e.phone = 'Verifica tu número (mínimo 10 dígitos)';
         setErrors(e);
         if (Object.keys(e).length === 0) { setErrors({}); setTouched({}); setStep(2); }
     }
@@ -85,9 +82,9 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
     async function handleSubmit(e) {
         e.preventDefault();
         const err = {};
-        if (!formData.state) err.state = 'Selecciona un estado';
-        if (!formData.city) err.city = 'Selecciona una ciudad';
-        if (!formData.address.trim()) err.address = 'La dirección es obligatoria';
+        if (!formData.state) err.state = 'Selecciona tu estado';
+        if (!formData.city) err.city = 'Selecciona tu ciudad';
+        if (!formData.address.trim()) err.address = 'Ingresa tu dirección exacta de entrega';
         setErrors(err);
         if (Object.keys(err).length > 0) return;
 
@@ -95,7 +92,6 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
         try {
             saveCustomer(formData);
 
-            // Generate order_id: KS-YYYYMMDD-XXXX
             const now = new Date();
             const datePart = now.toISOString().slice(0, 10).replace(/-/g, '');
             const rand = Math.floor(1000 + Math.random() * 9000);
@@ -120,9 +116,9 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
                 status: 'pending_whatsapp'
             }).select();
 
-            if (error) console.error('Supabase error:', error);
+            if (error) console.error('Supabase order insert error:', error);
 
-            // 🚀 Inyección Automática en DroPanas API
+            // Inyección Automática en DroPanas API
             createDroPanasOrder({
                 orderId,
                 customerName: formData.name,
@@ -145,26 +141,26 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
 
             const displayId = data?.[0]?.order_id || orderId;
             const bundleText = selectedBundle > 1 ? `(Oferta ${selectedBundle} unidades)` : '';
-            const bsLine = exchangeRate ? `\n💱 *En Bs:* ${formatBs(totalPrice)}` : '';
+            const bsLine = exchangeRate ? `\n💱 *Monto en Bs:* ${formatBs(totalPrice)}` : '';
 
             const message =
                 `Hola, deseo confirmar mi pedido en KiplyStart.\n\n` +
-                `DETALLES DEL PEDIDO\n` +
-                `ID: ${displayId}\n` +
-                `Producto: ${product.name}\n` +
-                `Cantidad: ${quantity} ${bundleText}\n` +
-                `Total: ${formatUSD(totalPrice)}${bsLine}\n\n` +
-                `DATOS DE ENVÍO\n` +
-                `Nombre: ${formData.name}\n` +
-                `CI: ${formData.ci}\n` +
-                `Teléfono: ${formData.phone}\n` +
-                `Dirección: ${formData.city}, ${formData.state}\n` +
-                `Dirección exacta: ${formData.address}\n` +
-                (formData.ref ? `Referencia: ${formData.ref}\n` : '') +
-                `\nEspero su confirmación para el despacho.`;
+                `📦 *DETALLES DEL PEDIDO*\n` +
+                `• *Nro de Orden:* ${displayId}\n` +
+                `• *Producto:* ${product.name}\n` +
+                `• *Cantidad:* ${quantity} ${bundleText}\n` +
+                `• *Total:* ${formatUSD(totalPrice)}${bsLine}\n\n` +
+                `📍 *DATOS DE ENTREGA*\n` +
+                `• *Nombre:* ${formData.name}\n` +
+                `• *Cédula:* ${formData.ci}\n` +
+                `• *Teléfono:* ${formData.phone}\n` +
+                `• *Ubicación:* ${formData.city}, ${formData.state}\n` +
+                `• *Dirección Exacta:* ${formData.address}\n` +
+                (formData.ref ? `• *Referencia:* ${formData.ref}\n` : '') +
+                `\n✅ *Método:* Pago Contra Entrega (Tasa Oficial BCV)`;
 
-            const WA = import.meta.env.VITE_WHATSAPP_NUMBER || '584241234567';
-            setTimeout(() => { window.location.href = `https://wa.me/${WA}?text=${encodeURIComponent(message)}`; }, 1200);
+            const WA = import.meta.env.VITE_WHATSAPP_NUMBER || '584124340546';
+            setTimeout(() => { window.location.href = `https://wa.me/${WA}?text=${encodeURIComponent(message)}`; }, 1000);
         } catch (err) {
             console.error('Submission error:', err);
             setLoading(false); setSuccess(false);
@@ -177,40 +173,53 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
         setReturning(false);
     }
 
-    /* ===== Shared field props ===== */
     const fieldProps = { formData, errors, handleChange, handleBlur, fieldBorder, getFieldStatus };
 
-    /* ===== Render ===== */
     if (success) return <CODSuccess />;
 
     return (
-        <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">
+        <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
-            <div className="relative bg-white w-full max-w-lg sm:rounded-2xl rounded-t-2xl shadow-2xl max-h-[92vh] overflow-y-auto animate-slideUp"
-                style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+            <div className="relative bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[92vh] overflow-y-auto animate-slideUp border border-gray-100"
+                style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
 
                 {/* Header + Stepper */}
-                <div className="sticky top-0 bg-brand-blue text-white p-3 md:p-4 z-10 sm:rounded-t-2xl">
+                <div className="sticky top-0 bg-[#0A2463] text-white p-4 sm:p-5 z-10 rounded-t-3xl sm:rounded-t-3xl shadow-md">
                     <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2 min-w-0">
-                            <span className="material-symbols-outlined text-[20px] shrink-0">local_shipping</span>
-                            <h3 className="font-display font-bold text-base truncate">Envío Rápido y Seguro</h3>
+                        <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center">
+                                <Truck className="w-4 h-4 text-amber-400" />
+                            </div>
+                            <div>
+                                <h3 className="font-extrabold text-base tracking-tight truncate">Envío Rápido y Seguro</h3>
+                                <p className="text-[11px] text-white/70">Pago Contra Entrega · Tasa Oficial BCV</p>
+                            </div>
                         </div>
-                        <button onClick={onClose} className="text-white/80 hover:text-white shrink-0 ml-2">
-                            <span className="material-symbols-outlined">close</span>
+                        <button onClick={onClose} className="text-white/70 hover:text-white p-1 rounded-xl hover:bg-white/10 transition-colors cursor-pointer" aria-label="Cerrar modal">
+                            <X className="w-5 h-5" />
                         </button>
                     </div>
 
-                    <div className="flex items-center gap-2 mt-3">
-                        <StepPill active={step === 1} done={step > 1} icon={step > 1 ? 'check_circle' : 'person'} label="Tus datos" />
-                        <div className={`h-[2px] flex-1 rounded ${step > 1 ? 'bg-white' : 'bg-white/20'}`} />
-                        <StepPill active={step === 2} icon="location_on" label="Envío" />
+                    <div className="flex items-center gap-2 mt-4">
+                        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                            step === 1 ? 'bg-white text-[#0A2463] shadow-md' : 'bg-white/15 text-white'
+                        }`}>
+                            {step > 1 ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <User className="w-3.5 h-3.5" />}
+                            <span>1. Tus Datos</span>
+                        </div>
+                        <div className={`h-[2px] flex-1 rounded-full ${step > 1 ? 'bg-emerald-400' : 'bg-white/20'}`} />
+                        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                            step === 2 ? 'bg-white text-[#0A2463] shadow-md' : 'bg-white/15 text-white/70'
+                        }`}>
+                            <MapPin className="w-3.5 h-3.5" />
+                            <span>2. Destino</span>
+                        </div>
                     </div>
                 </div>
 
                 {/* Body */}
-                <div className="p-4 md:p-6">
+                <div className="p-5 sm:p-6">
                     <CODProductSummary product={product} quantity={quantity}
                         selectedBundle={selectedBundle} totalPrice={totalPrice} />
 
@@ -226,17 +235,6 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
                     </form>
                 </div>
             </div>
-        </div>
-    );
-}
-
-/* ===== Tiny helper ===== */
-function StepPill({ active, icon, label }) {
-    return (
-        <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors
-            ${active ? 'bg-white text-brand-blue' : 'bg-white/20 text-white/70'}`}>
-            <span className="material-symbols-outlined text-[14px]">{icon}</span>
-            {label}
         </div>
     );
 }
