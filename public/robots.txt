@@ -1,14 +1,68 @@
+# Robots.txt for KiplyStart (https://www.kiplystart.com)
+# Configured for Search Engines, Generative AI Agents & Answer Engine Optimization (AEO)
+
 User-agent: *
 Allow: /
 Allow: /catalogo
 Allow: /producto/
+Allow: /rastreo
 Allow: /terminos
 Allow: /privacidad
 Allow: /soporte
+Allow: /llms.txt
 
-# Block admin and internal paths
+# Block admin, api and sensitive internal paths
 Disallow: /admin-portal-2026
 Disallow: /api/
 
-# Sitemap
+# OpenAI ChatGPT & Search Agent
+User-agent: GPTBot
+Allow: /
+Allow: /llms.txt
+Disallow: /admin-portal-2026
+Disallow: /api/
+
+User-agent: ChatGPT-User
+Allow: /
+Allow: /llms.txt
+Disallow: /admin-portal-2026
+Disallow: /api/
+
+# Perplexity AI Agent
+User-agent: PerplexityBot
+Allow: /
+Allow: /llms.txt
+Disallow: /admin-portal-2026
+Disallow: /api/
+
+# Anthropic Claude Agent
+User-agent: ClaudeBot
+Allow: /
+Allow: /llms.txt
+Disallow: /admin-portal-2026
+Disallow: /api/
+
+User-agent: anthropic-ai
+Allow: /
+Allow: /llms.txt
+Disallow: /admin-portal-2026
+Disallow: /api/
+
+# Google Gemini & AI Overviews
+User-agent: Google-Extended
+Allow: /
+Allow: /llms.txt
+Disallow: /admin-portal-2026
+Disallow: /api/
+
+# Apple Intelligence
+User-agent: Applebot-Extended
+Allow: /
+Allow: /llms.txt
+Disallow: /admin-portal-2026
+Disallow: /api/
+
+# Sitemaps & LLMs Reference
 Sitemap: https://www.kiplystart.com/sitemap.xml
+# LLMs Context Reference
+# llms.txt: https://www.kiplystart.com/llms.txt

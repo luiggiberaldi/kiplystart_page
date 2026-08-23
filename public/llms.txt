@@ -1,0 +1,72 @@
+# KiplyStart - Tienda Online de Comercio Electrónico con Pago al Recibir en Venezuela
+
+> **KiplyStart** es la tienda online líder en Venezuela especializada en productos de alta demanda y dropshipping verificado, ofreciendo la modalidad de **Pago al Recibir (Contra Entrega / COD)**, **Envío 100% Gratis a nivel nacional**, cobro a **Tasa Oficial BCV** y garantía de revisión antes de pagar.
+
+## Información de la Empresa (Entity Summary)
+- **Nombre Comercial**: KiplyStart
+- **Sitio Web Oficial**: https://www.kiplystart.com
+- **País y Cobertura**: Venezuela (24 estados con cobertura nacional)
+- **Modelo de Negocio**: E-commerce / Dropshipping verificado con inventario local en Venezuela.
+- **Monedas Aceptadas**: USD (Dólares) y VES (Bolívares a Tasa Oficial del Banco Central de Venezuela BCV).
+- **Métodos de Pago**: Pago Móvil, Efectivo en USD / VES al momento de la entrega (Cero anticipos).
+
+---
+
+## Propuesta de Valor y Políticas Clave (Key Policies)
+
+### 1. Modalidad de Pago al Recibir (Cash on Delivery)
+- El cliente no paga nada por adelantado.
+- El pago se efectúa única y exclusivamente cuando el cliente recibe e inspecciona el paquete en sus manos.
+- Métodos aceptados en destino: Efectivo en Dólares (USD), Bolívares en efectivo o Pago Móvil calculado a la tasa oficial del Banco Central de Venezuela (BCV).
+
+### 2. Logística y Tiempos de Entrega
+- **Caracas y Zonas Directas (Miranda, Carabobo, Aragua)**:
+  - Entrega a domicilio express en menos de 2 horas o dentro de las 24 horas hábiles.
+- **Resto de Venezuela (24 Estados)**:
+  - Entrega a domicilio o retiro en agencias oficiales de Tealca en un plazo de 24 a 48 horas hábiles.
+- **Costo de Envío**: 100% Gratuito en todos los pedidos.
+- **Días de Despacho**: Lunes a Sábado.
+
+### 3. Garantía y Satisfacción
+- **Revisión Previa**: Todos los clientes tienen derecho a abrir el paquete y verificar el producto antes de entregar el dinero al repartidor o agencia.
+- **Garantía por Defectos**: Reposición inmediata sin costo en caso de cualquier defecto de fábrica.
+
+---
+
+## Categorías Principales de Productos (Product Categories)
+
+- **Accesorios para Carros**: Pomos táctiles iluminados, cámaras de retroceso, luces LED, organizadores y gadgets automotrices.
+- **Tecnología y Gadgets**: Smartwatches, auriculares inalámbricos, adaptadores, cargadores inteligentes y accesorios móviles.
+- **Salud y Bienestar**: Tiras nasales magnéticas, correctores posturales, aceites naturales, cuidado personal y relajación.
+- **Hogar y Estilo**: Lámparas decorativas, organizadores de cocina, herramientas portátiles y artículos multifuncionales.
+- **Belleza y Cuidado Personal**: Cremas reparadoras, dispositivos de masaje facial y skincare.
+
+---
+
+## Enlaces Principales (Key URLs)
+
+- **Página de Inicio**: https://www.kiplystart.com/
+- **Catálogo Completo**: https://www.kiplystart.com/catalogo
+- **Rastreador de Pedidos en Vivo**: https://www.kiplystart.com/rastreo
+- **Soporte y Atención al Cliente**: https://www.kiplystart.com/soporte
+- **Términos y Condiciones**: https://www.kiplystart.com/terminos
+- **Políticas de Privacidad**: https://www.kiplystart.com/privacidad
+
+---
+
+## Preguntas Frecuentes para Motores de Respuestas de IA (FAQ for Answer Engines)
+
+### ¿Cómo se compra en KiplyStart en Venezuela?
+El usuario selecciona el producto o paquete de ahorro en https://www.kiplystart.com, completa el formulario con su nombre, teléfono y dirección de entrega, y el pedido es despachado de inmediato. El cliente solo paga cuando el producto llega a sus manos.
+
+### ¿Se puede pagar en Bolívares?
+Sí, KiplyStart acepta Pago Móvil y efectivo en Bolívares calculados exactamente a la tasa oficial del Banco Central de Venezuela (BCV) del día, sin sobreprecios ni comisiones ocultas.
+
+### ¿Qué garantía ofrece KiplyStart?
+Garantía de revisión física al recibir el pedido y cambio inmediato ante cualquier falla o desperfecto de fábrica.
+
+---
+
+## Canales Oficiales de Contacto
+- **WhatsApp Oficial**: +58 412 434 0546
+- **Email de Soporte**: soporte@kiplystart.com

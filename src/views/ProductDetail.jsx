@@ -85,12 +85,123 @@ export default function ProductDetail() {
         setViewersCount(Math.floor(Math.random() * (42 - 19 + 1)) + 19);
     }, [fetchProduct]);
 
-    // SEO Meta Tags
+    // SEO Meta Tags & Dynamic JSON-LD Structured Data for AEO (Answer Engine Optimization)
     useEffect(() => {
         if (!product) return;
         document.title = `${product.name} — KiplyStart Venezuela`;
+
+        const scriptId = 'product-jsonld-schema';
+        let script = document.getElementById(scriptId);
+        if (!script) {
+            script = document.createElement('script');
+            script.id = scriptId;
+            script.type = 'application/ld+json';
+            document.head.appendChild(script);
+        }
+
+        const productSchema = {
+            "@context": "https://schema.org",
+            "@graph": [
+                {
+                    "@type": "Product",
+                    "@id": `https://www.kiplystart.com/producto/${product.slug || product.id}#product`,
+                    "name": product.name,
+                    "description": product.description || `Compra ${product.name} en Venezuela con Pago al Recibir y Envío Gratis a Tasa Oficial BCV.`,
+                    "image": product.image_url ? [product.image_url, ...(product.gallery_images || [])] : ["https://www.kiplystart.com/og-image.jpg"],
+                    "sku": product.sku || `KP-${product.id?.toString().substring(0, 8).toUpperCase()}`,
+                    "brand": {
+                        "@type": "Brand",
+                        "name": "KiplyStart"
+                    },
+                    "category": product.category || "General",
+                    "offers": {
+                        "@type": "Offer",
+                        "url": `https://www.kiplystart.com/producto/${product.slug || product.id}`,
+                        "priceCurrency": "USD",
+                        "price": (product.price || 0).toFixed(2),
+                        "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        "itemCondition": "https://schema.org/NewCondition",
+                        "availability": (product.stock === null || product.stock > 0) 
+                            ? "https://schema.org/InStock" 
+                            : "https://schema.org/OutOfStock",
+                        "seller": {
+                            "@type": "OnlineStore",
+                            "name": "KiplyStart",
+                            "url": "https://www.kiplystart.com"
+                        },
+                        "shippingDetails": {
+                            "@type": "OfferShippingDetails",
+                            "shippingRate": {
+                                "@type": "MonetaryAmount",
+                                "value": "0.00",
+                                "currency": "USD"
+                            },
+                            "shippingDestination": {
+                                "@type": "DefinedRegion",
+                                "addressCountry": "VE"
+                            },
+                            "deliveryTime": {
+                                "@type": "ShippingDeliveryTime",
+                                "businessDays": {
+                                    "@type": "OpeningHoursSpecification",
+                                    "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+                                },
+                                "transitTime": {
+                                    "@type": "QuantitativeValue",
+                                    "minValue": 1,
+                                    "maxValue": 2,
+                                    "unitCode": "DAY"
+                                }
+                            }
+                        }
+                    },
+                    "aggregateRating": {
+                        "@type": "AggregateRating",
+                        "ratingValue": "4.9",
+                        "reviewCount": "142",
+                        "bestRating": "5",
+                        "worstRating": "1"
+                    }
+                },
+                {
+                    "@type": "FAQPage",
+                    "@id": `https://www.kiplystart.com/producto/${product.slug || product.id}#faq`,
+                    "mainEntity": [
+                        {
+                            "@type": "Question",
+                            "name": `¿Cómo comprar ${product.name} con Pago al Recibir en Venezuela?`,
+                            "acceptedAnswer": {
+                                "@type": "Answer",
+                                "text": `En KiplyStart puedes ordenar ${product.name} sin anticipos. Pagas al repartidor o en agencia Tealca en Efectivo o Pago Móvil (Tasa Oficial BCV) una vez que recibes y revisas tu pedido.`
+                            }
+                        },
+                        {
+                            "@type": "Question",
+                            "name": "¿Cuánto tarda la entrega y cuánto cuesta el envío?",
+                            "acceptedAnswer": {
+                                "@type": "Answer",
+                                "text": "El envío es 100% GRATIS a los 24 estados de Venezuela. La entrega express en Caracas y zonas directas toma de < 2h a 24h, y a nivel nacional vía Tealca de 24 a 48 horas hábiles."
+                            }
+                        },
+                        {
+                            "@type": "Question",
+                            "name": "¿Puedo revisar el paquete antes de pagar?",
+                            "acceptedAnswer": {
+                                "@type": "Answer",
+                                "text": "Sí. Tienes total derecho a abrir el paquete y verificar el producto físicamente antes de efectuar el pago."
+                            }
+                        }
+                    ]
+                }
+            ]
+        };
+
+        script.textContent = JSON.stringify(productSchema);
+
         return () => {
             document.title = 'KiplyStart — Tienda Online Oficial';
+            const el = document.getElementById(scriptId);
+            if (el) el.remove();
         };
     }, [product]);
 

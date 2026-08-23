@@ -40,7 +40,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="apple-touch-icon" href="/favicon.png" />
 
-  <!-- JSON-LD Structured Data -->
+  <!-- JSON-LD Structured Data for AEO & Search Engines -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -48,6 +48,7 @@
     "name": "KiplyStart",
     "url": "https://www.kiplystart.com",
     "description": "Tienda online en Venezuela con Pago al Recibir, Envío Gratis y Tasa BCV",
+    "inLanguage": "es-VE",
     "potentialAction": {
       "@type": "SearchAction",
       "target": "https://www.kiplystart.com/catalogo?q={search_term_string}",
@@ -58,20 +59,36 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": "OnlineStore",
     "name": "KiplyStart",
     "url": "https://www.kiplystart.com",
     "logo": "https://www.kiplystart.com/favicon.png",
-    "description": "Productos únicos con Pago al Recibir en Venezuela",
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "contactType": "customer service",
-      "availableLanguage": "Spanish"
-    },
+    "image": "https://www.kiplystart.com/og-image.jpg",
+    "description": "Tienda online de productos únicos y dropshipping verificado con Pago al Recibir en toda Venezuela a Tasa Oficial BCV.",
+    "telephone": "+584124340546",
+    "email": "soporte@kiplystart.com",
+    "priceRange": "$$",
+    "currenciesAccepted": "USD, VES",
+    "paymentAccepted": "Cash, CashOnDelivery, PagoMovil",
     "areaServed": {
       "@type": "Country",
       "name": "Venezuela"
-    }
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+584124340546",
+      "contactType": "customer service",
+      "contactOption": "WhatsApp",
+      "areaServed": "VE",
+      "availableLanguage": ["Spanish"]
+    },
+    "knowsAbout": [
+      "Accesorios para Carros",
+      "Tecnología y Gadgets",
+      "Salud y Bienestar",
+      "Hogar y Estilo",
+      "Pago Contra Entrega Venezuela"
+    ]
   }
   </script>
 
