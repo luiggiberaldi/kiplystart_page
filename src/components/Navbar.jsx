@@ -49,8 +49,8 @@ export default function Navbar() {
             <nav className="bg-white/95 backdrop-blur-md px-4 md:px-8 py-3.5 flex items-center justify-between border-b border-gray-100 gap-4">
                 {/* Brand Logo */}
                 <div className="flex items-center min-w-0">
-                    <Link to="/" className="hover:opacity-90 transition-opacity">
-                        <div style={{ width: '155px' }}>
+                    <Link to="/" className="hover:opacity-90 transition-opacity block">
+                        <div className="w-[125px] sm:w-[155px]">
                             <Logo className="w-full h-auto" />
                         </div>
                     </Link>
@@ -79,13 +79,13 @@ export default function Navbar() {
                 </div>
 
                 {/* Right Actions: Cart + Catalog CTA */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                     <button
                         onClick={() => setIsCartOpen(true)}
-                        className="relative p-2.5 text-brand-navy hover:bg-gray-100 rounded-2xl transition-all"
+                        className="relative p-2 sm:p-2.5 text-brand-navy hover:bg-gray-100 rounded-2xl transition-all"
                         aria-label="Abrir Carrito"
                     >
-                        <ShoppingCart size={22} />
+                        <ShoppingCart size={21} />
                         {cartCount > 0 && (
                             <span className="absolute top-1 right-1 bg-brand-red text-white text-[10px] font-black h-4 w-4 rounded-full flex items-center justify-center shadow-md shadow-brand-red/40 animate-scaleIn">
                                 {cartCount}
@@ -95,9 +95,9 @@ export default function Navbar() {
 
                     <Link
                         to="/catalogo"
-                        className="bg-brand-red text-white px-5 h-[42px] flex items-center justify-center rounded-2xl text-xs md:text-sm font-extrabold shadow-lg shadow-brand-red/25 hover:bg-brand-red/90 active:scale-95 transition-all shrink-0 whitespace-nowrap"
+                        className="bg-brand-red text-white px-3 sm:px-5 h-[38px] sm:h-[42px] flex items-center justify-center rounded-2xl text-xs sm:text-sm font-extrabold shadow-lg shadow-brand-red/25 hover:bg-brand-red/90 active:scale-95 transition-all shrink-0 whitespace-nowrap"
                     >
-                        Ver Catálogo
+                        <span>Catálogo</span>
                     </Link>
                 </div>
             </nav>

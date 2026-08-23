@@ -55,7 +55,7 @@ export default function LiveSalesToast({ productName = 'producto' }) {
     const shortProd = productName.length > 26 ? productName.slice(0, 24) + '...' : productName;
 
     return (
-        <div className="fixed bottom-20 md:bottom-6 left-4 z-40 max-w-[320px] bg-white/95 backdrop-blur-md rounded-2xl p-3 border border-gray-200/90 shadow-xl shadow-black/10 flex items-center gap-3 animate-slideUp">
+        <div className="fixed bottom-20 md:bottom-6 left-3 right-3 sm:right-auto sm:left-4 z-40 max-w-[calc(100vw-1.5rem)] sm:max-w-[320px] bg-white/95 backdrop-blur-md rounded-2xl p-3 border border-gray-200/90 shadow-xl shadow-black/10 flex items-center gap-3 animate-slideUp">
             <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
                 <ShoppingBag className="w-5 h-5" />
             </div>

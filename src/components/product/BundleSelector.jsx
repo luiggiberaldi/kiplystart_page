@@ -152,7 +152,7 @@ export default function BundleSelector({
             >
                 <div className="absolute -top-2.5 right-4 bg-brand-red text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm flex items-center gap-1">
                     <TrendingUp className="w-3 h-3 text-amber-300" />
-                    <span>MÁXIMO AHORRO (-{discount3}%) · ¡PRECIO DE FÁBRICA!</span>
+                    <span>MÁXIMO AHORRO (-{discount3}%)<span className="hidden sm:inline"> · ¡PRECIO DE FÁBRICA!</span></span>
                 </div>
                 <div className="flex items-center gap-3 min-w-0">
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedBundle === 3 ? 'border-brand-red bg-brand-red' : 'border-gray-300'}`}>
