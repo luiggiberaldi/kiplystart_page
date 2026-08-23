@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import useLiveVisitors from '../../hooks/useLiveVisitors';
 import VisitorMap from './VisitorMap';
+import { 
+    Users, Eye, Package, ShoppingBag, 
+    AlertTriangle, XCircle, ShoppingCart, 
+    TrendingUp, Sparkles, Globe, X, Plus, RefreshCw, Layers
+} from 'lucide-react';
 
-/**
- * DashboardStats Component (v3.0 — with Analytics)
- * @description
- * Overview metrics for dropshipping + live visitor analytics.
- */
-export default function DashboardStats() {
+export default function DashboardStats({ onNavigate }) {
     const { liveCount, visitors } = useLiveVisitors();
     const [stats, setStats] = useState({
         total_products: 0,
@@ -23,6 +23,7 @@ export default function DashboardStats() {
         cart_adds_today: 0,
     });
     const [loading, setLoading] = useState(true);
+    const [showVisitorsModal, setShowVisitorsModal] = useState(false);
 
     useEffect(() => {
         fetchStats();
@@ -80,11 +81,8 @@ export default function DashboardStats() {
         }
     }
 
-    const [showVisitorsModal, setShowVisitorsModal] = useState(false);
-
-    // Format path for display (e.g. /producto/reloj-x -> Reloj X)
     const formatPath = (path) => {
-        if (path === '/') return 'Inicio';
+        if (path === '/') return 'Página de Inicio';
         if (path === '/catalogo') return 'Catálogo';
         if (path.startsWith('/producto/')) {
             const slug = path.replace('/producto/', '');
@@ -95,11 +93,11 @@ export default function DashboardStats() {
 
     if (loading) {
         return (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                 {[1, 2, 3, 4, 5, 6].map(i => (
-                    <div key={i} className="bg-white p-4 md:p-5 rounded-xl border border-gray-100 animate-pulse">
-                        <div className="h-4 bg-gray-100 rounded w-1/2 mb-3" />
-                        <div className="h-8 bg-gray-100 rounded w-2/3" />
+                    <div key={i} className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm animate-pulse">
+                        <div className="h-4 bg-gray-200 rounded w-1/2 mb-3" />
+                        <div className="h-8 bg-gray-200 rounded w-2/3" />
                     </div>
                 ))}
             </div>
@@ -107,182 +105,213 @@ export default function DashboardStats() {
     }
 
     const uniqueCountries = [...new Set(visitors.map(v => v.country).filter(Boolean))];
-    const liveSubtitle = uniqueCountries.length > 0
-        ? uniqueCountries.map(code => {
-            const count = visitors.filter(v => v.country === code).length;
-            const flag = code.toUpperCase().replace(/./g, char => String.fromCodePoint(char.charCodeAt(0) + 127397));
-            return `${flag} ${count}`;
-        }).join('  ')
-        : (liveCount === 1 ? 'visitante ahora' : 'visitantes ahora');
-
-    const cards = [
-        {
-            label: 'En Vivo',
-            value: liveCount,
-            icon: 'radio_button_checked',
-            color: liveCount > 0 ? 'text-green-600' : 'text-gray-400',
-            bg: liveCount > 0 ? 'bg-green-50' : 'bg-gray-50',
-            pulse: liveCount > 0,
-            subtitle: liveSubtitle,
-            onClick: () => setShowVisitorsModal(true),
-            cursor: 'cursor-pointer'
-        },
-        {
-            label: 'Visitas Hoy',
-            value: stats.views_today,
-            icon: 'visibility',
-            color: 'text-indigo-600',
-            bg: 'bg-indigo-50',
-            subtitle: `${stats.views_week} esta semana`
-        },
-        {
-            label: 'Productos',
-            value: `${stats.active_products}/${stats.total_products}`,
-            icon: 'inventory_2',
-            color: 'text-brand-blue',
-            bg: 'bg-blue-50'
-        },
-        {
-            label: 'Pedidos Pend.',
-            value: stats.pending_orders,
-            icon: 'shopping_cart',
-            color: stats.pending_orders > 0 ? 'text-yellow-600' : 'text-green-600',
-            bg: stats.pending_orders > 0 ? 'bg-yellow-50' : 'bg-green-50',
-            subtitle: `${stats.total_orders} total`
-        },
-        {
-            label: 'Sin Stock',
-            value: stats.out_of_stock,
-            icon: 'error',
-            color: stats.out_of_stock > 0 ? 'text-red-600' : 'text-green-600',
-            bg: stats.out_of_stock > 0 ? 'bg-red-50' : 'bg-green-50'
-        },
-        {
-            label: 'Stock Bajo',
-            value: stats.low_stock_count,
-            icon: 'warning',
-            color: stats.low_stock_count > 0 ? 'text-orange-600' : 'text-green-600',
-            bg: stats.low_stock_count > 0 ? 'bg-orange-50' : 'bg-green-50'
-        },
-        {
-            label: 'Agreg. Carrito',
-            value: stats.cart_adds_today,
-            icon: 'add_shopping_cart',
-            color: 'text-purple-600',
-            bg: 'bg-purple-50',
-            subtitle: 'Hoy'
-        }
-    ];
 
     return (
-        <>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
-                {cards.map((card, idx) => (
-                    <div
-                        key={idx}
-                        onClick={card.onClick}
-                        className={`bg-white/80 backdrop-blur-sm p-4 md:p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all hover:translate-y-[-2px] ${card.cursor || ''}`}
-                    >
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-wider">{card.label}</span>
-                            <div className={`${card.bg} p-1.5 md:p-2 rounded-lg relative`}>
-                                <span className={`material-symbols-outlined ${card.color} text-[18px] md:text-[22px]`}>{card.icon}</span>
-                                {card.pulse && (
-                                    <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-50" />
-                                        <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500 border-2 border-white" />
-                                    </span>
-                                )}
-                            </div>
+        <div className="space-y-6">
+            {/* KPI Cards Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                {/* 1. Live Visitors Card */}
+                <div 
+                    onClick={() => setShowVisitorsModal(true)}
+                    className="bg-white rounded-3xl p-5 border border-gray-200/80 shadow-xs hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-0.5 relative overflow-hidden"
+                >
+                    <div className="flex items-center justify-between mb-3">
+                        <span className="text-xs font-black uppercase tracking-wider text-gray-500">Visitantes en Vivo</span>
+                        <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center relative">
+                            <Users className="w-5 h-5" />
+                            {liveCount > 0 && (
+                                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-white" />
+                                </span>
+                            )}
                         </div>
-                        <p className={`text-xl md:text-2xl font-bold font-display ${card.color}`}>{card.value}</p>
-                        {card.subtitle && (
-                            <p className="text-[10px] md:text-xs text-gray-400 mt-1">{card.subtitle}</p>
-                        )}
                     </div>
-                ))}
-            </div>
-
-            {/* Visitor Map */}
-            <div className="mt-8 mb-6">
-                <div className="flex items-center gap-2 mb-4 px-1">
-                    <span className="material-symbols-outlined text-gray-700">public</span>
-                    <h3 className="text-lg font-bold text-gray-800">Mapa de Visitantes en Vivo</h3>
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-black text-gray-950 tabular-nums">{liveCount}</span>
+                        <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">En tiempo real</span>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-2 font-medium">Toca para ver países y páginas activas</p>
                 </div>
-                <VisitorMap visitors={visitors} />
+
+                {/* 2. Page Views Card */}
+                <div className="bg-white rounded-3xl p-5 border border-gray-200/80 shadow-xs hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+                    <div className="flex items-center justify-between mb-3">
+                        <span className="text-xs font-black uppercase tracking-wider text-gray-500">Visitas Hoy</span>
+                        <div className="w-10 h-10 rounded-2xl bg-blue-50 text-[#0A2463] flex items-center justify-center">
+                            <Eye className="w-5 h-5" />
+                        </div>
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-black text-gray-950 tabular-nums">{stats.views_today}</span>
+                        <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md">+{stats.views_week} esta semana</span>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-2 font-medium">{stats.views_month} visitas acumuladas este mes</p>
+                </div>
+
+                {/* 3. Catalog Products Card */}
+                <div 
+                    onClick={() => onNavigate && onNavigate('productos')}
+                    className="bg-white rounded-3xl p-5 border border-gray-200/80 shadow-xs hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-0.5"
+                >
+                    <div className="flex items-center justify-between mb-3">
+                        <span className="text-xs font-black uppercase tracking-wider text-gray-500">Catálogo Activo</span>
+                        <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                            <Package className="w-5 h-5" />
+                        </div>
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-black text-gray-950 tabular-nums">{stats.active_products}</span>
+                        <span className="text-xs font-bold text-gray-500">/ {stats.total_products} productos</span>
+                    </div>
+                    <div className="mt-3 w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                        <div 
+                            className="bg-indigo-600 h-full rounded-full transition-all duration-500"
+                            style={{ width: `${stats.total_products > 0 ? (stats.active_products / stats.total_products) * 100 : 0}%` }}
+                        />
+                    </div>
+                </div>
+
+                {/* 4. Orders Pending Card */}
+                <div 
+                    onClick={() => onNavigate && onNavigate('pedidos')}
+                    className="bg-white rounded-3xl p-5 border border-gray-200/80 shadow-xs hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-0.5"
+                >
+                    <div className="flex items-center justify-between mb-3">
+                        <span className="text-xs font-black uppercase tracking-wider text-gray-500">Pedidos COD Pendientes</span>
+                        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${stats.pending_orders > 0 ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'}`}>
+                            <ShoppingBag className="w-5 h-5" />
+                        </div>
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                        <span className={`text-3xl font-black tabular-nums ${stats.pending_orders > 0 ? 'text-amber-600' : 'text-gray-950'}`}>
+                            {stats.pending_orders}
+                        </span>
+                        <span className="text-xs font-bold text-gray-500">de {stats.total_orders} pedidos totales</span>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-2 font-medium">Por confirmar vía WhatsApp / DroPanas</p>
+                </div>
             </div>
 
-            {/* Visitor Breakdown Modal */}
-            {
-                showVisitorsModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setShowVisitorsModal(false)}>
-                        <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden" onClick={e => e.stopPropagation()}>
-                            <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-                                <h3 className="font-bold text-gray-800">Visitantes en Vivo</h3>
-                                <button onClick={() => setShowVisitorsModal(false)} className="text-gray-400 hover:text-gray-600">
-                                    <span className="material-symbols-outlined">close</span>
-                                </button>
+            {/* Quick Secondary Stats & Inventory Health */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-white p-4 rounded-2xl border border-gray-200 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                            <ShoppingCart className="w-4 h-4" />
+                        </div>
+                        <div>
+                            <p className="text-xs font-bold text-gray-500">Añadidos al Carrito Hoy</p>
+                            <p className="text-xl font-black text-gray-950 tabular-nums">{stats.cart_adds_today}</p>
+                        </div>
+                    </div>
+                    <span className="text-xs font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-lg">Intención</span>
+                </div>
+
+                <div className="bg-white p-4 rounded-2xl border border-gray-200 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                            <AlertTriangle className="w-4 h-4" />
+                        </div>
+                        <div>
+                            <p className="text-xs font-bold text-gray-500">Pocas Unidades (Stock Bajo)</p>
+                            <p className="text-xl font-black text-amber-600 tabular-nums">{stats.low_stock_count}</p>
+                        </div>
+                    </div>
+                    <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-lg">Atención</span>
+                </div>
+
+                <div className="bg-white p-4 rounded-2xl border border-gray-200 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
+                            <XCircle className="w-4 h-4" />
+                        </div>
+                        <div>
+                            <p className="text-xs font-bold text-gray-500">Agotados (Sin Stock)</p>
+                            <p className="text-xl font-black text-red-600 tabular-nums">{stats.out_of_stock}</p>
+                        </div>
+                    </div>
+                    <span className="text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-lg">0 unidades</span>
+                </div>
+            </div>
+
+            {/* Visitor Map Frame */}
+            <div className="bg-white rounded-3xl p-6 border border-gray-200/80 shadow-xs">
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-blue-50 text-[#0A2463] flex items-center justify-center">
+                            <Globe className="w-4 h-4" />
+                        </div>
+                        <div>
+                            <h3 className="text-base font-extrabold text-gray-950">Mapa de Tráfico Global en Vivo</h3>
+                            <p className="text-xs text-gray-500">Ubicación geográfica de los compradores navegando KiplyStart</p>
+                        </div>
+                    </div>
+                    <span className="text-xs font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-xl flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>{visitors.length} Sesiones Activas</span>
+                    </span>
+                </div>
+                <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-inner">
+                    <VisitorMap visitors={visitors} />
+                </div>
+            </div>
+
+            {/* Visitor Modal */}
+            {showVisitorsModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setShowVisitorsModal(false)}>
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border border-gray-100 animate-scaleIn" onClick={e => e.stopPropagation()}>
+                        <div className="bg-[#0A2463] px-6 py-4 text-white flex justify-between items-center">
+                            <div className="flex items-center gap-2.5">
+                                <Users className="w-5 h-5 text-emerald-400" />
+                                <h3 className="font-extrabold text-base">Visitantes en Vivo ({visitors.length})</h3>
+                            </div>
+                            <button onClick={() => setShowVisitorsModal(false)} className="text-white/70 hover:text-white p-1 rounded-lg cursor-pointer">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
+                            <div>
+                                <h4 className="text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-3">Países de Origen</h4>
+                                <div className="space-y-2">
+                                    {uniqueCountries.map(code => {
+                                        const count = visitors.filter(v => v.country === code).length;
+                                        const flag = code.toUpperCase().replace(/./g, char => String.fromCodePoint(char.charCodeAt(0) + 127397));
+                                        return (
+                                            <div key={code} className="flex justify-between items-center bg-slate-50 p-3 rounded-2xl border border-gray-200">
+                                                <div className="flex items-center gap-2.5">
+                                                    <span className="text-xl">{flag}</span>
+                                                    <span className="font-bold text-gray-800">{code}</span>
+                                                </div>
+                                                <span className="font-black text-gray-950 bg-white px-2.5 py-1 rounded-xl border border-gray-200 shadow-xs">{count}</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             </div>
 
-                            <div className="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
-                                {/* By Country */}
-                                <div>
-                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Por País</h4>
-                                    <div className="space-y-2">
-                                        {uniqueCountries.map(code => {
-                                            const count = visitors.filter(v => v.country === code).length;
-                                            const flag = code.toUpperCase().replace(/./g, char => String.fromCodePoint(char.charCodeAt(0) + 127397));
-                                            return (
-                                                <div key={code} className="flex justify-between items-center bg-gray-50 p-2 rounded-lg">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-xl">{flag}</span>
-                                                        <span className="font-medium text-gray-700">{code}</span>
-                                                    </div>
-                                                    <span className="font-bold text-gray-900">{count}</span>
-                                                </div>
-                                            );
-                                        })}
-
-                                        {visitors.filter(v => !v.country).length > 0 && (
-                                            <div className="flex justify-between items-center bg-gray-50 p-2 rounded-lg border border-dashed border-gray-200">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="material-symbols-outlined text-gray-400 text-sm">help</span>
-                                                    <span className="font-medium text-gray-500 text-sm">Desconocido / Sin Datos</span>
-                                                </div>
-                                                <span className="font-bold text-gray-500">{visitors.filter(v => !v.country).length}</span>
+                            <div>
+                                <h4 className="text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-3">Páginas que están viendo</h4>
+                                <div className="space-y-2">
+                                    {[...new Set(visitors.map(v => v.path))].map(path => {
+                                        const count = visitors.filter(v => v.path === path).length;
+                                        return (
+                                            <div key={path} className="flex justify-between items-center p-3 bg-slate-50 rounded-2xl border border-gray-200">
+                                                <span className="text-xs font-bold text-gray-800 truncate">{formatPath(path)}</span>
+                                                <span className="bg-[#0A2463] text-white text-xs font-black px-2.5 py-1 rounded-xl">
+                                                    {count}
+                                                </span>
                                             </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* By Page */}
-                                <div>
-                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Viendo Ahora</h4>
-                                    <div className="space-y-2">
-                                        {[...new Set(visitors.map(v => v.path))].map(path => {
-                                            const count = visitors.filter(v => v.path === path).length;
-                                            return (
-                                                <div key={path} className="flex justify-between items-center p-2 hover:bg-gray-50 rounded-lg transition-colors">
-                                                    <div className="flex items-center gap-2 overflow-hidden">
-                                                        {path.startsWith('/producto/')
-                                                            ? <span className="material-symbols-outlined text-brand-blue text-sm shrink-0">shopping_bag</span>
-                                                            : <span className="material-symbols-outlined text-gray-400 text-sm shrink-0">public</span>
-                                                        }
-                                                        <span className="text-sm text-gray-700 truncate">{formatPath(path)}</span>
-                                                    </div>
-                                                    <span className="bg-brand-blue/10 text-brand-blue text-xs font-bold px-2 py-0.5 rounded-full">
-                                                        {count}
-                                                    </span>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </div>
                     </div>
-                )
-            }
-        </>
+                </div>
+            )}
+        </div>
     );
 }

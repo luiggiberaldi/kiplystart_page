@@ -1,3 +1,5 @@
+import { Search, RotateCcw } from 'lucide-react';
+
 export default function ProductFilters({
     searchTerm, setSearchTerm,
     filterCategory, setFilterCategory,
@@ -6,35 +8,46 @@ export default function ProductFilters({
     onRefresh
 }) {
     return (
-        <div className="flex flex-wrap gap-2 items-center bg-white p-3 rounded-xl border border-gray-200">
-            <div className="flex-1 min-w-[180px] relative">
-                <span className="material-symbols-outlined text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 text-[18px]">search</span>
+        <div className="flex flex-wrap gap-3 items-center bg-white p-3.5 rounded-2xl border border-gray-200 shadow-xs">
+            <div className="flex-1 min-w-[200px] relative">
+                <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
-                    type="text" placeholder="Buscar producto..."
-                    value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-blue outline-none"
+                    type="text" 
+                    placeholder="Buscar producto por nombre o SKU..."
+                    value={searchTerm} 
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 border border-gray-200 rounded-xl text-xs sm:text-sm font-semibold text-gray-900 placeholder:text-gray-400 focus:bg-white focus:ring-2 focus:ring-[#0A2463] focus:border-[#0A2463] outline-none transition-all"
                 />
             </div>
 
-            <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}
-                className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue outline-none">
+            <select 
+                value={filterCategory} 
+                onChange={(e) => setFilterCategory(e.target.value)}
+                className="bg-slate-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-bold text-gray-800 focus:bg-white focus:ring-2 focus:ring-[#0A2463] outline-none cursor-pointer"
+            >
                 {categories.map(cat => (
-                    <option key={cat} value={cat}>{cat === 'all' ? 'Categorías' : cat}</option>
+                    <option key={cat} value={cat}>{cat === 'all' ? 'Todas las Categorías' : cat}</option>
                 ))}
             </select>
 
-            <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
-                className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue outline-none">
-                <option value="all">Estado</option>
+            <select 
+                value={filterStatus} 
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="bg-slate-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-bold text-gray-800 focus:bg-white focus:ring-2 focus:ring-[#0A2463] outline-none cursor-pointer"
+            >
+                <option value="all">Todos los Estados</option>
                 <option value="active">Activos</option>
                 <option value="inactive">Inactivos</option>
-                <option value="low_stock">Stock Bajo</option>
-                <option value="out_of_stock">Sin Stock</option>
+                <option value="low_stock">Stock Bajo (⚠️)</option>
+                <option value="out_of_stock">Agotados (⛔)</option>
             </select>
 
-            <button onClick={onRefresh}
-                className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors" title="Actualizar">
-                <span className="material-symbols-outlined text-[18px]">refresh</span>
+            <button 
+                onClick={onRefresh}
+                className="p-2.5 bg-slate-100 hover:bg-slate-200 text-gray-700 rounded-xl transition-colors cursor-pointer flex items-center justify-center" 
+                title="Actualizar catálogo"
+            >
+                <RotateCcw className="w-4 h-4" />
             </button>
         </div>
     );

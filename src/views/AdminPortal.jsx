@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { slugify } from "../utils/slugify";
+import { Link } from "react-router-dom";
 
 // Admin Components
 import AdminLogin from "../components/admin/AdminLogin";
@@ -10,7 +11,7 @@ import ProductList from "../components/admin/ProductList";
 import ProductDrawer from "../components/admin/ProductDrawer";
 import OrdersManager from "../components/admin/OrdersManager";
 import SyncDashboard from "../components/admin/SyncDashboard";
-import CustomersManager from "../components/admin/CustomersManager"; // New Component
+import CustomersManager from "../components/admin/CustomersManager";
 import AdminAnalytics from "../components/admin/AdminAnalytics";
 import ActivityLog from "../components/admin/ActivityLog";
 import AdminSettings from "../components/admin/AdminSettings";
@@ -19,13 +20,13 @@ import ConfirmModal from "../components/admin/ConfirmModal";
 import { SettingsProvider } from "../context/SettingsContext";
 import useIsMobile from "../hooks/useIsMobile";
 import useOrderNotifications from "../hooks/useOrderNotifications";
+import { 
+    Plus, RefreshCw, Users, ShoppingBag, 
+    LogOut, ExternalLink, ShieldCheck, 
+    CheckCircle2, Sparkles, Package, Bell, 
+    ChevronRight, ArrowUpRight, Store
+} from 'lucide-react';
 
-/**
- * AdminPortal v2.0
- * @description
- * Full admin panel with sidebar navigation, auth gate, and 8 modules.
- * Optimized for dropshipping (no inventory ownership).
- */
 export default function AdminPortal() {
     const [authenticated, setAuthenticated] = useState(
         () => sessionStorage.getItem('admin_auth') === 'true'
@@ -40,7 +41,6 @@ export default function AdminPortal() {
     const [orderNotification, setOrderNotification] = useState(null);
     const isMobile = useIsMobile();
 
-    // ── New order real-time notifications (memoized to prevent WebSocket thrashing) ──
     const handleNewOrder = useCallback((newOrder) => {
         setOrderNotification(newOrder);
         setTimeout(() => setOrderNotification(null), 8000);
@@ -73,7 +73,6 @@ export default function AdminPortal() {
 
     async function handleProductSubmit(productData) {
         try {
-            // Auto-generate SEO slug from product name
             if (productData.name) {
                 productData.slug = slugify(productData.name);
             }
@@ -88,7 +87,7 @@ export default function AdminPortal() {
                 await logActivity('product_update', 'product', editingProduct.id, {
                     name: productData.name || editingProduct.name
                 });
-                showMessage('success', '✅ Producto actualizado exitosamente');
+                showMessage('success', 'Producto actualizado exitosamente');
                 setEditingProduct(null);
                 setDrawerOpen(false);
             } else {
@@ -101,7 +100,7 @@ export default function AdminPortal() {
                 await logActivity('product_create', 'product', data?.[0]?.id, {
                     name: productData.name
                 });
-                showMessage('success', '✅ Producto creado exitosamente');
+                showMessage('success', 'Producto creado exitosamente');
                 setDrawerOpen(false);
             }
             fetchProducts();
@@ -110,7 +109,6 @@ export default function AdminPortal() {
         }
     }
 
-    // ── Delete confirmation flow ──
     const [deleteTarget, setDeleteTarget] = useState(null);
 
     function handleDelete(id) {
@@ -125,7 +123,7 @@ export default function AdminPortal() {
             if (error) throw error;
 
             await logActivity('product_delete', 'product', deleteTarget.id, { name: deleteTarget?.name });
-            showMessage('success', '✅ Producto eliminado permanentemente');
+            showMessage('success', 'Producto eliminado permanentemente');
             fetchProducts();
         } catch (err) {
             showMessage('error', `Error: ${err.message}`);
@@ -141,7 +139,7 @@ export default function AdminPortal() {
                 .update({ is_active: !product.is_active })
                 .eq('id', product.id);
             if (error) throw error;
-            showMessage('success', `✅ Producto ${product.is_active ? 'desactivado' : 'activado'}`);
+            showMessage('success', `Producto ${product.is_active ? 'desactivado' : 'activado'}`);
             fetchProducts();
         } catch (err) {
             showMessage('error', `Error: ${err.message}`);
@@ -155,7 +153,7 @@ export default function AdminPortal() {
                 .update({ featured: !product.featured })
                 .eq('id', product.id);
             if (error) throw error;
-            showMessage('success', `${!product.featured ? '⭐ Destacado' : 'Destacado removido'}`);
+            showMessage('success', `${!product.featured ? 'Producto destacado' : 'Destacado removido'}`);
             fetchProducts();
         } catch (err) {
             showMessage('error', `Error: ${err.message}`);
@@ -171,11 +169,35 @@ export default function AdminPortal() {
     function handleClone(product) {
         const cloned = { ...product, id: undefined, name: `${product.name} (Copia)`, created_at: undefined };
         setEditingProduct(null);
-        // Small delay so form resets, then set cloned data
         setTimeout(() => {
             setEditingProduct(cloned);
             setDrawerOpen(true);
         }, 50);
+    }
+
+    async function logActivity(action, entityType, entityId, details) {
+        try {
+            await supabase.from('admin_activity_log').insert({
+                action,
+                entity_type: entityType,
+                entity_id: entityId ? String(entityId) : null,
+                details: details || {}
+            });
+        } catch (e) {
+            console.warn('Could not log activity:', e);
+        }
+    }
+
+    function showMessage(type, text) {
+        setMessage({ type, text });
+        setTimeout(() => setMessage(null), 4000);
+    }
+
+    function handleLogout() {
+        if (confirm('¿Deseas cerrar sesión del Panel Admin?')) {
+            sessionStorage.removeItem('admin_auth');
+            setAuthenticated(false);
+        }
     }
 
     function openNewProduct() {
@@ -183,40 +205,27 @@ export default function AdminPortal() {
         setDrawerOpen(true);
     }
 
-    function handleLogout() {
-        sessionStorage.removeItem('admin_auth');
-        setAuthenticated(false);
-    }
-
-    function showMessage(type, text) {
-        setMessage({ type, text });
-        setTimeout(() => setMessage(null), 5000);
-    }
-
-    async function logActivity(action, entityType, entityId, details) {
-        try {
-            await supabase.from('activity_log').insert({
-                action,
-                entity_type: entityType,
-                entity_id: entityId,
-                details
-            });
-        } catch (e) {
-            console.error('Activity log error:', e);
-        }
-    }
-
-    // Auth Gate
     if (!authenticated) {
         return <AdminLogin onSuccess={() => setAuthenticated(true)} />;
     }
 
-    const sidebarWidth = sidebarCollapsed ? 68 : 240;
+    const sidebarWidth = sidebarCollapsed ? '72px' : '250px';
+
+    const tabTitles = {
+        dashboard: 'Panel General y Métricas',
+        productos: 'Gestión de Productos',
+        pedidos: 'Pedidos COD & DroPanas',
+        sync: 'Sincronización de Catálogo',
+        clientes: 'Base de Datos de Clientes',
+        analytics: 'Analítica de Rendimiento',
+        actividad: 'Registro de Auditoría',
+        config: 'Configuración del Sistema'
+    };
 
     return (
         <SettingsProvider>
-            <div className="min-h-screen bg-gray-50/80 font-body text-soft-black">
-                {/* Sidebar */}
+            <div className="min-h-screen bg-slate-50 text-gray-900 flex font-sans">
+                {/* Desktop Sidebar */}
                 <AdminSidebar
                     activeTab={activeTab}
                     setActiveTab={setActiveTab}
@@ -226,112 +235,132 @@ export default function AdminPortal() {
 
                 {/* Main Content Area */}
                 <div
-                    className="transition-all duration-300 min-h-screen"
+                    className="flex-1 transition-all duration-300 min-h-screen flex flex-col"
                     style={{
                         marginLeft: isMobile ? 0 : sidebarWidth,
                         paddingBottom: isMobile ? '72px' : 0
                     }}
                 >
-                    {/* Top Bar */}
-                    <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-4 md:px-6 py-3 flex items-center justify-between">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                            {isMobile && (
-                                <div className="w-8 h-8 bg-[#0A2463] rounded-lg flex items-center justify-center shrink-0">
-                                    <span className="material-symbols-outlined text-white text-[18px]">admin_panel_settings</span>
-                                </div>
-                            )}
-                            <h1 className="text-base md:text-lg font-bold font-display text-brand-blue capitalize truncate">
-                                {activeTab === 'dashboard' && 'Panel de Control'}
-                                {activeTab === 'productos' && 'Productos'}
-                                {activeTab === 'pedidos' && 'Pedidos COD'}
-                                {activeTab === 'sync' && 'Sync DroPanas'}
-                                {activeTab === 'clientes' && 'Clientes'}
-                                {activeTab === 'analytics' && 'Analytics'}
-                                {activeTab === 'actividad' && 'Actividad'}
-                                {activeTab === 'config' && 'Configuración'}
-                            </h1>
+                    {/* Modern Top Bar */}
+                    <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-200 px-5 sm:px-8 py-3.5 flex items-center justify-between shadow-2xs">
+                        <div className="flex items-center gap-3 min-w-0">
+                            <div className="flex items-center gap-1.5 text-xs text-gray-500 font-semibold">
+                                <span className="text-gray-400">Admin</span>
+                                <ChevronRight className="w-3.5 h-3.5 text-gray-300" />
+                                <span className="text-gray-950 font-extrabold">{tabTitles[activeTab] || activeTab}</span>
+                            </div>
                         </div>
+
                         <div className="flex items-center gap-3">
+                            <Link
+                                to="/"
+                                target="_blank"
+                                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-gray-700 transition-colors"
+                            >
+                                <Store className="w-3.5 h-3.5 text-emerald-600" />
+                                <span>Ver Tienda</span>
+                                <ArrowUpRight className="w-3.5 h-3.5 text-gray-400" />
+                            </Link>
+
                             <button
                                 onClick={handleLogout}
-                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer"
                                 title="Cerrar sesión"
                             >
-                                <span className="material-symbols-outlined text-[16px]">logout</span>
-                                Salir
+                                <LogOut className="w-3.5 h-3.5" />
+                                <span className="hidden sm:inline">Salir</span>
                             </button>
                         </div>
                     </header>
 
-                    {/* Flash Message */}
+                    {/* Flash Message Toast */}
                     {message && (
-                        <div className="fixed top-16 right-4 z-50 animate-slideInRight">
-                            <div className={`px-4 py-3 rounded-lg shadow-lg text-sm font-medium ${message.type === 'success'
-                                ? 'bg-green-100 text-green-700 border border-green-300'
-                                : 'bg-red-100 text-red-700 border border-red-300'
-                                }`}>
-                                {message.text}
+                        <div className="fixed top-16 right-6 z-50 animate-slideInRight">
+                            <div className={`px-4 py-3 rounded-2xl shadow-xl text-xs font-extrabold flex items-center gap-2 border ${
+                                message.type === 'success'
+                                    ? 'bg-emerald-50 text-emerald-800 border-emerald-200 shadow-emerald-600/10'
+                                    : 'bg-red-50 text-red-800 border-red-200 shadow-red-600/10'
+                            }`}>
+                                <CheckCircle2 className="w-4 h-4" />
+                                <span>{message.text}</span>
                             </div>
                         </div>
                     )}
 
                     {/* Page Content */}
-                    <main className="p-4 md:p-6 max-w-7xl">
+                    <main className="p-5 sm:p-8 max-w-7xl w-full flex-1">
 
                         {/* ===== DASHBOARD ===== */}
                         {activeTab === 'dashboard' && (
-                            <div className="space-y-6">
-                                <div>
-                                    <h2 className="text-2xl font-bold font-display text-brand-blue mb-1">¡Hola! 👋</h2>
-                                    <p className="text-gray-500 text-sm">Resumen de tu tienda dropshipping</p>
+                            <div className="space-y-8">
+                                <div className="flex flex-wrap items-center justify-between gap-4">
+                                    <div>
+                                        <h2 className="text-2xl sm:text-3xl font-black text-gray-950 tracking-tight">
+                                            ¡Hola, Administrador! 👋
+                                        </h2>
+                                        <p className="text-gray-500 text-xs sm:text-sm mt-0.5 font-medium">
+                                            Resumen operativo y métricas en tiempo real de tu tienda dropshipping KiplyStart.
+                                        </p>
+                                    </div>
+
+                                    <button
+                                        onClick={() => { openNewProduct(); setActiveTab('productos'); }}
+                                        className="inline-flex items-center gap-2 px-5 py-3 bg-brand-red hover:bg-red-700 text-white rounded-2xl font-extrabold text-xs sm:text-sm transition-all shadow-lg shadow-brand-red/25 cursor-pointer active:scale-95"
+                                    >
+                                        <Plus className="w-4 h-4" />
+                                        <span>Nuevo Producto</span>
+                                    </button>
                                 </div>
-                                <DashboardStats />
+
+                                <DashboardStats onNavigate={setActiveTab} />
 
                                 {/* Quick Actions */}
-                                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mt-8">Acciones Rápidas</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <QuickAction
-                                        icon="add_box"
-                                        title="Añadir Producto"
-                                        desc="Crear nuevo producto con bundles"
-                                        onClick={() => { openNewProduct(); setActiveTab('productos'); }}
-                                    />
-                                    <QuickAction
-                                        icon="sync"
-                                        title="Sincronizar DroPanas"
-                                        desc="Importar reporte del scraper"
-                                        onClick={() => setActiveTab('sync')}
-                                    />
-                                    <QuickAction
-                                        icon="group"
-                                        title="Ver Clientes"
-                                        desc="Base de datos de compradores"
-                                        onClick={() => setActiveTab('clientes')}
-                                    />
+                                <div>
+                                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-wider mb-4">Acciones Rápidas del Sistema</h3>
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                        <QuickAction
+                                            icon={Plus}
+                                            title="Añadir Producto"
+                                            desc="Crear nuevo producto con ofertas y bundles"
+                                            onClick={() => { openNewProduct(); setActiveTab('productos'); }}
+                                        />
+                                        <QuickAction
+                                            icon={RefreshCw}
+                                            title="Sincronizar DroPanas"
+                                            desc="Actualizar inventario y catálogo de DroPanas"
+                                            onClick={() => setActiveTab('sync')}
+                                        />
+                                        <QuickAction
+                                            icon={Users}
+                                            title="Base de Clientes"
+                                            desc="Consultar compradores, teléfonos y estados"
+                                            onClick={() => setActiveTab('clientes')}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         )}
 
                         {/* ===== PRODUCTOS ===== */}
                         {activeTab === 'productos' && (
-                            <div className="space-y-4">
-                                <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
+                            <div className="space-y-6">
+                                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                                     <div>
-                                        <h2 className="text-xl md:text-2xl font-bold font-display text-brand-blue mb-0.5">Catálogo</h2>
-                                        <p className="text-gray-500 text-xs md:text-sm">{products.length} productos en tu tienda</p>
+                                        <h2 className="text-2xl sm:text-3xl font-black text-gray-950 tracking-tight">Catálogo de Productos</h2>
+                                        <p className="text-gray-500 text-xs sm:text-sm mt-0.5">{products.length} productos registrados en base de datos</p>
                                     </div>
                                     <button
                                         onClick={openNewProduct}
-                                        className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#E63946] hover:bg-red-700 text-white rounded-xl font-bold text-sm transition-colors shadow-lg shadow-red-500/20 w-full md:w-auto"
+                                        className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-brand-red hover:bg-red-700 text-white rounded-2xl font-extrabold text-sm transition-all shadow-lg shadow-brand-red/25 w-full sm:w-auto cursor-pointer active:scale-95"
                                     >
-                                        <span className="material-symbols-outlined text-[18px]">add</span>
-                                        Nuevo Producto
+                                        <Plus className="w-4 h-4" />
+                                        <span>Crear Producto</span>
                                     </button>
                                 </div>
 
                                 {loading ? (
-                                    <div className="flex justify-center p-10">
-                                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue" />
+                                    <div className="flex justify-center p-16">
+                                        <div className="w-10 h-10 border-3 border-[#0A2463]/20 border-t-[#0A2463] rounded-full animate-spin" />
                                     </div>
                                 ) : (
                                     <ProductList
@@ -390,30 +419,24 @@ export default function AdminPortal() {
                             className="fixed top-4 right-4 z-[300] max-w-sm w-full animate-slideUp cursor-pointer"
                             onClick={() => { setActiveTab('pedidos'); setOrderNotification(null); }}
                         >
-                            <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
-                                <div className="h-1 bg-gradient-to-r from-green-400 to-emerald-500" />
+                            <div className="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
+                                <div className="h-1.5 bg-gradient-to-r from-emerald-400 to-green-600" />
                                 <div className="p-4 flex items-start gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
-                                        <span className="material-symbols-outlined text-green-600 text-[22px]">shopping_bag</span>
+                                    <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                                        <ShoppingBag className="w-5 h-5" />
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                        <p className="font-bold text-sm text-gray-900">🎉 ¡Nuevo Pedido!</p>
-                                        <p className="text-xs text-gray-500 mt-0.5 truncate">
+                                        <p className="font-extrabold text-sm text-gray-950">🎉 ¡Nuevo Pedido COD!</p>
+                                        <p className="text-xs text-gray-500 mt-0.5 truncate font-medium">
                                             {orderNotification.user_name} — {orderNotification.product_name}
                                         </p>
-                                        <p className="text-xs font-bold text-green-600 mt-0.5">
+                                        <p className="text-xs font-black text-emerald-600 mt-0.5">
                                             ${orderNotification.total_price?.toFixed(2)} USD
                                         </p>
                                     </div>
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); setOrderNotification(null); }}
-                                        className="text-gray-300 hover:text-gray-500 transition-colors"
-                                    >
-                                        <span className="material-symbols-outlined text-[18px]">close</span>
-                                    </button>
                                 </div>
                                 <div className="px-4 pb-3">
-                                    <p className="text-[10px] text-gray-400">Toca para ver pedidos</p>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Toca para gestionar pedido</p>
                                 </div>
                             </div>
                         </div>
@@ -424,22 +447,22 @@ export default function AdminPortal() {
                         <AdminMobileNav activeTab={activeTab} setActiveTab={setActiveTab} />
                     )}
                 </div>
-            </div >
-        </SettingsProvider >
+            </div>
+        </SettingsProvider>
     );
 }
 
-function QuickAction({ icon, title, desc, onClick }) {
+function QuickAction({ icon: Icon, title, desc, onClick }) {
     return (
         <button
             onClick={onClick}
-            className="bg-white p-5 rounded-xl border border-gray-200 hover:border-brand-blue hover:shadow-lg transition-all text-left group"
+            className="bg-white p-5 rounded-3xl border border-gray-200/80 hover:border-[#0A2463] hover:shadow-lg transition-all text-left group cursor-pointer"
         >
-            <span className="material-symbols-outlined text-brand-blue text-[36px] mb-2 block group-hover:scale-110 transition-transform">
-                {icon}
-            </span>
-            <h3 className="font-bold text-base mb-0.5">{title}</h3>
-            <p className="text-xs text-gray-500">{desc}</p>
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#0A2463] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+                <Icon className="w-6 h-6" />
+            </div>
+            <h3 className="font-extrabold text-sm text-gray-950 mb-1">{title}</h3>
+            <p className="text-xs text-gray-500 font-medium">{desc}</p>
         </button>
     );
 }
