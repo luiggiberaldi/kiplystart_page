@@ -94,7 +94,7 @@ export default function DeliveryUrgencyTimer() {
             <div className="pt-2 border-t border-amber-200/60 flex items-center justify-between text-[10px] font-bold text-amber-950 flex-wrap gap-2">
                 <span className="flex items-center gap-1 text-emerald-800 bg-emerald-100/60 px-2 py-0.5 rounded-md border border-emerald-200/50">
                     <Zap className="w-3 h-3 text-emerald-600 fill-emerald-600 shrink-0" />
-                    <span><strong>Caracas &amp; Zonas Directas:</strong> Domicilio Express (&lt; 2h)</span>
+                    <span><strong>Caracas:</strong> Express en 60 Minutos</span>
                 </span>
                 <span className="flex items-center gap-1 text-blue-900 bg-blue-100/60 px-2 py-0.5 rounded-md border border-blue-200/50">
                     <Truck className="w-3 h-3 text-blue-700 shrink-0" />
