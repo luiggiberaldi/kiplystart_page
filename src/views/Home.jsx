@@ -16,6 +16,7 @@ const TestimonialsSection = lazy(() => import('../components/TestimonialsSection
 const CoverageSection = lazy(() => import('../components/CoverageSection'));
 const FAQSection = lazy(() => import('../components/FAQSection'));
 const BrandStoryCTA = lazy(() => import('../components/BrandStoryCTA'));
+const HomeTrackingBanner = lazy(() => import('../components/tracking/HomeTrackingBanner'));
 
 /** Section loading fallback */
 const SectionSkeleton = () => (
@@ -112,6 +113,11 @@ const Home = () => {
                 {/* 5. COD Education Banner */}
                 <Suspense fallback={<SectionSkeleton />}>
                     <CODBanner />
+                </Suspense>
+
+                {/* 5b. Live Tracking Banner */}
+                <Suspense fallback={<SectionSkeleton />}>
+                    <HomeTrackingBanner />
                 </Suspense>
 
                 {/* 6. Category Product Rows */}

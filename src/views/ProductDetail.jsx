@@ -411,25 +411,30 @@ export default function ProductDetail() {
                 </div>
             </main>
 
-            <div className="fixed bottom-0 left-0 right-0 bg-white p-3 md:p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] border-t border-gray-100 z-50 animate-slideUp" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
-                <div className="max-w-md mx-auto md:max-w-4xl flex flex-col md:flex-row gap-1.5 md:gap-3 md:items-center">
+            <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md p-3 md:p-4 shadow-[0_-4px_25px_rgba(0,0,0,0.12)] border-t border-gray-100 z-50 animate-slideUp" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+                <div className="max-w-md mx-auto md:max-w-4xl flex flex-col md:flex-row gap-2 md:gap-4 md:items-center">
                     <div className="hidden md:block flex-1">
-                        <p className="font-bold text-brand-blue">{product.name}</p>
-                        <p className="text-xs text-gray-500">Envío Gratis + Pago al Recibir</p>
+                        <p className="font-bold text-gray-900 text-sm truncate">{product.name}</p>
+                        <p className="text-xs text-emerald-600 font-semibold">🚚 Envío Gratis · Pago Contra Entrega (Tasa BCV)</p>
                     </div>
-                    <div className="flex flex-col items-center w-full md:w-auto">
+                    <div className="flex items-center gap-2 w-full md:w-auto">
                         <button
                             onClick={handleAddToCart}
-                            className="w-full md:w-auto md:min-w-[300px] h-[46px] md:h-14 bg-green-600 hover:bg-green-700 text-white font-display font-bold text-[14px] md:text-[18px] rounded-xl flex items-center justify-center gap-1.5 md:gap-2 active:scale-[0.98] transition-all shadow-lg shadow-green-600/25 relative overflow-hidden px-3 md:px-4"
+                            className="p-3 md:px-4 md:py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-2xl flex items-center justify-center gap-1.5 active:scale-95 transition-all shrink-0"
+                            title="Añadir al Carrito"
+                            aria-label="Añadir al Carrito"
                         >
-                            <span className="absolute inset-0 bg-white/20 animate-pulse-slow"></span>
-                            <span className="material-symbols-outlined relative z-10 text-[18px] md:text-[20px]">shopping_cart</span>
-                            <span className="relative z-10 truncate">Añadir al Carrito - ${Math.ceil(getPrice())}</span>
+                            <span className="material-symbols-outlined text-[20px]">shopping_cart</span>
+                            <span className="hidden sm:inline text-xs font-bold">Al Carrito</span>
                         </button>
-                        {/* Risk Reversal Microcopy - Product Bible 2026 */}
-                        <p className="text-center text-gray-500 text-[10px] md:text-xs mt-1">
-                            ✓ Añade varios artículos y paga al recibir
-                        </p>
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="flex-1 md:min-w-[280px] h-[48px] md:h-14 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-extrabold text-xs sm:text-sm md:text-base rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-600/25 relative overflow-hidden px-4"
+                        >
+                            <span className="material-symbols-outlined text-[20px]">check_circle</span>
+                            <span>PEDIR AHORA · ${Math.ceil(getPrice())}</span>
+                            <span className="text-[10px] sm:text-xs font-normal opacity-90 hidden xs:inline">(Pagas al Recibir)</span>
+                        </button>
                     </div>
                 </div>
             </div>
