@@ -1,16 +1,13 @@
-import { useState } from 'react';
 import { 
     MessageCircle, CheckCheck, Star, ShieldCheck, 
-    Play, Pause, MapPin, CheckCircle2, Sparkles, PackageCheck
+    Play, MapPin, CheckCircle2, PackageCheck
 } from 'lucide-react';
 
 /**
  * SocialProofChat Component
- * Hyper-realistic, high-converting WhatsApp testimonials for Venezuelan COD dropshipping.
+ * Hyper-realistic WhatsApp testimonials for Venezuelan COD dropshipping.
  */
 export default function SocialProofChat({ messages }) {
-    const [playingVoice, setPlayingVoice] = useState(null);
-
     if (!messages || messages.length === 0) return null;
 
     const AVATAR_COLORS = [
@@ -90,20 +87,12 @@ export default function SocialProofChat({ messages }) {
                                     </span>
                                 </div>
 
-                                {/* Voice Note Preview (Simulated WhatsApp Audio Note) */}
+                                {/* Voice Note Preview (Static Visual Element) */}
                                 {msg.hasVoiceNote && (
-                                    <div className="bg-slate-50 border border-gray-200/80 rounded-xl p-2.5 flex items-center gap-2.5">
-                                        <button
-                                            type="button"
-                                            onClick={() => setPlayingVoice(playingVoice === index ? null : index)}
-                                            className="w-8 h-8 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shrink-0 shadow-xs transition-transform active:scale-90 cursor-pointer"
-                                        >
-                                            {playingVoice === index ? (
-                                                <Pause className="w-3.5 h-3.5 fill-white" />
-                                            ) : (
-                                                <Play className="w-3.5 h-3.5 fill-white ml-0.5" />
-                                            )}
-                                        </button>
+                                    <div className="bg-slate-50 border border-gray-200/80 rounded-xl p-2.5 flex items-center gap-2.5 select-none pointer-events-none">
+                                        <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                                            <Play className="w-3.5 h-3.5 fill-white ml-0.5" />
+                                        </div>
                                         
                                         <div className="flex-1 space-y-1">
                                             <div className="flex items-center gap-0.5 h-4">
@@ -111,16 +100,12 @@ export default function SocialProofChat({ messages }) {
                                                     <span 
                                                         key={i} 
                                                         style={{ height: `${h * 1.5}px` }}
-                                                        className={`w-1 rounded-full ${
-                                                            playingVoice === index && i < 10 
-                                                                ? 'bg-emerald-600' 
-                                                                : 'bg-gray-300'
-                                                        }`} 
+                                                        className="w-1 rounded-full bg-gray-300" 
                                                     />
                                                 ))}
                                             </div>
                                             <div className="flex justify-between text-[9px] text-gray-500 font-mono font-bold">
-                                                <span>{playingVoice === index ? '0:06' : '0:14'}</span>
+                                                <span>0:14</span>
                                                 <span className="text-emerald-700">Nota de voz</span>
                                             </div>
                                         </div>
