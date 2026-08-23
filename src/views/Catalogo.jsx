@@ -142,25 +142,25 @@ export default function Catalogo() {
                         </div>
                     </div>
 
-                    {/* Interactive Category Filter Pills */}
+                    {/* Interactive Category Filter Pills (No Clipping - Full Wrap) */}
                     {categories.length > 1 && (
-                        <div className="mt-6 flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 pt-1">
+                        <div className="mt-6 flex flex-wrap items-center gap-2 sm:gap-2.5 pt-1">
                             {categories.map(cat => {
                                 const isActive = selectedCategory === cat;
                                 return (
                                     <button
                                         key={cat}
                                         onClick={() => handleCategorySelect(cat)}
-                                        className={`px-4 py-2 rounded-2xl text-xs sm:text-sm font-extrabold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
+                                        className={`px-3.5 sm:px-4 py-2 rounded-2xl text-xs sm:text-sm font-extrabold transition-all flex items-center gap-1.5 cursor-pointer ${
                                             isActive
-                                                ? 'bg-[#0A2463] text-white shadow-lg shadow-[#0A2463]/25 scale-105'
-                                                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 shadow-2xs'
+                                                ? 'bg-[#0A2463] text-white shadow-md shadow-[#0A2463]/25 scale-105 ring-2 ring-[#0A2463]/30'
+                                                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 shadow-2xs hover:border-gray-300'
                                         }`}
                                     >
                                         {cat === 'Todas' ? (
                                             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                                         ) : (
-                                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                            <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-emerald-400' : 'bg-emerald-500'}`}></span>
                                         )}
                                         <span>{cat}</span>
                                     </button>

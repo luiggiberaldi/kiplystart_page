@@ -56,9 +56,9 @@ export default function ProductCard({ product, loading = false }) {
 
                     {/* Category Pill */}
                     {product.category && (
-                        <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md text-gray-800 text-[10px] font-extrabold px-3 py-1 rounded-xl shadow-xs border border-gray-200/60 flex items-center gap-1">
-                            <Sparkles className="w-3 h-3 text-brand-red" />
-                            <span>{product.category}</span>
+                        <div className="absolute top-3 left-3 max-w-[65%] bg-white/95 backdrop-blur-md text-gray-800 text-[10px] font-extrabold px-3 py-1 rounded-xl shadow-xs border border-gray-200/60 flex items-center gap-1">
+                            <Sparkles className="w-3 h-3 text-brand-red shrink-0" />
+                            <span className="truncate">{product.category}</span>
                         </div>
                     )}
                 </div>
