@@ -85,10 +85,36 @@ export default function ProductDetail() {
         setViewersCount(Math.floor(Math.random() * (42 - 19 + 1)) + 19);
     }, [fetchProduct]);
 
-    // SEO Meta Tags & Dynamic JSON-LD Structured Data for AEO (Answer Engine Optimization)
+    // SEO Meta Tags & Dynamic JSON-LD Structured Data for AEO (Answer Engine Optimization) & WhatsApp Previews
     useEffect(() => {
         if (!product) return;
         document.title = `${product.name} — KiplyStart Venezuela`;
+
+        const updateMeta = (nameOrProperty, content, isProperty = false) => {
+            const attr = isProperty ? `meta[property="${nameOrProperty}"]` : `meta[name="${nameOrProperty}"]`;
+            let el = document.querySelector(attr);
+            if (!el) {
+                el = document.createElement('meta');
+                if (isProperty) el.setAttribute('property', nameOrProperty);
+                else el.setAttribute('name', nameOrProperty);
+                document.head.appendChild(el);
+            }
+            el.setAttribute('content', content);
+        };
+
+        const prodTitle = `${product.name} · $${product.price?.toFixed(0)} (Pago al Recibir)`;
+        const prodDesc = product.description || `Compra ${product.name} en Venezuela con Pago al Recibir y Envío 100% Gratis a Tasa Oficial BCV.`;
+        const prodImg = product.image_url || 'https://www.kiplystart.com/og-image.jpg';
+        const prodUrl = `https://www.kiplystart.com/producto/${product.slug || product.id}`;
+
+        updateMeta('description', prodDesc);
+        updateMeta('og:title', prodTitle, true);
+        updateMeta('og:description', prodDesc, true);
+        updateMeta('og:image', prodImg, true);
+        updateMeta('og:url', prodUrl, true);
+        updateMeta('twitter:title', prodTitle);
+        updateMeta('twitter:description', prodDesc);
+        updateMeta('twitter:image', prodImg);
 
         const scriptId = 'product-jsonld-schema';
         let script = document.getElementById(scriptId);
@@ -104,9 +130,9 @@ export default function ProductDetail() {
             "@graph": [
                 {
                     "@type": "Product",
-                    "@id": `https://www.kiplystart.com/producto/${product.slug || product.id}#product`,
+                    "@id": `${prodUrl}#product`,
                     "name": product.name,
-                    "description": product.description || `Compra ${product.name} en Venezuela con Pago al Recibir y Envío Gratis a Tasa Oficial BCV.`,
+                    "description": prodDesc,
                     "image": product.image_url ? [product.image_url, ...(product.gallery_images || [])] : ["https://www.kiplystart.com/og-image.jpg"],
                     "sku": product.sku || `KP-${product.id?.toString().substring(0, 8).toUpperCase()}`,
                     "brand": {
@@ -116,7 +142,7 @@ export default function ProductDetail() {
                     "category": product.category || "General",
                     "offers": {
                         "@type": "Offer",
-                        "url": `https://www.kiplystart.com/producto/${product.slug || product.id}`,
+                        "url": prodUrl,
                         "priceCurrency": "USD",
                         "price": (product.price || 0).toFixed(2),
                         "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -164,8 +190,38 @@ export default function ProductDetail() {
                     }
                 },
                 {
+                    "@type": "BreadcrumbList",
+                    "@id": `${prodUrl}#breadcrumb`,
+                    "itemListElement": [
+                        {
+                            "@type": "ListItem",
+                            "position": 1,
+                            "name": "Inicio",
+                            "item": "https://www.kiplystart.com/"
+                        },
+                        {
+                            "@type": "ListItem",
+                            "position": 2,
+                            "name": "Catálogo",
+                            "item": "https://www.kiplystart.com/catalogo"
+                        },
+                        ...(product.category ? [{
+                            "@type": "ListItem",
+                            "position": 3,
+                            "name": product.category,
+                            "item": `https://www.kiplystart.com/catalogo?category=${encodeURIComponent(product.category)}`
+                        }] : []),
+                        {
+                            "@type": "ListItem",
+                            "position": product.category ? 4 : 3,
+                            "name": product.name,
+                            "item": prodUrl
+                        }
+                    ]
+                },
+                {
                     "@type": "FAQPage",
-                    "@id": `https://www.kiplystart.com/producto/${product.slug || product.id}#faq`,
+                    "@id": `${prodUrl}#faq`,
                     "mainEntity": [
                         {
                             "@type": "Question",

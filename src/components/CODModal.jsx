@@ -6,6 +6,7 @@ import CODProductSummary from './cod/CODProductSummary';
 import CODStepPersonal from './cod/CODStepPersonal';
 import CODStepDelivery from './cod/CODStepDelivery';
 import CODSuccess from './cod/CODSuccess';
+import { trackInitiateCheckout, trackPurchase } from '../lib/fbPixelEvents';
 import { Truck, X, User, MapPin, CheckCircle2, ShieldCheck } from 'lucide-react';
 
 const EMPTY_FORM = { name: '', ci: '', phone: '', state: '', city: '', address: '', ref: '' };
@@ -17,7 +18,12 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
     const [returning, setReturning] = useState(() => !!getSavedCustomer()?.name);
     const [formData, setFormData] = useState(() => {
         const saved = getSavedCustomer();
-        return saved?.name ? { ...EMPTY_FORM, ...saved } : { ...EMPTY_FORM };
+        if (saved?.name) return { ...EMPTY_FORM, ...saved };
+        try {
+            const draft = sessionStorage.getItem('cod_form_draft');
+            if (draft) return JSON.parse(draft);
+        } catch {}
+        return { ...EMPTY_FORM };
     });
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
@@ -26,14 +32,17 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
     const [registeredOrderId, setRegisteredOrderId] = useState(null);
     const formRef = useRef(null);
 
-    /* ===== Lifecycle ===== */
+    /* ===== Lifecycle & Tracking ===== */
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
+            if (product) {
+                trackInitiateCheckout([{ id: product.id, name: product.name, price: totalPrice }], totalPrice);
+            }
         } else {
             document.body.style.overflow = 'unset';
         }
-    }, [isOpen]);
+    }, [isOpen, product, totalPrice]);
 
     useEffect(() => () => { document.body.style.overflow = 'unset'; }, []);
 
@@ -45,6 +54,7 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
         setFormData(prev => {
             const next = { ...prev, [name]: value };
             if (name === 'state') next.city = '';
+            try { sessionStorage.setItem('cod_form_draft', JSON.stringify(next)); } catch {}
             return next;
         });
         if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
@@ -120,6 +130,8 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
 
             const displayId = data?.[0]?.order_id || orderId;
             setRegisteredOrderId(displayId);
+            trackPurchase(displayId, [{ id: product.id, name: product.name, price: totalPrice }], totalPrice);
+            try { sessionStorage.removeItem('cod_form_draft'); } catch {}
             setSuccess(true);
         } catch (err) {
             console.error('Submission error:', err);

@@ -87,17 +87,17 @@ export default function CODSuccess({
                         href={whatsappUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-extrabold text-xs sm:text-sm rounded-2xl shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                        className="w-full py-4 px-4 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-black text-sm rounded-2xl shadow-xl shadow-emerald-600/30 transition-all flex items-center justify-center gap-2.5 cursor-pointer"
                     >
-                        <MessageCircle className="w-4 h-4 shrink-0 fill-current" />
-                        <span>¿Deseas confirmar ya? Escríbenos</span>
+                        <MessageCircle className="w-5 h-5 shrink-0 fill-current" />
+                        <span>⚡ Agilizar Despacho por WhatsApp</span>
                     </a>
 
                     {onClose && (
                         <button
                             type="button"
                             onClick={onClose}
-                            className="w-full py-3 text-xs font-extrabold text-gray-600 hover:text-gray-950 hover:bg-slate-100 rounded-2xl transition-colors cursor-pointer"
+                            className="w-full py-2.5 text-xs font-bold text-gray-500 hover:text-gray-900 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
                         >
                             Esperaré su mensaje · Volver a la tienda
                         </button>

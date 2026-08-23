@@ -27,6 +27,36 @@ export default function CODStepDelivery({
                 </h4>
             </div>
 
+            {/* Quick City Shortcuts */}
+            <div className="space-y-1.5 pb-1">
+                <span className="text-[10px] font-extrabold text-gray-500 uppercase tracking-wider">Atajos Rápidos:</span>
+                <div className="flex flex-wrap gap-1.5">
+                    {[
+                        { label: '⚡ Caracas (< 2h)', state: 'Distrito Capital', city: 'Caracas' },
+                        { label: 'Valencia', state: 'Carabobo', city: 'Valencia' },
+                        { label: 'Maracay', state: 'Aragua', city: 'Maracay' },
+                        { label: 'Barquisimeto', state: 'Lara', city: 'Barquisimeto' },
+                        { label: 'Maracaibo', state: 'Zulia', city: 'Maracaibo' },
+                    ].map((item) => (
+                        <button
+                            key={item.label}
+                            type="button"
+                            onClick={() => {
+                                handleChange({ target: { name: 'state', value: item.state } });
+                                handleChange({ target: { name: 'city', value: item.city } });
+                            }}
+                            className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                                formData.state === item.state && formData.city === item.city
+                                    ? 'bg-[#0A2463] text-white border-[#0A2463] shadow-xs'
+                                    : 'bg-slate-100 hover:bg-slate-200 text-gray-700 border-slate-200'
+                            }`}
+                        >
+                            {item.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
             {/* State */}
             <CODField label="Estado" icon={MapPin} name="state"
                 error={errors.state} status={getFieldStatus('state')} borderClass={fieldBorder('state')}>
