@@ -11,6 +11,39 @@ import {
     Copy, Check, Edit2, FileText
 } from 'lucide-react';
 
+/* ===== Micro-Component: Click to Copy Individual Data Field ===== */
+function CopyableField({ label, value, copyValue, isMono = false, className = '' }) {
+    const [copied, setCopied] = useState(false);
+
+    if (!value) return null;
+
+    const handleCopy = (e) => {
+        e.stopPropagation();
+        const textToCopy = String(copyValue || value);
+        navigator.clipboard.writeText(textToCopy);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+    };
+
+    return (
+        <div 
+            onClick={handleCopy}
+            className={`group/field relative inline-flex items-center gap-1.5 px-2 py-0.5 -mx-1.5 rounded-lg cursor-pointer transition-all hover:bg-blue-50/90 hover:text-[#0A2463] ${className}`}
+            title={`Clic para copiar: ${copyValue || value}`}
+        >
+            {label && <span className="text-gray-500 font-normal">{label}: </span>}
+            <span className={`${isMono ? 'font-mono' : ''} truncate max-w-full`}>{value}</span>
+            {copied ? (
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-extrabold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-md animate-scaleIn shrink-0">
+                    <Check className="w-2.5 h-2.5" /> Copiado
+                </span>
+            ) : (
+                <Copy className="w-3 h-3 text-gray-300 group-hover/field:text-blue-600 opacity-0 group-hover/field:opacity-100 transition-opacity shrink-0" />
+            )}
+        </div>
+    );
+}
+
 export default function OrdersManager() {
     const { formatPrice } = useCurrency();
     const [orders, setOrders] = useState([]);
@@ -474,10 +507,15 @@ export default function OrdersManager() {
                                 <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
                                     <div>
                                         <div className="flex flex-wrap items-center gap-2.5 mb-1.5">
-                                            <h4 className="font-black text-base text-gray-950 flex items-center gap-1.5">
-                                                <span>Guía / Pedido:</span>
-                                                <span className="text-[#0A2463] font-mono font-extrabold">#{order.order_id || order.id?.slice(0, 8)}</span>
-                                            </h4>
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="font-black text-base text-gray-950">Guía / Pedido:</span>
+                                                <CopyableField 
+                                                    value={`#${order.order_id || order.id?.slice(0, 8)}`} 
+                                                    copyValue={order.order_id || order.id?.slice(0, 8)} 
+                                                    isMono 
+                                                    className="text-[#0A2463] font-mono font-extrabold text-base" 
+                                                />
+                                            </div>
 
                                             {order.status !== 'deleted' && (
                                                 <button
@@ -519,55 +557,42 @@ export default function OrdersManager() {
                                     </div>
 
                                     <div className="text-right">
-                                        <p className="text-2xl font-black text-gray-950 tabular-nums">
-                                            {formatPrice(order.total_price)}
-                                        </p>
+                                        <CopyableField 
+                                            value={formatPrice(order.total_price)} 
+                                            copyValue={order.total_price} 
+                                            className="text-2xl font-black text-gray-950 tabular-nums p-0 hover:bg-transparent" 
+                                        />
                                         <p className="text-xs text-emerald-700 font-bold">
                                             Pago Contra Entrega (COD)
                                         </p>
                                     </div>
                                 </div>
 
-                                {/* Detail Grid */}
+                                {/* Detail Grid with Click to Copy Fields */}
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-t border-gray-100 text-xs">
                                     {/* Customer Column */}
-                                    <div className="space-y-1 bg-slate-50/70 p-3.5 rounded-2xl border border-gray-100">
-                                        <p className="text-[10px] font-extrabold text-gray-500 uppercase tracking-wider flex items-center gap-1">
-                                            <User className="w-3 h-3" /> Cliente
-                                        </p>
-                                        <p className="font-extrabold text-gray-900 text-sm">{order.user_name}</p>
-                                        <p className="font-mono text-gray-600 font-bold">{order.user_phone}</p>
+                                    <div className="space-y-1 bg-slate-50/70 p-3.5 rounded-2xl border border-gray-100 flex flex-col justify-between">
+                                        <div>
+                                            <p className="text-[10px] font-extrabold text-gray-500 uppercase tracking-wider flex items-center gap-1 mb-1">
+                                                <User className="w-3 h-3" /> Cliente (Toca para copiar)
+                                            </p>
+                                            <div className="space-y-0.5">
+                                                <div><CopyableField value={order.user_name} className="font-extrabold text-gray-900 text-sm" /></div>
+                                                <div><CopyableField value={order.user_phone} copyValue={getCleanPhone(order.user_phone)} isMono className="font-bold text-gray-600" /></div>
+                                                {order.user_ci && (
+                                                    <div><CopyableField label="CI" value={order.user_ci} copyValue={order.user_ci} isMono className="text-gray-500 text-[11px]" /></div>
+                                                )}
+                                            </div>
+                                        </div>
 
                                         {order.status !== 'deleted' && (
-                                            <div className="flex flex-wrap items-center gap-2 mt-2.5">
+                                            <div className="flex flex-wrap items-center gap-2 mt-3 pt-2.5 border-t border-gray-200/60">
                                                 <button 
                                                     onClick={() => setContactOrder(order)}
                                                     className="inline-flex items-center gap-1.5 bg-[#25D366] hover:bg-[#20bd5a] text-white px-3 py-1.5 rounded-xl text-xs font-extrabold shadow-sm transition-all cursor-pointer"
                                                 >
                                                     <MessageCircle className="w-3.5 h-3.5" />
                                                     <span>Contactar WhatsApp</span>
-                                                </button>
-
-                                                <button
-                                                    onClick={() => copyCustomerData(order)}
-                                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer border ${
-                                                        copiedId === order.id
-                                                            ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
-                                                            : 'bg-white hover:bg-slate-100 text-gray-700 border-gray-200 shadow-xs'
-                                                    }`}
-                                                    title="Copiar datos estructurados para crear en DroPanas"
-                                                >
-                                                    {copiedId === order.id ? (
-                                                        <>
-                                                            <Check className="w-3.5 h-3.5 text-emerald-600" />
-                                                            <span>¡Copiado!</span>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <Copy className="w-3.5 h-3.5 text-gray-500" />
-                                                            <span>Copiar p/ DroPanas</span>
-                                                        </>
-                                                    )}
                                                 </button>
 
                                                 {order.status === 'pending_whatsapp' && (
@@ -597,26 +622,30 @@ export default function OrdersManager() {
 
                                     {/* Product Column */}
                                     <div className="space-y-1 bg-slate-50/70 p-3.5 rounded-2xl border border-gray-100">
-                                        <p className="text-[10px] font-extrabold text-gray-500 uppercase tracking-wider flex items-center gap-1">
-                                            <Layers className="w-3 h-3" /> Producto
+                                        <p className="text-[10px] font-extrabold text-gray-500 uppercase tracking-wider flex items-center gap-1 mb-1">
+                                            <Layers className="w-3 h-3" /> Producto (Toca para copiar)
                                         </p>
-                                        <p className="font-extrabold text-gray-900 text-sm">{order.product_name}</p>
-                                        <p className="text-gray-600">Cantidad: <strong>{order.quantity || 1} un.</strong></p>
-                                        <p className="text-gray-600">Precio unitario: <strong>{formatPrice(order.unit_price || order.total_price)}</strong></p>
+                                        <div className="space-y-0.5">
+                                            <div><CopyableField value={order.product_name} className="font-extrabold text-gray-900 text-sm" /></div>
+                                            <div><CopyableField label="Cantidad" value={`${order.quantity || 1} un.`} copyValue={order.quantity || 1} className="text-gray-600" /></div>
+                                            <div><CopyableField label="Precio unitario" value={formatPrice(order.unit_price || order.total_price)} copyValue={order.unit_price || order.total_price} className="text-gray-600" /></div>
+                                        </div>
                                     </div>
 
                                     {/* Logistics & Delivery Column */}
                                     <div className="space-y-1 bg-slate-50/70 p-3.5 rounded-2xl border border-gray-100">
-                                        <p className="text-[10px] font-extrabold text-gray-500 uppercase tracking-wider flex items-center gap-1">
-                                            <MapPin className="w-3 h-3" /> Despacho & Bodega
+                                        <p className="text-[10px] font-extrabold text-gray-500 uppercase tracking-wider flex items-center gap-1 mb-1">
+                                            <MapPin className="w-3 h-3" /> Despacho & Bodega (Toca para copiar)
                                         </p>
-                                        <p className="font-extrabold text-gray-900 text-sm">{order.city}, {order.state}</p>
-                                        <p className="text-gray-600 line-clamp-2 leading-relaxed">{order.delivery_address}</p>
-                                        {order.delivery_ref && (
-                                            <p className="text-[11px] font-mono text-blue-700 font-bold bg-blue-50 p-1 rounded-lg">
-                                                {order.delivery_ref}
-                                            </p>
-                                        )}
+                                        <div className="space-y-0.5">
+                                            <div><CopyableField value={`${order.city}, ${order.state}`} copyValue={`${order.city}, ${order.state}`} className="font-extrabold text-gray-900 text-sm" /></div>
+                                            <div><CopyableField value={order.delivery_address} className="text-gray-600 leading-relaxed block" /></div>
+                                            {order.delivery_ref && (
+                                                <div className="mt-1">
+                                                    <CopyableField label="Ref" value={order.delivery_ref} className="text-[11px] font-mono text-blue-700 font-bold bg-blue-50/90 p-1.5 rounded-lg block" />
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 
