@@ -36,6 +36,7 @@ export default async function handler(req, res) {
         let isNumeric = /^\d+$/.test(numericId);
 
         let trackingData = null;
+        let dpResStatus = null;
 
         if (isNumeric) {
             // Fetch directly from DroPanas /api/v1/ordenes/{numericId}/tracking
@@ -47,6 +48,8 @@ export default async function handler(req, res) {
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
                 }
             });
+
+            dpResStatus = dpRes.status;
 
             if (dpRes.ok) {
                 const json = await dpRes.json();
@@ -110,7 +113,12 @@ export default async function handler(req, res) {
 
         return res.status(404).json({
             success: false,
-            message: `No se encontró información de tracking para '${rawQuery}'. Verifica tu número de guía (ej: DP28377) o teléfono.`
+            message: `No se encontró información de tracking para '${rawQuery}'. Verifica tu número de guía (ej: DP28377) o teléfono.`,
+            debug: {
+                numericId,
+                isNumeric,
+                dpStatus: typeof dpResStatus !== 'undefined' ? dpResStatus : null
+            }
         });
 
     } catch (error) {
