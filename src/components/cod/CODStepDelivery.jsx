@@ -5,7 +5,7 @@ import { ArrowLeft, MapPin, Building2, Home, Navigation, Clock, ShieldCheck, Che
 
 export default function CODStepDelivery({
     formData, errors, handleChange, handleBlur, fieldBorder, getFieldStatus,
-    loading, onBack
+    loading, onBack, children
 }) {
     const selectedZone = ZONES.find(z => z.state === formData.state);
     const cities = selectedZone?.cities || [];
@@ -118,6 +118,9 @@ export default function CODStepDelivery({
                     className="flex-1 outline-none text-sm font-semibold text-gray-950 bg-transparent placeholder:text-gray-400"
                     placeholder="Ej: Frente a la farmacia, casa rejas blancas..." />
             </CODField>
+
+            {/* Order Bump Slot */}
+            {children}
 
             {/* Submit CTA */}
             <div className="pt-2 pb-1">

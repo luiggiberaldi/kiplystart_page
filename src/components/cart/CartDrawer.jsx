@@ -7,6 +7,7 @@ import PriceDual from '../PriceDual';
 import CODField from '../cod/CODField';
 import CustomSelect from '../cod/CustomSelect';
 import CODSuccess from '../cod/CODSuccess';
+import CartDrawerCrossSell from './CartDrawerCrossSell';
 import { ZONES, getSavedCustomer, saveCustomer, clearSavedCustomer } from '../cod/codData';
 import { trackInitiateCheckout, trackPurchase } from '../../lib/fbPixelEvents';
 
@@ -317,6 +318,7 @@ export default function CartDrawer() {
                                     );
                                 })
                             )}
+                            {cartItems.length > 0 && <CartDrawerCrossSell />}
                         </div>
                     )}
 

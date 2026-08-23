@@ -6,6 +6,7 @@ export default function CODSuccess({
     customerName,
     customerPhone,
     productName,
+    bumpItem,
     totalPrice,
     onClose
 }) {
@@ -17,6 +18,7 @@ export default function CODSuccess({
     const usdText = totalPrice ? formatUSD(totalPrice) : '';
     const bsText = (totalPrice && exchangeRate) ? ` (${formatBs(totalPrice)})` : '';
     const totalLine = (usdText || bsText) ? `• *Total a Pagar:* ${usdText}${bsText}\n` : '';
+    const bumpLine = bumpItem ? `• *Oferta Especial Agregada:* ${bumpItem.name} (+$${bumpItem.price} USD)\n` : '';
 
     // Clean, professional WhatsApp message
     const message = 
@@ -26,6 +28,7 @@ export default function CODSuccess({
         `• *Nro de Orden:* #${orderId || ''}\n` +
         `• *Cliente:* ${customerName || ''}\n` +
         (productName ? `• *Producto:* ${productName}\n` : '') +
+        bumpLine +
         totalLine +
         `• *Método de Pago:* Contra Entrega (Pagas al recibir)\n\n` +
         `Quedo atento a su mensaje para verificar los datos de entrega y coordinar el despacho. ¡Muchas gracias!`;

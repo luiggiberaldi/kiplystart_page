@@ -9,6 +9,7 @@ import ProductImageGallery from '../components/product/ProductImageGallery';
 import BundleSelector from '../components/product/BundleSelector';
 import DeliveryUrgencyTimer from '../components/product/DeliveryUrgencyTimer';
 import BeforeAfterComparison from '../components/product/BeforeAfterComparison';
+import FrequentlyBoughtTogether from '../components/product/FrequentlyBoughtTogether';
 import CODProcessSteps from '../components/product/CODProcessSteps';
 import ProductFAQ from '../components/product/ProductFAQ';
 import ProductDescription from '../components/ProductDescription';
@@ -38,11 +39,17 @@ export default function ProductDetail() {
     // UI State
     const [showSpecs, setShowSpecs] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [comboData, setComboData] = useState(null);
     const [copiedLink, setCopiedLink] = useState(false);
 
     // Marketing State
     const [viewersCount, setViewersCount] = useState(24);
     const [selectedBundle, setSelectedBundle] = useState(1);
+
+    const handleSelectCombo = (combo) => {
+        setComboData(combo);
+        setIsModalOpen(true);
+    };
 
     const handleShare = async () => {
         if (navigator.share) {
@@ -562,6 +569,9 @@ export default function ProductDetail() {
 
                 {/* Lower Section: Neuromarketing, Copywriting, PAS Block & Tech Specs */}
                 <div className="mt-12 max-w-4xl mx-auto space-y-10">
+                    {/* Frequently Bought Together Combo Module (Cross-Selling) */}
+                    <FrequentlyBoughtTogether product={product} onSelectCombo={handleSelectCombo} />
+
                     {/* Before vs After Visual Contrast */}
                     <BeforeAfterComparison product={product} />
 
@@ -628,7 +638,7 @@ export default function ProductDetail() {
                         <ShoppingCart className="w-5 h-5" />
                     </button>
                     <button
-                        onClick={() => setIsModalOpen(true)}
+                        onClick={() => { setComboData(null); setIsModalOpen(true); }}
                         className="flex-1 h-12 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-black rounded-2xl flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-600/25 px-3 cursor-pointer"
                     >
                         <CheckCircle2 className="w-4 h-4 shrink-0" />
@@ -640,11 +650,17 @@ export default function ProductDetail() {
 
             <CODModal
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                product={product}
+                onClose={() => {
+                    setIsModalOpen(false);
+                    setComboData(null);
+                }}
+                product={comboData ? {
+                    ...product,
+                    name: `${comboData.mainProduct.name} + ${comboData.pairedProduct.name} (COMBO AHORRO)`
+                } : product}
                 quantity={1}
-                totalPrice={getPrice()}
-                selectedBundle={selectedBundle}
+                totalPrice={comboData ? comboData.comboPrice : getPrice()}
+                selectedBundle={comboData ? 1 : selectedBundle}
             />
         </div>
     );

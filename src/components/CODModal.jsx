@@ -6,6 +6,7 @@ import CODProductSummary from './cod/CODProductSummary';
 import CODStepPersonal from './cod/CODStepPersonal';
 import CODStepDelivery from './cod/CODStepDelivery';
 import CODSuccess from './cod/CODSuccess';
+import CODOrderBump, { BUMP_OFFERS } from './cod/CODOrderBump';
 import { trackInitiateCheckout, trackPurchase } from '../lib/fbPixelEvents';
 import { Truck, X, User, MapPin, CheckCircle2, ShieldCheck } from 'lucide-react';
 
@@ -15,7 +16,14 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
     const { formatUSD, formatBs, exchangeRate } = useCurrency();
 
     const [step, setStep] = useState(1);
+    const [isBumpSelected, setIsBumpSelected] = useState(false);
     const [returning, setReturning] = useState(() => !!getSavedCustomer()?.name);
+
+    const category = (product?.category || '').toLowerCase();
+    const isCar = category.includes('carro') || category.includes('auto') || (product?.slug || '').includes('carro');
+    const bumpOffer = isCar ? BUMP_OFFERS.car : BUMP_OFFERS.general;
+    const finalTotalPrice = isBumpSelected ? (totalPrice + bumpOffer.price) : totalPrice;
+
     const [formData, setFormData] = useState(() => {
         const saved = getSavedCustomer();
         if (saved?.name) return { ...EMPTY_FORM, ...saved };
@@ -107,6 +115,9 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
             const rand = Math.floor(1000 + Math.random() * 9000);
             const orderId = `KS-${datePart}-${rand}`;
             const unitPrice = selectedBundle > 1 ? totalPrice / (quantity * selectedBundle) : totalPrice / quantity;
+            const fullProductName = isBumpSelected 
+                ? `${product.name} + [OFERTA: ${bumpOffer.name}]` 
+                : product.name;
 
             const { data, error } = await supabase.from('orders').insert({
                 order_id: orderId,
@@ -114,11 +125,11 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
                 user_phone: formData.phone,
                 user_ci: formData.ci,
                 product_id: product.id,
-                product_name: product.name,
+                product_name: fullProductName,
                 quantity,
                 bundle_type: selectedBundle,
                 unit_price: unitPrice,
-                total_price: totalPrice,
+                total_price: finalTotalPrice,
                 city: formData.city,
                 state: formData.state,
                 delivery_address: formData.address,
@@ -130,7 +141,7 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
 
             const displayId = data?.[0]?.order_id || orderId;
             setRegisteredOrderId(displayId);
-            trackPurchase(displayId, [{ id: product.id, name: product.name, price: totalPrice }], totalPrice);
+            trackPurchase(displayId, [{ id: product.id, name: fullProductName, price: finalTotalPrice }], finalTotalPrice);
             try { sessionStorage.removeItem('cod_form_draft'); } catch {}
             setSuccess(true);
         } catch (err) {
@@ -156,7 +167,8 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
                 customerName={formData.name}
                 customerPhone={formData.phone}
                 productName={product.name}
-                totalPrice={totalPrice}
+                bumpItem={isBumpSelected ? bumpOffer : null}
+                totalPrice={finalTotalPrice}
                 onClose={() => {
                     setSuccess(false);
                     onClose();
@@ -209,7 +221,7 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
                 {/* Body */}
                 <div className="p-5 sm:p-6">
                     <CODProductSummary product={product} quantity={quantity}
-                        selectedBundle={selectedBundle} totalPrice={totalPrice} />
+                        selectedBundle={selectedBundle} totalPrice={finalTotalPrice} />
 
                     <form onSubmit={handleSubmit} ref={formRef}>
                         {step === 1 && (
@@ -218,7 +230,15 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
                         )}
                         {step === 2 && (
                             <CODStepDelivery {...fieldProps}
-                                loading={loading} onBack={() => { setStep(1); setErrors({}); }} />
+                                loading={loading} onBack={() => { setStep(1); setErrors({}); }}>
+                                <div className="pt-1">
+                                    <CODOrderBump 
+                                        product={product} 
+                                        isSelected={isBumpSelected} 
+                                        onToggle={() => setIsBumpSelected(prev => !prev)} 
+                                    />
+                                </div>
+                            </CODStepDelivery>
                         )}
                     </form>
                 </div>
