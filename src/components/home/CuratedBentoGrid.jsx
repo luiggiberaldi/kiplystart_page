@@ -97,7 +97,7 @@ export default function CuratedBentoGrid() {
                             </div>
                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[10px] font-black uppercase tracking-wider text-emerald-300">
                                 <Truck className="w-3 h-3 text-emerald-400" />
-                                <span>Entrega Express</span>
+                                <span>Express 60 Minutos</span>
                             </span>
                         </div>
 
@@ -105,7 +105,7 @@ export default function CuratedBentoGrid() {
                             Despacho Express Caracas
                         </h3>
                         <p className="text-blue-200/80 text-xs sm:text-sm font-medium leading-relaxed">
-                            Motorizado directo a tu puerta de 2 a 24 horas con pago al recibir en el sitio.
+                            Motorizado directo a tu puerta en solo 60 minutos en Caracas con pago al recibir en el sitio.
                         </p>
                     </div>
 

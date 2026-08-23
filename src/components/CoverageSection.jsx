@@ -18,24 +18,24 @@ import {
 const coverageData = [
     { 
         state: "Distrito Capital", 
-        cities: ["Caracas", "Municipio Libertador", "Chacao / Baruta / Sucre / El Hatillo"], 
-        time: "De 2 a 24 horas (Mismo Día)", 
+        cities: ["Caracas (Municipio Libertador)", "Chacao / Baruta / Sucre / El Hatillo"], 
+        time: "Express 60 Minutos", 
         icon: Building2,
         express: true
     },
     { 
         state: "Miranda", 
         cities: ["Los Teques", "Guatire", "Guarenas", "San Antonio de los Altos"], 
-        time: "De 2 a 24 horas (Mismo Día)", 
+        time: "24 a 48 horas hábiles", 
         icon: Mountain,
-        express: true
+        express: false
     },
     { 
         state: "La Guaira", 
         cities: ["La Guaira", "Maiquetía", "Catia la Mar", "Caraballeda"], 
-        time: "24 horas hábiles", 
+        time: "24 a 48 horas hábiles", 
         icon: Palmtree,
-        express: true
+        express: false
     },
     { 
         state: "Carabobo", 

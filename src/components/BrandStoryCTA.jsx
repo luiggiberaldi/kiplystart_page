@@ -63,7 +63,7 @@ export default function BrandStoryCTA() {
                     </Link>
 
                     <p className="mt-5 text-xs text-slate-400 font-semibold tracking-wide">
-                        Entregas express en Gran Caracas y envíos gratis vía Tealca a todo el país.
+                        Entregas express en 60 minutos en Caracas y envíos gratis vía Tealca a todo el país.
                     </p>
                 </div>
             </div>

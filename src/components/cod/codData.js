@@ -7,19 +7,19 @@ export const ZONES = [
     {
         state: 'Distrito Capital',
         cities: ['Caracas', 'Caracas (Municipio Libertador)', 'Caracas (Chacao / Baruta / Sucre / El Hatillo)'],
-        delivery: 'Entrega Express a Domicilio (2 a 24h)',
+        delivery: 'Entrega Express en 60 minutos (Caracas)',
         hasHomeDelivery: true
     },
     {
         state: 'Miranda',
         cities: ['Los Teques', 'Guatire', 'Guarenas', 'San Antonio de los Altos', 'Charallave', 'Cúa', 'Higuerote'],
-        delivery: 'Entrega a Domicilio y Oficina (24h)',
+        delivery: 'Entrega a Domicilio y Oficina (24 a 48h)',
         hasHomeDelivery: true
     },
     {
         state: 'La Guaira',
         cities: ['La Guaira', 'Maiquetía', 'Catia la Mar', 'Caraballeda', 'Macuto'],
-        delivery: 'Entrega a Domicilio y Oficina (24h)',
+        delivery: 'Entrega a Domicilio y Oficina (24 a 48h)',
         hasHomeDelivery: true
     },
     {
