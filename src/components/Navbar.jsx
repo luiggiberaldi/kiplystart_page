@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import Logo from './Logo';
 import { useCart } from '../context/CartContext';
 import { useCurrency } from '../context/CurrencyContext';
-import { ShoppingCart, Truck } from 'lucide-react';
+import { ShoppingCart, Truck, MapPin, ChevronRight } from 'lucide-react';
 
 export default function Navbar() {
     const { setIsCartOpen, cartCount } = useCart();
@@ -17,29 +17,38 @@ export default function Navbar() {
 
     return (
         <header className="sticky top-0 z-50 shadow-md">
-            {/* Top Announcement Bar - High Contrast */}
-            <div className="bg-[#0A2463] text-white text-xs py-2.5 px-4 border-b border-white/15">
-                <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-                    {/* BCV Live & Free Shipping */}
-                    <div className="flex items-center gap-3">
-                        <span className="inline-flex items-center gap-1.5 font-bold text-amber-300 bg-black/30 px-2.5 py-0.5 rounded-lg border border-amber-400/30">
-                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                            Tasa BCV: {exchangeRate ? `Bs. ${exchangeRate.toFixed(2)}` : 'Cargando...'}
+            {/* Top Announcement Bar - Sleek & Ultra-Professional */}
+            <div className="bg-[#051329] text-slate-200 text-xs py-2 px-3 sm:px-6 border-b border-white/10">
+                <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
+                    {/* Left: BCV Live Rate & Free Shipping Guarantee */}
+                    <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+                        <span className="inline-flex items-center gap-1.5 bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold shadow-2xs shrink-0">
+                            <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                            </span>
+                            <span>Tasa BCV: {exchangeRate ? `Bs. ${exchangeRate.toFixed(2)}` : 'Cargando...'}</span>
                         </span>
-                        <span className="hidden sm:inline text-white/40">•</span>
-                        <span className="hidden sm:inline text-white font-medium">
-                            🚚 <strong className="text-amber-300 font-bold">Envío GRATIS</strong> a toda Venezuela · Pagas al Recibir
+
+                        <span className="hidden md:inline text-white/20">•</span>
+
+                        <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-slate-300 font-medium truncate">
+                            <Truck className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                            <span>
+                                <strong className="text-white font-bold">Envío GRATIS</strong> a toda Venezuela · Pagas al Recibir
+                            </span>
                         </span>
                     </div>
 
-                    {/* Quick Tracking Link */}
-                    <div className="flex items-center gap-4 ml-auto text-xs">
+                    {/* Right: Satellite Tracking Pill Button */}
+                    <div className="flex items-center gap-2 shrink-0">
                         <Link
                             to="/rastreo"
-                            className="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white font-bold px-3 py-1 rounded-xl transition-all border border-white/20"
+                            className="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/15 active:scale-95 text-white font-bold px-3 py-1 rounded-full text-[11px] transition-all border border-white/15 shadow-2xs hover:border-white/30"
                         >
-                            <Truck className="w-3.5 h-3.5 text-emerald-400" />
+                            <MapPin className="w-3 h-3 text-emerald-400 shrink-0" />
                             <span>Rastrear Pedido</span>
+                            <ChevronRight className="w-3 h-3 text-white/50 -ml-0.5" />
                         </Link>
                     </div>
                 </div>
