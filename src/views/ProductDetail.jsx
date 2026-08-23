@@ -26,7 +26,7 @@ export default function ProductDetail() {
     const { addToCart } = useCart();
     const { settings } = useSettings();
     const [product, setProduct] = useState(null);
-    const socialProof = product ? getSocialProof(product.slug) : null;
+    const socialProof = product ? getSocialProof(product.slug, product) : null;
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 

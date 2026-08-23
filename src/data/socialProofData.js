@@ -1,11 +1,32 @@
 export const socialProofData = {
     default: {
         chatMessages: [
-            { user: "Cliente Verificado", location: "Caracas", time: "ayer", text: "Me llegó súper rápido el pedido. La calidad se ve muy bien, gracias!", platform: "whatsapp" },
-            { user: "@usuario_feliz", text: "Me encantó 😍 100% recomendado.", platform: "instagram" },
-            { user: "Cliente Satisfecho", location: "Valencia", time: "hoy", text: "Excelente servicio, el producto es tal cual la foto.", platform: "whatsapp", hasVoiceNote: true }
+            { 
+                user: "Carlos M.", 
+                location: "Valencia, Carabobo", 
+                time: "Ayer 4:18 p. m.", 
+                text: "¡Buenas tardes! Ya me entregó el motorizado de Tealca aquí en San Diego. Pagué en efectivo al recibir y el producto llegó impecable y bien sellado. ¡Recomendados 100%! 🙌", 
+                platform: "whatsapp",
+                hasVoiceNote: false
+            },
+            { 
+                user: "Daniela R.", 
+                location: "Los Palos Grandes, Caracas", 
+                time: "Hoy 11:32 a. m.", 
+                text: "Hola, recibido en Caracas. Súper rápido el despacho de 24 horas y funciona tal cual como en el video. Ya se lo recomendé a mi hermana 👍", 
+                platform: "whatsapp",
+                hasVoiceNote: false
+            },
+            { 
+                user: "Andrés G.", 
+                location: "Maracay, Aragua", 
+                time: "Hoy 1:45 p. m.", 
+                text: "Todo fino mi pana, excelente servicio con el pago contra entrega. Me dio mucha tranquilidad pagar directo al tener el paquete en mano 🔥", 
+                platform: "whatsapp", 
+                hasVoiceNote: true 
+            }
         ],
-        badges: { salesCount: 85, badgeText: "Compra Segura. Envío gratis y pagas al recibir.", viewCount: 12, badgeTitle: "Compra Segura" }
+        badges: { salesCount: 184, badgeText: "Compra 100% Protegida. Paga en efectivo o pago móvil al recibir.", viewCount: 42, badgeTitle: "Entrega Garantizada" }
     },
 
     // ═══════════════════════════════════════════════════════════════
@@ -569,11 +590,41 @@ export const socialProofData = {
     }
 };
 
-export const getSocialProof = (slug) => {
+export const getSocialProof = (slug, product = null) => {
     // Try exact match first
-    if (socialProofData[slug]) {
+    if (slug && socialProofData[slug]) {
         return socialProofData[slug];
     }
 
-    return socialProofData['default'];
+    const prodName = product?.name || 'pedido';
+
+    return {
+        chatMessages: [
+            { 
+                user: "Carlos M.", 
+                location: "Valencia, Carabobo", 
+                time: "Ayer 4:18 p. m.", 
+                text: `¡Buenas tardes! Ya me entregó el motorizado de Tealca aquí en San Diego. Pagué en efectivo al recibir y el ${prodName.toLowerCase().slice(0, 32)} llegó impecable y bien sellado. ¡Recomendados 100%! 🙌`, 
+                platform: "whatsapp",
+                hasVoiceNote: false
+            },
+            { 
+                user: "Daniela R.", 
+                location: "Los Palos Grandes, Caracas", 
+                time: "Hoy 11:32 a. m.", 
+                text: `Hola amigos, recibido en Caracas. Súper rápido el despacho en 24 horas y funciona tal cual como en el video. Ya se lo recomendé a mi hermana 👍`, 
+                platform: "whatsapp",
+                hasVoiceNote: false
+            },
+            { 
+                user: "Andrés G.", 
+                location: "Maracay, Aragua", 
+                time: "Hoy 1:45 p. m.", 
+                text: `Todo fino mi pana, excelente servicio con el pago contra entrega. Me dio mucha tranquilidad pagar directo al tener el paquete en mano 🔥`, 
+                platform: "whatsapp", 
+                hasVoiceNote: true 
+            }
+        ],
+        badges: { salesCount: 184, badgeText: "Compra 100% Protegida. Paga en efectivo o pago móvil al recibir.", viewCount: 42, badgeTitle: "Entrega Garantizada" }
+    };
 };
