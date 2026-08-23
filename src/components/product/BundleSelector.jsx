@@ -51,11 +51,11 @@ export default function BundleSelector({
                 {/* Option 2: Buy 2 Get 1 Free */}
                 <div
                     onClick={() => onSelectBundle(3)}
-                    className={`relative border-2 rounded-2xl p-3.5 flex items-center justify-between cursor-pointer transition-all ${
+                    className={`relative border-2 rounded-2xl pt-4 pb-3.5 px-3.5 sm:p-3.5 flex items-center justify-between cursor-pointer transition-all ${
                         selectedBundle === 3 ? 'border-emerald-600 bg-emerald-50/40 shadow-sm ring-2 ring-emerald-600/15' : 'border-gray-200 hover:border-gray-300 bg-white'
                     }`}
                 >
-                    <div className="absolute -top-2.5 right-4 bg-brand-red text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm flex items-center gap-1 animate-bounce">
+                    <div className="absolute -top-2.5 right-3 sm:right-4 bg-brand-red text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm flex items-center gap-1 z-10 animate-bounce">
                         <Gift className="w-3 h-3" />
                         <span>¡PAGAS 2 Y LLEVAS 3 (1 GRATIS)!</span>
                     </div>
@@ -75,7 +75,7 @@ export default function BundleSelector({
                             </div>
                         </div>
                     </div>
-                    <div className="text-right shrink-0 ml-2">
+                    <div className="text-right shrink-0 ml-2 pt-1">
                         <span className="block text-xs text-gray-400 line-through">${(singlePrice * 3).toFixed(0)}</span>
                         <span className="font-black text-base sm:text-lg text-emerald-700">${bundlePrice.toFixed(0)}</span>
                     </div>
@@ -122,11 +122,11 @@ export default function BundleSelector({
             {/* Option 2: 2 Units */}
             <div
                 onClick={() => onSelectBundle(2)}
-                className={`relative border-2 rounded-2xl p-3.5 flex items-center justify-between cursor-pointer transition-all ${
+                className={`relative border-2 rounded-2xl pt-4 pb-3.5 px-3.5 sm:p-3.5 flex items-center justify-between cursor-pointer transition-all ${
                     selectedBundle === 2 ? 'border-[#0A2463] bg-blue-50/40 shadow-sm ring-2 ring-[#0A2463]/10' : 'border-gray-200 hover:border-gray-300 bg-white'
                 }`}
             >
-                <div className="absolute -top-2.5 right-4 bg-[#0A2463] text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm flex items-center gap-1">
+                <div className="absolute -top-2.5 right-3 sm:right-4 bg-[#0A2463] text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm flex items-center gap-1 z-10">
                     <Sparkles className="w-3 h-3 text-amber-400" />
                     <span>MÁS POPULAR (-{discount2}%)</span>
                 </div>
@@ -146,7 +146,7 @@ export default function BundleSelector({
                         </div>
                     </div>
                 </div>
-                <div className="text-right shrink-0 ml-2">
+                <div className="text-right shrink-0 ml-2 pt-1">
                     <span className="block text-xs text-gray-400 line-through">${Math.ceil(product.price * 2)}</span>
                     <span className="font-black text-base sm:text-lg text-[#0A2463]">${getPrice(2)}</span>
                 </div>
@@ -155,11 +155,11 @@ export default function BundleSelector({
             {/* Option 3: 3 Units - Maximum Savings / Decoy Winner */}
             <div
                 onClick={() => onSelectBundle(3)}
-                className={`relative border-2 rounded-2xl p-3.5 flex items-center justify-between cursor-pointer transition-all ${
+                className={`relative border-2 rounded-2xl pt-4 pb-3.5 px-3.5 sm:p-3.5 flex items-center justify-between cursor-pointer transition-all ${
                     selectedBundle === 3 ? 'border-brand-red bg-rose-50/40 shadow-sm ring-2 ring-brand-red/15' : 'border-gray-200 hover:border-gray-300 bg-white'
                 }`}
             >
-                <div className="absolute -top-2.5 right-4 bg-brand-red text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm flex items-center gap-1">
+                <div className="absolute -top-2.5 right-3 sm:right-4 bg-brand-red text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm flex items-center gap-1 z-10">
                     <TrendingUp className="w-3 h-3 text-amber-300" />
                     <span>MÁXIMO AHORRO (-{discount3}%)<span className="hidden sm:inline"> · ¡PRECIO DE FÁBRICA!</span></span>
                 </div>
@@ -179,7 +179,7 @@ export default function BundleSelector({
                         </div>
                     </div>
                 </div>
-                <div className="text-right shrink-0 ml-2">
+                <div className="text-right shrink-0 ml-2 pt-1">
                     <span className="block text-xs text-gray-400 line-through">${Math.ceil(product.price * 3)}</span>
                     <span className="font-black text-base sm:text-lg text-brand-red">${getPrice(3)}</span>
                 </div>

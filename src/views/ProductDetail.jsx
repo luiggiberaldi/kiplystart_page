@@ -336,14 +336,17 @@ export default function ProductDetail() {
                             discount3={discount3}
                         />
 
-                        {/* Desktop Fast Actions */}
+                        {/* Desktop & Mobile Buy Box Fast Actions */}
                         <div className="space-y-3 pt-2">
                             <button
                                 onClick={() => setIsModalOpen(true)}
-                                className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-black text-base rounded-2xl flex items-center justify-center gap-2.5 shadow-xl shadow-emerald-600/30 transition-all cursor-pointer"
+                                className="w-full min-h-[56px] py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white rounded-2xl flex items-center justify-center gap-2.5 shadow-xl shadow-emerald-600/30 transition-all cursor-pointer"
                             >
-                                <CheckCircle2 className="w-5 h-5" />
-                                <span>PEDIR AHORA · ${getPrice()} (Pagas al Recibir)</span>
+                                <CheckCircle2 className="w-5 h-5 shrink-0" />
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2 text-center leading-tight">
+                                    <span className="font-black text-base sm:text-lg tracking-tight">PEDIR AHORA · ${getPrice()}</span>
+                                    <span className="text-[11px] sm:text-xs font-bold text-emerald-100 sm:text-white sm:opacity-90">(Pagas al Recibir)</span>
+                                </div>
                             </button>
 
                             <div className="grid grid-cols-2 gap-2.5">
@@ -360,7 +363,7 @@ export default function ProductDetail() {
                                     rel="noopener noreferrer"
                                     className="h-12 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-extrabold text-xs sm:text-sm rounded-2xl flex items-center justify-center gap-2 transition-all border border-emerald-200/80"
                                 >
-                                    <MessageCircle className="w-4 h-4" />
+                                    <MessageCircle className="w-4 h-4 text-emerald-600" />
                                     <span>Consultar</span>
                                 </a>
                             </div>
@@ -368,23 +371,23 @@ export default function ProductDetail() {
 
                         {/* Quick Trust Reassurance */}
                         <div className="pt-4 border-t border-gray-100 space-y-2.5">
-                            <div className="flex items-center gap-2.5 text-xs font-bold text-gray-700">
-                                <div className="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shrink-0">
+                            <div className="flex items-start gap-2.5 text-xs font-bold text-gray-700">
+                                <div className="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
                                     <CheckCircle2 className="w-3.5 h-3.5" />
                                 </div>
-                                <span>Envío 100% Gratis a toda Venezuela</span>
+                                <span className="pt-0.5 leading-snug">Envío 100% Gratis a toda Venezuela</span>
                             </div>
-                            <div className="flex items-center gap-2.5 text-xs font-bold text-gray-700">
-                                <div className="w-6 h-6 rounded-lg bg-blue-50 text-[#0A2463] border border-blue-100 flex items-center justify-center shrink-0">
+                            <div className="flex items-start gap-2.5 text-xs font-bold text-gray-700">
+                                <div className="w-6 h-6 rounded-lg bg-blue-50 text-[#0A2463] border border-blue-100 flex items-center justify-center shrink-0 mt-0.5">
                                     <ShieldCheck className="w-3.5 h-3.5" />
                                 </div>
-                                <span>Pagas al Recibir en Efectivo o Pago Móvil (Tasa BCV)</span>
+                                <span className="pt-0.5 leading-snug">Pagas al Recibir en Efectivo o Pago Móvil (Tasa BCV)</span>
                             </div>
-                            <div className="flex items-center gap-2.5 text-xs font-bold text-gray-700">
-                                <div className="w-6 h-6 rounded-lg bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center shrink-0">
+                            <div className="flex items-start gap-2.5 text-xs font-bold text-gray-700">
+                                <div className="w-6 h-6 rounded-lg bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center shrink-0 mt-0.5">
                                     <RotateCcw className="w-3.5 h-3.5" />
                                 </div>
-                                <span>Garantía de Satisfacción: Revisas al llegar</span>
+                                <span className="pt-0.5 leading-snug">Garantía de Satisfacción: Revisas al llegar</span>
                             </div>
                         </div>
                     </div>
@@ -459,10 +462,11 @@ export default function ProductDetail() {
                     </button>
                     <button
                         onClick={() => setIsModalOpen(true)}
-                        className="flex-1 h-12 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-black text-xs sm:text-sm rounded-2xl flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-600/25 px-3"
+                        className="flex-1 h-12 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-black rounded-2xl flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-600/25 px-3 cursor-pointer"
                     >
                         <CheckCircle2 className="w-4 h-4 shrink-0" />
-                        <span className="truncate">PEDIR AHORA · ${getPrice()} (Pagas al Recibir)</span>
+                        <span className="text-xs sm:text-sm font-black tracking-tight">PEDIR AHORA · ${getPrice()}</span>
+                        <span className="text-[10px] sm:text-xs font-extrabold text-emerald-100 hidden xs:inline">(Pagas al Recibir)</span>
                     </button>
                 </div>
             </div>
