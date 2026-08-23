@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { useCurrency } from '../../context/CurrencyContext';
+import { supabase } from '../../lib/supabaseClient';
 import { 
     Save, RotateCcw, CheckCircle2, AlertTriangle, 
     DollarSign, Percent, Store, Phone, 
     Instagram, Mail, Coins, ShieldCheck, 
-    Sparkles, RefreshCw, Layers, Flame, Calculator
+    Sparkles, RefreshCw, Layers, Flame, Calculator,
+    Zap, ArrowRight
 } from 'lucide-react';
 
 export default function AdminSettings() {
@@ -15,6 +17,11 @@ export default function AdminSettings() {
     const [saving, setSaving] = useState(false);
     const [status, setStatus] = useState(null); // 'success' | 'error'
     const [dirty, setDirty] = useState(false);
+
+    // Bulk Recalculation State
+    const [recalculating, setRecalculating] = useState(false);
+    const [recalcProgress, setRecalcProgress] = useState(0);
+    const [recalcResult, setRecalcResult] = useState(null);
 
     useEffect(() => {
         if (loaded) {
@@ -50,6 +57,62 @@ export default function AdminSettings() {
         setStatus(null);
     }
 
+    // Recalculates all products in the database using the new formula
+    async function handleBulkRecalculate() {
+        if (!window.confirm(`¿Deseas recalcular y actualizar los precios de venta de todo el catálogo en Supabase usando Costo de Envío ($${local.shipping_cost}) y Margen ($${local.profit_margin})?`)) {
+            return;
+        }
+
+        setRecalculating(true);
+        setRecalcProgress(0);
+        setRecalcResult(null);
+
+        try {
+            // First save the settings
+            await saveSettings(local);
+            setDirty(false);
+
+            // Fetch all products
+            const { data: products, error } = await supabase
+                .from('products')
+                .select('id, name, dropanas_price, price, compare_at_price');
+
+            if (error) throw error;
+
+            const toUpdate = products.filter(p => p.dropanas_price && p.dropanas_price > 0);
+            let updatedCount = 0;
+
+            for (let i = 0; i < toUpdate.length; i++) {
+                const prod = toUpdate[i];
+                const newPrice = Math.ceil(prod.dropanas_price + (local.shipping_cost || 8) + (local.profit_margin || 6));
+                const newCompareAt = parseFloat((newPrice * (local.compare_at_multiplier || 1.4)).toFixed(0)) + 0.90;
+
+                await supabase.from('products').update({
+                    price: newPrice,
+                    compare_at_price: newCompareAt,
+                    bundle_2_discount: local.bundle_2_discount || 10,
+                    bundle_3_discount: local.bundle_3_discount || 20
+                }).eq('id', prod.id);
+
+                updatedCount++;
+                setRecalcProgress(Math.round(((i + 1) / toUpdate.length) * 100));
+            }
+
+            setRecalcResult({
+                success: true,
+                count: updatedCount,
+                total: products.length
+            });
+
+            setTimeout(() => setRecalcResult(null), 7000);
+        } catch (err) {
+            console.error('Error recalculating prices:', err);
+            setRecalcResult({ success: false, message: err.message });
+        } finally {
+            setRecalculating(false);
+        }
+    }
+
     if (!loaded) {
         return (
             <div className="flex justify-center p-16">
@@ -60,7 +123,7 @@ export default function AdminSettings() {
 
     // Example calculation for visual helper
     const exampleCost = 10;
-    const exampleSalePrice = Math.ceil(Math.max(exampleCost + (local.shipping_cost || 8) + (local.profit_margin || 6), 20));
+    const exampleSalePrice = Math.ceil(exampleCost + (local.shipping_cost || 6) + (local.profit_margin || 5));
     const exampleCompareAt = Math.round(exampleSalePrice * (local.compare_at_multiplier || 1.4));
 
     return (
@@ -125,6 +188,28 @@ export default function AdminSettings() {
                 </div>
             </div>
 
+            {/* Recalculate Feedback Alert */}
+            {recalcResult && (
+                <div className={`p-4 rounded-2xl border-2 flex items-center gap-3 animate-slideUp ${
+                    recalcResult.success 
+                        ? 'bg-emerald-50 border-emerald-300 text-emerald-900' 
+                        : 'bg-red-50 border-red-300 text-red-900'
+                }`}>
+                    {recalcResult.success ? (
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                    ) : (
+                        <AlertTriangle className="w-5 h-5 text-red-600 shrink-0" />
+                    )}
+                    <div>
+                        <p className="text-xs sm:text-sm font-black">
+                            {recalcResult.success 
+                                ? `¡Precios actualizados con éxito! Se recalcularon ${recalcResult.count} productos del catálogo.`
+                                : `Error al recalcular: ${recalcResult.message}`}
+                        </p>
+                    </div>
+                </div>
+            )}
+
             {/* Unsaved Changes Banner */}
             {dirty && (
                 <div className="bg-amber-50 border-2 border-amber-200/80 rounded-2xl p-4 flex items-center justify-between gap-3 text-amber-900 animate-slideUp">
@@ -132,7 +217,7 @@ export default function AdminSettings() {
                         <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
                         <div>
                             <p className="text-xs sm:text-sm font-extrabold">Tienes modificaciones pendientes por guardar</p>
-                            <p className="text-[11px] text-amber-700 font-medium">Recuerda hacer clic en "Guardar Cambios" para aplicar a toda la tienda.</p>
+                            <p className="text-[11px] text-amber-700 font-medium">Recuerda hacer clic en "Guardar Cambios" para guardar los parámetros globales.</p>
                         </div>
                     </div>
                     <button 
@@ -199,6 +284,31 @@ export default function AdminSettings() {
                             type="text" 
                             placeholder=".90"
                         />
+                    </div>
+
+                    {/* ⚡ Bulk Recalculate Button */}
+                    <div className="pt-3 border-t border-gray-100">
+                        <button
+                            type="button"
+                            onClick={handleBulkRecalculate}
+                            disabled={recalculating}
+                            className="w-full py-3.5 px-4 bg-gradient-to-r from-[#0A2463] to-blue-900 hover:from-blue-900 hover:to-[#0A2463] text-white rounded-2xl text-xs font-black shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
+                        >
+                            {recalculating ? (
+                                <>
+                                    <RefreshCw className="w-4 h-4 animate-spin" />
+                                    <span>Recalculando Catálogo ({recalcProgress}%)...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Zap className="w-4 h-4 text-amber-400 fill-amber-400" />
+                                    <span>Aplicar y Recalcular Precios de Todos los Productos</span>
+                                </>
+                            )}
+                        </button>
+                        <p className="text-[10px] text-gray-400 text-center mt-2 leading-relaxed">
+                            Aplica la fórmula actual a los 212 productos sincronizados con DroPanas de una sola vez.
+                        </p>
                     </div>
                 </SettingsCard>
 
