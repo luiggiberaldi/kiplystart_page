@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import VideoHero from '../components/VideoHero';
-import TrustBar from '../components/TrustBar';
 import FeaturedCarousel from '../components/FeaturedCarousel';
 import WhatsAppFloat from '../components/WhatsAppFloat';
 
@@ -16,7 +15,6 @@ import DeliveryEstimator from '../components/home/DeliveryEstimator';
 
 // Lazy-load below-the-fold sections for performance
 const CategoryGrid = lazy(() => import('../components/CategoryGrid'));
-const CODBanner = lazy(() => import('../components/CODBanner'));
 const CategoryRow = lazy(() => import('../components/CategoryRow'));
 const TestimonialsSection = lazy(() => import('../components/TestimonialsSection'));
 const CoverageSection = lazy(() => import('../components/CoverageSection'));
@@ -84,27 +82,22 @@ const Home = () => {
 
             <main className="max-w-md mx-auto md:max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-12 my-6 sm:my-10">
 
-                {/* 2. TrustBar 2.0 — Quick Trust Signals */}
-                <section>
-                    <TrustBar />
-                </section>
-
-                {/* 3. Neuromarketing: Zero Risk Reversal Banner */}
+                {/* 2. Neuromarketing: Zero Risk Reversal Banner */}
                 <section>
                     <ZeroRiskBanner />
                 </section>
 
-                {/* 4. Neuromarketing: 24h Flash Deals with Live Countdown */}
+                {/* 3. Neuromarketing: 24h Flash Deals with Live Countdown */}
                 <section>
                     <FlashDealsSection products={featuredProducts} />
                 </section>
 
-                {/* 5. Neuromarketing: Curated Bento Grid Collections */}
+                {/* 4. Neuromarketing: Curated Bento Grid Collections */}
                 <section>
                     <CuratedBentoGrid />
                 </section>
 
-                {/* 6. Featured Products Carousel */}
+                {/* 5. Featured Products Carousel */}
                 <section className="flex flex-col gap-6">
                     <div className="flex items-center justify-between">
                         <div>
@@ -131,22 +124,17 @@ const Home = () => {
                     )}
                 </section>
 
-                {/* 7. Interactive Delivery & Transit Estimator for Venezuela */}
+                {/* 6. Interactive Delivery & Transit Estimator for Venezuela */}
                 <section>
                     <DeliveryEstimator />
                 </section>
 
-                {/* 8. Category Grid — Visual navigation */}
+                {/* 7. Category Grid — Visual navigation */}
                 <Suspense fallback={<SectionSkeleton />}>
                     <CategoryGrid />
                 </Suspense>
 
-                {/* 9. COD Education Banner */}
-                <Suspense fallback={<SectionSkeleton />}>
-                    <CODBanner />
-                </Suspense>
-
-                {/* 10. Live Tracking Banner */}
+                {/* 8. Live Tracking Banner */}
                 <Suspense fallback={<SectionSkeleton />}>
                     <HomeTrackingBanner />
                 </Suspense>
