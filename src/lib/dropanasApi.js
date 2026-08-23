@@ -85,13 +85,33 @@ export async function createDroPanasOrder(orderData) {
 
 /**
  * 📍 2. Consulta el estado de rastreo (Tracking) de una orden
- * @param {string|number} orderId ID o referencia de la orden
+ * @param {string|number} orderId ID o referencia de la orden (ej: DP28377, 28377, KS-...)
  */
 export async function getOrderTracking(orderId) {
     if (!orderId) {
         return { success: false, message: 'Se requiere un ID de orden o número de tracking' };
     }
-    return await apiRequest(`/ordenes/${encodeURIComponent(orderId)}/tracking`, {
+
+    const cleanQuery = orderId.toString().trim();
+
+    // 1. Try Vercel Serverless Tracking Proxy
+    try {
+        const proxyRes = await fetch(`/api/tracking?id=${encodeURIComponent(cleanQuery)}`);
+        if (proxyRes.ok) {
+            const proxyData = await proxyRes.json();
+            if (proxyData.success && proxyData.data) {
+                return { success: true, data: proxyData.data };
+            }
+        }
+    } catch {
+        // Fallback to direct client API request
+    }
+
+    // 2. Direct fallback (extract numeric ID if starts with DP)
+    const numericId = cleanQuery.replace(/^[dD][pP]-?/, '').trim();
+    const lookupTarget = /^\d+$/.test(numericId) ? numericId : cleanQuery;
+
+    return await apiRequest(`/ordenes/${encodeURIComponent(lookupTarget)}/tracking`, {
         method: 'GET'
     });
 }

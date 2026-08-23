@@ -16,19 +16,19 @@ export default function Navbar() {
     const { exchangeRate } = useCurrency();
 
     return (
-        <header className="sticky top-0 z-50 shadow-sm">
-            {/* Top Announcement Bar */}
-            <div className="bg-brand-navy text-white text-xs py-2 px-4 border-b border-white/10">
+        <header className="sticky top-0 z-50 shadow-md">
+            {/* Top Announcement Bar - High Contrast */}
+            <div className="bg-[#0A2463] text-white text-xs py-2.5 px-4 border-b border-white/15">
                 <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
                     {/* BCV Live & Free Shipping */}
                     <div className="flex items-center gap-3">
-                        <span className="inline-flex items-center gap-1.5 font-semibold text-amber-400">
+                        <span className="inline-flex items-center gap-1.5 font-bold text-amber-300 bg-black/30 px-2.5 py-0.5 rounded-lg border border-amber-400/30">
                             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                            Tasa BCV: {exchangeRate ? `Bs. ${exchangeRate.toFixed(2)}` : 'Oficial'}
+                            Tasa BCV: {exchangeRate ? `Bs. ${exchangeRate.toFixed(2)}` : 'Cargando...'}
                         </span>
-                        <span className="hidden sm:inline text-white/30">•</span>
-                        <span className="hidden sm:inline text-gray-200">
-                            🚚 <span className="font-bold text-white">Envío GRATIS</span> y Pago Contra Entrega
+                        <span className="hidden sm:inline text-white/40">•</span>
+                        <span className="hidden sm:inline text-white font-medium">
+                            🚚 <strong className="text-amber-300 font-bold">Envío GRATIS</strong> a toda Venezuela · Pagas al Recibir
                         </span>
                     </div>
 
@@ -36,9 +36,9 @@ export default function Navbar() {
                     <div className="flex items-center gap-4 ml-auto text-xs">
                         <Link
                             to="/rastreo"
-                            className="inline-flex items-center gap-1.5 text-gray-200 hover:text-white font-semibold transition-colors"
+                            className="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white font-bold px-3 py-1 rounded-xl transition-all border border-white/20"
                         >
-                            <span className="material-symbols-outlined text-sm text-brand-red">local_shipping</span>
+                            <span className="material-symbols-outlined text-sm text-emerald-400">local_shipping</span>
                             <span>Rastrear Pedido</span>
                         </Link>
                     </div>

@@ -57,15 +57,14 @@ describe('DroPanas API Client Tests', () => {
         const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValueOnce({
             ok: true,
             status: 200,
-            json: async () => ({ estado: 'En Reparto', guia: 'DP-7788', ciudad: 'Caracas' })
+            json: async () => ({ success: true, data: { estado: 'En Reparto', guia: 'DP-7788', ciudad: 'Caracas' } })
         });
 
-        const res = await getOrderTracking('KS-20260822-1234');
+        const res = await getOrderTracking('DP28377');
         expect(res.success).toBe(true);
         expect(res.data.estado).toBe('En Reparto');
         expect(fetchSpy).toHaveBeenCalledWith(
-            'https://app.dropanas.com/api/v1/ordenes/KS-20260822-1234/tracking',
-            expect.objectContaining({ method: 'GET' })
+            '/api/tracking?id=DP28377'
         );
     });
 

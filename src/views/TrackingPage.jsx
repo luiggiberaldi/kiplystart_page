@@ -14,14 +14,14 @@ export default function TrackingPage() {
             <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 w-full flex flex-col justify-center">
                 {/* Hero section for tracking */}
                 <div className="text-center max-w-2xl mx-auto mb-10">
-                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-brand-red/10 text-brand-red text-xs font-extrabold tracking-wide uppercase mb-3">
-                        <span className="w-2 h-2 rounded-full bg-brand-red animate-ping"></span>
+                    <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-50 text-red-800 text-xs font-black tracking-wide uppercase mb-3 border border-red-200 shadow-xs">
+                        <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping"></span>
                         Rastreo Satelital & Logístico Nacional
                     </span>
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight leading-tight">
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-950 tracking-tight leading-tight">
                         Sigue Tu Envío en Vivo
                     </h1>
-                    <p className="text-gray-600 mt-3 text-base sm:text-lg">
+                    <p className="text-gray-600 mt-3 text-base sm:text-lg font-medium">
                         Monitorea tu paquete desde la bodega central hasta la puerta de tu casa.
                     </p>
                 </div>

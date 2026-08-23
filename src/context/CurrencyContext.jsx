@@ -7,31 +7,39 @@ export const useCurrency = () => useContext(CurrencyContext);
 
 // === API Chain ===
 async function fetchRateFromAPIs() {
-    // 1. Private Google Script API
+    // 1. Primary Live Official BCV API: DolarApi Venezuela
     try {
-        const bcvToken = import.meta.env.VITE_BCV_TOKEN || '';
-        const res = await fetch(`/google-api/macros/s/AKfycbxT9sKz_XWRWuQx_XP-BJ33T0hoAgJsLwhZA00v6nPt4Ij4jRjq-90mDGLVCsS6FXwW9Q/exec?token=${bcvToken}`);
-        const data = await res.json();
-        if (data.bcv?.price) return { rate: data.bcv.price, source: 'google-script' };
+        const res = await fetch('https://ve.dolarapi.com/v1/dolares/oficial');
+        if (res.ok) {
+            const data = await res.json();
+            const rate = parseFloat(data.promedio || data.precio || data.valor);
+            if (rate && rate > 100) return { rate, source: 'bcv-oficial-dolarapi' };
+        }
     } catch {
-        // Fallback to public monitor
+        // Fallback to secondary APIs
     }
 
-    // 2. Public API (pydolarve / bcv-api)
-    try {
-        const res = await fetch('/api/v1/dollar?page=bcv');
-        const data = await res.json();
-        const rate = data.monitors?.bcv?.price || data.bcv?.price || data.bcv?.rate;
-        if (rate) return { rate, source: 'pydolarve' };
-    } catch {
-        // Fallback to rafnixg
-    }
-
-    // 3. Fallback: rafnixg BCV API
+    // 2. Secondary: BCV API rafnixg
     try {
         const res = await fetch('https://bcv-api.rafnixg.dev/rates/');
-        const data = await res.json();
-        if (data.usd) return { rate: parseFloat(data.usd), source: 'rafnixg' };
+        if (res.ok) {
+            const data = await res.json();
+            if (data.usd && parseFloat(data.usd) > 100) {
+                return { rate: parseFloat(data.usd), source: 'bcv-rafnixg' };
+            }
+        }
+    } catch {
+        // Fallback
+    }
+
+    // 3. Private Google Script API
+    try {
+        const bcvToken = import.meta.env.VITE_BCV_TOKEN || '';
+        if (bcvToken) {
+            const res = await fetch(`/google-api/macros/s/AKfycbxT9sKz_XWRWuQx_XP-BJ33T0hoAgJsLwhZA00v6nPt4Ij4jRjq-90mDGLVCsS6FXwW9Q/exec?token=${bcvToken}`);
+            const data = await res.json();
+            if (data.bcv?.price && data.bcv.price > 600) return { rate: data.bcv.price, source: 'google-script' };
+        }
     } catch {
         // All remote APIs failed
     }
@@ -43,7 +51,8 @@ async function fetchRateFromAPIs() {
 function getCachedRate() {
     try {
         const cached = JSON.parse(localStorage.getItem('bcv_rate_cache'));
-        if (cached?.rate && cached?.timestamp) return cached;
+        // Invalidate stale caches with outdated exchange rate (< 600)
+        if (cached?.rate && cached?.rate > 600 && cached?.timestamp) return cached;
     } catch {
         // Cache parse failure
     }
@@ -86,7 +95,7 @@ export const CurrencyProvider = ({ children }) => {
                     }
 
                     // Auto mode: check cache first
-                    const cacheHours = data.rate_cache_hours || 4;
+                    const cacheHours = data.rate_cache_hours || 2;
                     const cached = getCachedRate();
                     if (cached && (Date.now() - cached.timestamp) < cacheHours * 3600000) {
                         setExchangeRate(cached.rate);
@@ -103,23 +112,21 @@ export const CurrencyProvider = ({ children }) => {
                         setRateSource(result.source);
                         setCachedRate(result.rate, result.source);
                     } else {
-                        // Use cached even if stale, or fallback
-                        setExchangeRate(cached?.rate || 55.0);
+                        setExchangeRate(cached?.rate || 779.95);
                         setRateSource(cached ? 'stale-cache' : 'fallback');
                     }
                     setLastUpdated(new Date());
                     setLoading(false);
                 } else {
-                    // No settings row — fallback
                     const result = await fetchRateFromAPIs();
-                    setExchangeRate(result?.rate || 55.0);
+                    setExchangeRate(result?.rate || 779.95);
                     setRateSource(result?.source || 'fallback');
                     setLastUpdated(new Date());
                     setLoading(false);
                 }
             } catch (e) {
                 console.warn('CurrencyContext init failed:', e);
-                setExchangeRate(55.0);
+                setExchangeRate(779.95);
                 setRateSource('error-fallback');
                 setLastUpdated(new Date());
                 setLoading(false);
