@@ -1,6 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Link } from 'react-router-dom';
+import { TrendingUp } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import VideoHero from '../components/VideoHero';
@@ -120,8 +121,9 @@ const Home = () => {
                             <span className="text-xs font-black text-brand-red uppercase tracking-wider">
                                 Preferidos por los Clientes
                             </span>
-                            <h2 className="text-brand-blue text-[24px] md:text-[28px] font-extrabold tracking-tight">
-                                🔥 Más Vendidos de la Semana
+                            <h2 className="text-brand-blue text-[24px] md:text-[28px] font-extrabold tracking-tight flex items-center gap-2 mt-0.5">
+                                <TrendingUp className="w-6 h-6 text-brand-red shrink-0" />
+                                <span>Más Vendidos de la Semana</span>
                             </h2>
                         </div>
                         <Link to="/catalogo" className="text-[#0A2463] text-sm font-extrabold hover:underline shrink-0">
