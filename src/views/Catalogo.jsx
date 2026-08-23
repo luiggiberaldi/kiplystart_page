@@ -4,7 +4,29 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Search, X, Sparkles, SlidersHorizontal, ChevronLeft, ChevronRight, PackageOpen, Home, Grid, MessageCircle } from 'lucide-react';
+import { 
+    Search, X, Sparkles, SlidersHorizontal, ChevronLeft, ChevronRight, 
+    PackageOpen, Home, Grid, MessageCircle, Car, Heart, Watch, 
+    Smartphone, HeartPulse, ShoppingBag, Scissors, Smile, Tag 
+} from 'lucide-react';
+
+const getCategoryIcon = (categoryName, isActive) => {
+    const name = categoryName.toLowerCase();
+    const iconClass = `w-4 h-4 shrink-0 transition-transform ${isActive ? 'scale-110' : ''}`;
+
+    if (name === 'todas') return <Sparkles className={`${iconClass} text-amber-400`} />;
+    if (name.includes('carro') || name.includes('auto') || name.includes('vehicul')) return <Car className={`${iconClass} ${isActive ? 'text-white' : 'text-blue-600'}`} />;
+    if (name.includes('belleza') || name.includes('skin')) return <Heart className={`${iconClass} ${isActive ? 'text-white' : 'text-pink-500'}`} />;
+    if (name.includes('reloj')) return <Watch className={`${iconClass} ${isActive ? 'text-white' : 'text-amber-600'}`} />;
+    if (name.includes('tecno') || name.includes('gadget')) return <Smartphone className={`${iconClass} ${isActive ? 'text-white' : 'text-indigo-600'}`} />;
+    if (name.includes('salud') || name.includes('bienestar')) return <HeartPulse className={`${iconClass} ${isActive ? 'text-white' : 'text-emerald-600'}`} />;
+    if (name.includes('hogar')) return <Home className={`${iconClass} ${isActive ? 'text-white' : 'text-orange-500'}`} />;
+    if (name.includes('bolso') || name.includes('moda') || name.includes('ropa')) return <ShoppingBag className={`${iconClass} ${isActive ? 'text-white' : 'text-purple-600'}`} />;
+    if (name.includes('capilar') || name.includes('cabello')) return <Scissors className={`${iconClass} ${isActive ? 'text-white' : 'text-rose-500'}`} />;
+    if (name.includes('bebé') || name.includes('bebe') || name.includes('niño')) return <Smile className={`${iconClass} ${isActive ? 'text-white' : 'text-cyan-500'}`} />;
+    
+    return <Tag className={`${iconClass} ${isActive ? 'text-white' : 'text-gray-500'}`} />;
+};
 
 export default function Catalogo() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -42,7 +64,7 @@ export default function Catalogo() {
                 .select('*', { count: 'exact' })
                 .eq('is_active', true);
 
-            if (selectedCategory !== 'Todas') {
+            if (selectedCategory && selectedCategory !== 'Todas') {
                 query = query.eq('category', selectedCategory);
             }
 
@@ -142,26 +164,22 @@ export default function Catalogo() {
                         </div>
                     </div>
 
-                    {/* Interactive Category Filter Pills (No Clipping - Full Wrap) */}
+                    {/* Interactive Category Filter Pills (Mobile Horizontal Scroll / Desktop Wrap) */}
                     {categories.length > 1 && (
-                        <div className="mt-6 flex flex-wrap items-center gap-2 sm:gap-2.5 pt-1">
+                        <div className="mt-5 -mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto no-scrollbar flex items-center gap-2 sm:gap-2.5 sm:flex-wrap py-2 snap-x scroll-smooth">
                             {categories.map(cat => {
                                 const isActive = selectedCategory === cat;
                                 return (
                                     <button
                                         key={cat}
                                         onClick={() => handleCategorySelect(cat)}
-                                        className={`px-3.5 sm:px-4 py-2 rounded-2xl text-xs sm:text-sm font-extrabold transition-all flex items-center gap-1.5 cursor-pointer ${
+                                        className={`px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold whitespace-nowrap shrink-0 transition-all flex items-center gap-2 cursor-pointer snap-start ${
                                             isActive
-                                                ? 'bg-[#0A2463] text-white shadow-md shadow-[#0A2463]/25 scale-105 ring-2 ring-[#0A2463]/30'
-                                                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 shadow-2xs hover:border-gray-300'
+                                                ? 'bg-[#0A2463] text-white shadow-lg shadow-[#0A2463]/25 scale-102 ring-2 ring-[#0A2463]/30'
+                                                : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200/90 shadow-2xs hover:border-gray-300'
                                         }`}
                                     >
-                                        {cat === 'Todas' ? (
-                                            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                                        ) : (
-                                            <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-emerald-400' : 'bg-emerald-500'}`}></span>
-                                        )}
+                                        {getCategoryIcon(cat, isActive)}
                                         <span>{cat}</span>
                                     </button>
                                 );
