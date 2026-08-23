@@ -7,9 +7,14 @@ import CODModal from '../components/CODModal';
 import PriceDual from '../components/PriceDual';
 import ProductImageGallery from '../components/product/ProductImageGallery';
 import BundleSelector from '../components/product/BundleSelector';
+import DeliveryUrgencyTimer from '../components/product/DeliveryUrgencyTimer';
+import BeforeAfterComparison from '../components/product/BeforeAfterComparison';
+import CODProcessSteps from '../components/product/CODProcessSteps';
+import ProductFAQ from '../components/product/ProductFAQ';
 import ProductDescription from '../components/ProductDescription';
 import PASBlock from '../components/PASBlock';
 import SocialProofChat from '../components/social/SocialProofChat';
+import LiveSalesToast from '../components/social/LiveSalesToast';
 import TrustBadges from '../components/social/TrustBadges';
 import { useCart } from '../context/CartContext';
 import { useSettings } from '../context/SettingsContext';
@@ -289,6 +294,9 @@ export default function ProductDetail() {
                             </div>
                         </div>
 
+                        {/* Delivery Urgency Countdown Timer (Mon-Sat, Caracas <2h, National 24-48h) */}
+                        <DeliveryUrgencyTimer />
+
                         {/* Stock Urgency Bar */}
                         {product.stock !== null && (
                             <div className="space-y-1.5">
@@ -369,10 +377,22 @@ export default function ProductDetail() {
                     </div>
                 </div>
 
-                {/* Lower Section: Copywriting, PAS Block & Tech Specs */}
+                {/* Lower Section: Neuromarketing, Copywriting, PAS Block & Tech Specs */}
                 <div className="mt-12 max-w-4xl mx-auto space-y-10">
+                    {/* Before vs After Visual Contrast */}
+                    <BeforeAfterComparison product={product} />
+
+                    {/* Rich Product Description */}
                     <ProductDescription description={product.description} />
+
+                    {/* 3-Step Cash on Delivery Infographic */}
+                    <CODProcessSteps />
+
+                    {/* PAS Problem-Agitation-Solution Framework */}
                     <PASBlock product={product} />
+
+                    {/* FAQ Accordion for Frictionless COD */}
+                    <ProductFAQ />
 
                     {/* Technical Specs Accordion */}
                     <div className="bg-white rounded-3xl p-6 border border-gray-200/80 shadow-xs">
@@ -406,6 +426,9 @@ export default function ProductDetail() {
                         )}
                     </div>
                 </div>
+
+                {/* Real-Time Live Sales Social Proof Notification */}
+                <LiveSalesToast productName={product?.name || ''} />
             </main>
 
             <Footer />
