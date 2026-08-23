@@ -169,6 +169,8 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
                 productName={product.name}
                 bumpItem={isBumpSelected ? bumpOffer : null}
                 totalPrice={finalTotalPrice}
+                city={formData.city}
+                state={formData.state}
                 onClose={() => {
                     setSuccess(false);
                     onClose();

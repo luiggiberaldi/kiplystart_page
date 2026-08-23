@@ -164,6 +164,8 @@ export default function CartDrawer() {
                 customerPhone={formData.phone}
                 productName={cartItems.map(i => i.name).join(', ')}
                 totalPrice={cartTotal}
+                city={formData.city}
+                state={formData.state}
                 onClose={() => {
                     setSuccess(false);
                     clearCart();
