@@ -197,7 +197,7 @@ export default function ProductDetail() {
                 {/* 2-Column Grid Layout for Desktop */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
                     
-                    {/* Left Column: Gallery & Guarantees */}
+                    {/* Left Column: Gallery, Badges & Real WhatsApp Reviews */}
                     <div className="lg:col-span-7 space-y-6">
                         <ProductImageGallery
                             allImages={allImages}
@@ -242,6 +242,9 @@ export default function ProductDetail() {
                                 />
                             </div>
                         )}
+
+                        {/* Social Proof Chat / Real WhatsApp Testimonials on Left Column */}
+                        {socialProof && <SocialProofChat messages={socialProof.chatMessages} />}
                     </div>
 
                     {/* Right Column: Pricing, Bundles, and Fast Checkout */}
@@ -348,13 +351,26 @@ export default function ProductDetail() {
                             </div>
                         </div>
 
-                        {/* Social Proof Chat / Microcopy */}
-                        {socialProof && <SocialProofChat messages={socialProof.chatMessages} />}
+                        {/* Quick Trust Reassurance */}
+                        <div className="pt-4 border-t border-gray-100 space-y-2">
+                            <div className="flex items-center gap-2 text-xs font-bold text-gray-700">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                                <span>Envío 100% Gratis a toda Venezuela</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs font-bold text-gray-700">
+                                <ShieldCheck className="w-4 h-4 text-[#0A2463] shrink-0" />
+                                <span>Pagas al Recibir en Efectivo o Pago Móvil (Tasa BCV)</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs font-bold text-gray-700">
+                                <RotateCcw className="w-4 h-4 text-amber-600 shrink-0" />
+                                <span>Garantía de Satisfacción: Revisas al llegar</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 {/* Lower Section: Copywriting, PAS Block & Tech Specs */}
-                <div className="mt-16 max-w-4xl mx-auto space-y-12">
+                <div className="mt-12 max-w-4xl mx-auto space-y-10">
                     <ProductDescription description={product.description} />
                     <PASBlock product={product} />
 
