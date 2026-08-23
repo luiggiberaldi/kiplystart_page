@@ -15,8 +15,8 @@ export default function CODProcessSteps() {
         {
             step: '02',
             icon: Truck,
-            title: 'Despacho Express Gratuito',
-            desc: 'Caracas en menos de 2 horas. Resto del país 24-48h por Tealca con guía rastreable.',
+            title: 'Despacho a Domicilio u Oficina',
+            desc: 'Entrega a tu domicilio en zonas con cobertura directa o en la oficina Tealca más cercana a ti en todo el país (24-48h).',
             highlight: true
         },
         {

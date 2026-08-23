@@ -90,11 +90,11 @@ export default function DeliveryUrgencyTimer() {
             <div className="pt-1.5 border-t border-amber-200/60 flex items-center justify-between text-[10px] font-bold text-amber-950 flex-wrap gap-2">
                 <span className="flex items-center gap-1 text-emerald-800">
                     <Zap className="w-3 h-3 text-emerald-600 fill-emerald-600" />
-                    <strong>Caracas:</strong> Entrega en &lt; 2h
+                    <strong>Caracas &amp; Zonas Directas:</strong> Domicilio Express (&lt; 2h / 24h)
                 </span>
                 <span className="flex items-center gap-1 text-blue-900">
                     <Truck className="w-3 h-3 text-blue-700" />
-                    <strong>Nacional:</strong> 24-48h por Tealca
+                    <strong>Nacional:</strong> Domicilio u Oficina Tealca (24-48h)
                 </span>
             </div>
         </div>

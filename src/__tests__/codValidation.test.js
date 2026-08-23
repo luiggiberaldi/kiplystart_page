@@ -71,7 +71,8 @@ describe('COD Form & Venezuelan Validation Harness', () => {
 
         it('rejects invalid city for a given state or non-existent zones', () => {
             expect(isValidDeliveryZone('Distrito Capital', 'Valencia')).toBe(false);
-            expect(isValidDeliveryZone('Amazonas', 'Puerto Ayacucho')).toBe(false);
+            expect(isValidDeliveryZone('Carabobo', 'Caracas')).toBe(false);
+            expect(isValidDeliveryZone('NonExistentState', 'FakeCity')).toBe(false);
             expect(isValidDeliveryZone('', '')).toBe(false);
         });
     });

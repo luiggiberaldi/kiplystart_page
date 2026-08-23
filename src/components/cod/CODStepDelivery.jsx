@@ -60,23 +60,25 @@ export default function CODStepDelivery({
                 </div>
             )}
 
-            {/* Delivery time indicator */}
+            {/* Delivery time indicator & coverage type */}
             {deliveryTime && formData.city && (
-                <div className="flex items-center gap-2 bg-emerald-50 text-emerald-800 p-3 rounded-2xl border border-emerald-200 animate-fadeIn">
-                    <Clock className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <p className="text-xs font-semibold">
-                        Tiempo estimado de entrega: <strong className="font-extrabold">{deliveryTime}</strong>
-                    </p>
+                <div className="space-y-2 animate-fadeIn">
+                    <div className="flex items-center gap-2 bg-emerald-50 text-emerald-800 p-3 rounded-2xl border border-emerald-200">
+                        <Clock className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <p className="text-xs font-semibold">
+                            Modalidad: <strong className="font-extrabold">{deliveryTime}</strong>
+                        </p>
+                    </div>
                 </div>
             )}
 
             {/* Address */}
-            <CODField label="Dirección Exacta de Entrega" icon={Home} name="address"
+            <CODField label="Dirección de Entrega o Agencia Tealca" icon={Home} name="address"
                 error={errors.address} status={getFieldStatus('address')} borderClass={fieldBorder('address')}>
                 <textarea name="address" value={formData.address} onChange={handleChange}
                     onBlur={() => handleBlur('address')} rows="2"
                     className="flex-1 outline-none text-sm font-semibold text-gray-950 bg-transparent resize-none placeholder:text-gray-400"
-                    placeholder="Calle, Edificio / Casa, Número, Apto..." />
+                    placeholder="Calle, Edificio / Casa, Número o Agencia Tealca de tu preferencia..." />
             </CODField>
 
             {/* Reference */}

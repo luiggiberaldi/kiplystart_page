@@ -18,8 +18,8 @@ export default function ProductFAQ() {
             a: 'Tu monto en Bolívares se calcula exactamente a la Tasa Oficial del Banco Central de Venezuela (BCV) correspondiente al día de la entrega. Puedes transferir por Pago Móvil al instante.'
         },
         {
-            q: '¿Cuánto tiempo tarda en llegar mi pedido a mi dirección?',
-            a: 'En Caracas contamos con entregas Express en menos de 2 horas. Para el resto de Venezuela (Valencia, Maracay, Barquisimeto, Maracaibo, Lechería, etc.), los envíos se realizan vía Tealca y tardan entre 24 y 48 horas hábiles.'
+            q: '¿El pedido llega directo a mi casa (domicilio) o a una oficina de Tealca?',
+            a: 'En Caracas y ciudades con cobertura directa (Valencia, Maracay, Barquisimeto, Maracaibo, etc.), el repartidor te entrega directamente en tu domicilio. Para otras localidades o ciudades del país, el despacho se envía para retiro y pago en la agencia u oficina de Tealca más cercana a tu dirección.'
         },
         {
             q: '¿Qué garantía tengo si el producto llega con algún defecto de fábrica?',
