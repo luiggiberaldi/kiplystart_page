@@ -12,7 +12,6 @@ const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'productos', label: 'Productos', icon: Package },
     { id: 'pedidos', label: 'Pedidos COD', icon: ShoppingBag },
-    { id: 'sync', label: 'Sync DroPanas', icon: RefreshCw },
     { id: 'clientes', label: 'Clientes', icon: Users },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
     { id: 'actividad', label: 'Actividad', icon: Activity },

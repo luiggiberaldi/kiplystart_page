@@ -8,7 +8,6 @@ const PRIMARY_TABS = [
 ];
 
 const MORE_TABS = [
-    { id: 'sync', label: 'Sync DroPanas', icon: 'sync' },
     { id: 'analytics', label: 'Analytics', icon: 'analytics' },
     { id: 'actividad', label: 'Actividad', icon: 'history' },
     { id: 'config', label: 'Configuración', icon: 'settings' },

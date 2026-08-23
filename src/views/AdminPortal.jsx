@@ -10,7 +10,6 @@ import DashboardStats from "../components/admin/DashboardStats";
 import ProductList from "../components/admin/ProductList";
 import ProductDrawer from "../components/admin/ProductDrawer";
 import OrdersManager from "../components/admin/OrdersManager";
-import SyncDashboard from "../components/admin/SyncDashboard";
 import CustomersManager from "../components/admin/CustomersManager";
 import AdminAnalytics from "../components/admin/AdminAnalytics";
 import ActivityLog from "../components/admin/ActivityLog";
@@ -386,9 +385,6 @@ export default function AdminPortal() {
 
                         {/* ===== PEDIDOS ===== */}
                         {activeTab === 'pedidos' && <OrdersManager />}
-
-                        {/* ===== SYNC ===== */}
-                        {activeTab === 'sync' && <SyncDashboard />}
 
                         {/* ===== CLIENTES ===== */}
                         {activeTab === 'clientes' && <CustomersManager />}
