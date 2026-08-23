@@ -37,6 +37,7 @@ export default async function handler(req, res) {
 
         let trackingData = null;
         let dpResStatus = null;
+        let dpErrorBody = null;
 
         if (isNumeric) {
             // Fetch directly from DroPanas /api/v1/ordenes/{numericId}/tracking
@@ -56,6 +57,8 @@ export default async function handler(req, res) {
                 if (json.data) {
                     trackingData = json.data;
                 }
+            } else {
+                dpErrorBody = await dpRes.text().catch(() => '');
             }
         }
 
@@ -111,13 +114,14 @@ export default async function handler(req, res) {
             });
         }
 
-        return res.status(404).json({
+        return res.status(200).json({
             success: false,
             message: `No se encontró información de tracking para '${rawQuery}'. Verifica tu número de guía (ej: DP28377) o teléfono.`,
             debug: {
                 numericId,
                 isNumeric,
-                dpStatus: typeof dpResStatus !== 'undefined' ? dpResStatus : null
+                dpStatus: dpResStatus,
+                dpBody: typeof dpErrorBody !== 'undefined' ? dpErrorBody : null
             }
         });
 
