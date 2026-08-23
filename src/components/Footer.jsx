@@ -6,16 +6,25 @@
 
 import { Link } from 'react-router-dom';
 import Logo from './Logo';
+import { useSecretAdminAccess } from '../hooks/useSecretAdminAccess';
 
 const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '584124340546';
 
 export default function Footer() {
+    const { createTapHandler } = useSecretAdminAccess();
+    const handleSecretTap = createTapHandler(3, 1200);
+
     return (
         <footer className="bg-slate-900 text-white mt-16 pt-16 pb-12 px-6 border-t border-slate-800">
             <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
                 {/* Brand Info */}
                 <div className="md:col-span-1 flex flex-col gap-4">
-                    <div style={{ width: '160px' }}>
+                    <div 
+                        style={{ width: '160px' }}
+                        onClick={handleSecretTap}
+                        className="cursor-pointer select-none"
+                        title="KiplyStart"
+                    >
                         <Logo className="w-full h-auto text-white brightness-200" />
                     </div>
                     <p className="text-gray-400 text-xs leading-relaxed">
@@ -82,7 +91,13 @@ export default function Footer() {
             </div>
 
             <div className="max-w-7xl mx-auto pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
-                <p>© {new Date().getFullYear()} KiplyStart. Todos los derechos reservados. Diseñado para Venezuela.</p>
+                <p 
+                    onClick={handleSecretTap} 
+                    className="cursor-pointer select-none"
+                    title="KiplyStart Venezuela"
+                >
+                    © {new Date().getFullYear()} KiplyStart. Todos los derechos reservados. Diseñado para Venezuela.
+                </p>
                 <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                     <span>Servidores y Tienda Activa 24/7</span>

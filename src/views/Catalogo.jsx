@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabaseClient';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { 
     Search, X, Sparkles, SlidersHorizontal, ChevronLeft, ChevronRight, 
     PackageOpen, Home, Grid, MessageCircle, Car, Heart, Watch, 
@@ -30,6 +30,7 @@ const getCategoryIcon = (categoryName, isActive) => {
 
 export default function Catalogo() {
     const [searchParams, setSearchParams] = useSearchParams();
+    const navigate = useNavigate();
 
     useEffect(() => { window.scrollTo(0, 0); }, []);
 
@@ -46,14 +47,20 @@ export default function Catalogo() {
     const PRODUCTS_PER_PAGE = 12;
     const searchInputRef = useRef(null);
 
-    // Debounce search input (250ms)
+    // Debounce search input (250ms) + Secret Admin Search Commands
     useEffect(() => {
+        const trimmed = searchQuery.trim().toLowerCase();
+        if (trimmed === '/admin' || trimmed === 'kp:admin' || trimmed === 'admin:kiply') {
+            navigate('/admin-portal-2026');
+            return;
+        }
+
         const timer = setTimeout(() => {
             setDebouncedSearch(searchQuery.trim());
             setPage(1);
         }, 250);
         return () => clearTimeout(timer);
-    }, [searchQuery]);
+    }, [searchQuery, navigate]);
 
     const fetchProducts = useCallback(async () => {
         try {

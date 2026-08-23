@@ -46,6 +46,7 @@ function PageLoader() {
 }
 
 import usePageTracker from './hooks/usePageTracker';
+import { useSecretAdminAccess } from './hooks/useSecretAdminAccess';
 
 import { CartProvider } from './context/CartContext';
 import { SettingsProvider } from './context/SettingsContext';
@@ -59,12 +60,18 @@ function PageTracker() {
   return null;
 }
 
+function SecretAdminListener() {
+  useSecretAdminAccess();
+  return null;
+}
+
 function App() {
   return (
     <SettingsProvider>
       <CartProvider>
         <Router>
           <PageTracker />
+          <SecretAdminListener />
           <FacebookPixel />
           <LiveSalesToast />
           <MobileBottomNav />
