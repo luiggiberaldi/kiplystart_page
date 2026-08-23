@@ -11,6 +11,7 @@ import {
 const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'productos', label: 'Productos', icon: Package },
+    { id: 'marketplace', label: 'Marketplace FB', icon: Zap },
     { id: 'pedidos', label: 'Pedidos COD', icon: ShoppingBag },
     { id: 'clientes', label: 'Clientes', icon: Users },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },

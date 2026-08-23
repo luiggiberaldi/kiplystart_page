@@ -8,6 +8,7 @@ const PRIMARY_TABS = [
 ];
 
 const MORE_TABS = [
+    { id: 'marketplace', label: 'Marketplace FB', icon: 'bolt' },
     { id: 'analytics', label: 'Analytics', icon: 'analytics' },
     { id: 'actividad', label: 'Actividad', icon: 'history' },
     { id: 'config', label: 'Configuración', icon: 'settings' },

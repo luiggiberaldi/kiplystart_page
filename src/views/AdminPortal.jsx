@@ -15,6 +15,7 @@ import AdminAnalytics from "../components/admin/AdminAnalytics";
 import ActivityLog from "../components/admin/ActivityLog";
 import AdminSettings from "../components/admin/AdminSettings";
 import AdminMobileNav from "../components/admin/AdminMobileNav";
+import MarketplaceGenerator from "../components/admin/MarketplaceGenerator";
 import ConfirmModal from "../components/admin/ConfirmModal";
 import { SettingsProvider } from "../context/SettingsContext";
 import useIsMobile from "../hooks/useIsMobile";
@@ -23,7 +24,7 @@ import {
     Plus, RefreshCw, Users, ShoppingBag, 
     LogOut, ExternalLink, ShieldCheck, 
     CheckCircle2, Sparkles, Package, Bell, 
-    ChevronRight, ArrowUpRight, Store
+    ChevronRight, ArrowUpRight, Store, Zap
 } from 'lucide-react';
 
 export default function AdminPortal() {
@@ -65,7 +66,7 @@ export default function AdminPortal() {
     }, []);
 
     useEffect(() => {
-        if (authenticated && (activeTab === 'productos' || activeTab === 'dashboard')) {
+        if (authenticated && (activeTab === 'productos' || activeTab === 'dashboard' || activeTab === 'marketplace')) {
             fetchProducts();
         }
     }, [activeTab, authenticated, fetchProducts]);
@@ -214,6 +215,7 @@ export default function AdminPortal() {
     const tabTitles = {
         dashboard: 'Panel General y Métricas',
         productos: 'Gestión de Productos',
+        marketplace: 'Generador Facebook Marketplace',
         pedidos: 'Pedidos COD & DroPanas',
         sync: 'Sincronización de Catálogo',
         clientes: 'Base de Datos de Clientes',
@@ -317,12 +319,18 @@ export default function AdminPortal() {
                                 {/* Quick Actions */}
                                 <div>
                                     <h3 className="text-xs font-black text-gray-400 uppercase tracking-wider mb-4">Acciones Rápidas del Sistema</h3>
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                                         <QuickAction
                                             icon={Plus}
                                             title="Añadir Producto"
                                             desc="Crear nuevo producto con ofertas y bundles"
                                             onClick={() => { openNewProduct(); setActiveTab('productos'); }}
+                                        />
+                                        <QuickAction
+                                            icon={Zap}
+                                            title="Marketplace FB"
+                                            desc="Generar publicaciones con neuromarketing"
+                                            onClick={() => setActiveTab('marketplace')}
                                         />
                                         <QuickAction
                                             icon={RefreshCw}
@@ -382,6 +390,9 @@ export default function AdminPortal() {
                                 />
                             </div>
                         )}
+
+                        {/* ===== MARKETPLACE GENERATOR ===== */}
+                        {activeTab === 'marketplace' && <MarketplaceGenerator products={products} />}
 
                         {/* ===== PEDIDOS ===== */}
                         {activeTab === 'pedidos' && <OrdersManager />}
