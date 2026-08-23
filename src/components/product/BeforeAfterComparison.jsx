@@ -1,19 +1,21 @@
-import { XCircle, CheckCircle2, Sparkles, ArrowRight } from 'lucide-react';
+import { XCircle, CheckCircle2, Sparkles } from 'lucide-react';
 
 /**
  * BeforeAfterComparison Component
  * Neuromarketing Pain vs Pleasure visual contrast.
+ * Tailored specifically per product with a safe, intelligent dynamic fallback.
  */
 export default function BeforeAfterComparison({ product }) {
     if (!product) return null;
 
-    const slug = product.slug || '';
+    const slug = (product.slug || '').toLowerCase();
     const name = product.name || 'este producto';
+    const s = `${slug} ${name.toLowerCase()}`;
 
-    // Tailored before/after data for popular products or smart category fallback
     let comparisonData = null;
 
-    if (slug.includes('nox') || slug.includes('nasal') || slug.includes('tiras')) {
+    // 1. Nox Tiras Nasales
+    if (s.includes('nox') || s.includes('tiras nasales') || s.includes('nasal')) {
         comparisonData = {
             beforeTitle: 'Sin Nox Tiras Nasales',
             beforeSubtitle: 'El problema diario al dormir',
@@ -32,43 +34,109 @@ export default function BeforeAfterComparison({ product }) {
                 'Adhesivo médico hipoalergénico suave con la piel'
             ]
         };
-    } else if (slug.includes('pomo') || slug.includes('palanca') || slug.includes('carro') || slug.includes('auto')) {
+    } 
+    // 2. Pomo Palanca LED (ONLY for pomos / palancas)
+    else if (s.includes('pomo') || s.includes('palanca de cambio') || s.includes('palanca led')) {
         comparisonData = {
             beforeTitle: 'Interior Tradicional',
             beforeSubtitle: 'Aspecto común y desgastado',
             beforeItems: [
-                'Palanca original desgastada u opaca',
-                'Interior del vehículo sin personalidad ni estilo',
+                'Palanca original desgastada, agrietada u opaca',
+                'Interior del vehículo sin personalidad ni estilo moderno',
                 'Cero iluminación al cambiar de velocidad de noche',
-                'Sensación de manejo común y corriente'
+                'Sensación de manejo anticuada y común'
             ],
             afterTitle: `Con ${name}`,
             afterSubtitle: 'Transformación premium al instante',
             afterItems: [
                 'Iluminación LED táctil RGB que impacta al subirte',
                 'Acabado cromado y cuero de alta durabilidad',
-                'Instalación en 3 minutos sin mecánicos ni cables',
-                'Sensación moderna y exótica cada vez que manejas'
+                'Instalación rápida sin mecánicos ni modificaciones',
+                'Sensación moderna y deportiva cada vez que manejas'
             ]
         };
-    } else {
-        // Universal Smart Fallback
+    } 
+    // 3. Cargador Inteligente Batería 12V
+    else if (s.includes('cargador') || s.includes('bateria') || s.includes('12v') || s.includes('pulse repair')) {
         comparisonData = {
-            beforeTitle: 'Sin ' + name,
+            beforeTitle: 'Sin Cargador Inteligente',
+            beforeSubtitle: 'Riesgos y gastos innecesarios',
+            beforeItems: [
+                'Batería descargada sin aviso previo dejándote varado en la calle o casa',
+                'Gastos excesivos comprando baterías nuevas que solo estaban sulfatadas',
+                'Depender de cables auxiliares o pedir auxilio a extraños',
+                'Cargadores lentos tradicionales sin protección que queman la batería'
+            ],
+            afterTitle: `Con ${name}`,
+            afterSubtitle: 'Energía y diagnóstico garantizado',
+            afterItems: [
+                'Carga inteligente por pulsos que revive y desulfata baterías descargadas',
+                'Pantalla digital LCD con voltaje, corriente y temperatura en tiempo real',
+                'Protección total contra sobrecalentamiento, polaridad invertida y cortocircuito',
+                'Compatible con autos, camionetas, motos y baterías 12V (4Ah a 100Ah)'
+            ]
+        };
+    }
+    // 4. Compresor de Aire Portátil Digital
+    else if (s.includes('compresor') || s.includes('inflador')) {
+        comparisonData = {
+            beforeTitle: 'Sin Compresor Portátil',
+            beforeSubtitle: 'Imprevistos en carretera',
+            beforeItems: [
+                'Caucho desinflado en plena vía sin estaciones de servicio cerca',
+                'Medidores analógicos imprecisos que desgastan tus neumáticos',
+                'Largas filas y pérdida de tiempo en bombas de gasolina',
+                'Inseguridad al quedarte accidentado de noche'
+            ],
+            afterTitle: `Con ${name}`,
+            afterSubtitle: 'Tranquilidad en todo viaje',
+            afterItems: [
+                'Inflado digital automático con corte exacto a los PSI deseados',
+                'Linterna LED de emergencia integrada para uso nocturno seguro',
+                'Pantalla digital LCD con lectura exacta de presión',
+                'Batería recargable y boquillas para autos, motos, bicis y balones'
+            ]
+        };
+    }
+    // 5. Esponja Mágica / Limpiador de Vidrios
+    else if (s.includes('esponja') || s.includes('vidrio') || s.includes('oil film') || s.includes('parabrisa')) {
+        comparisonData = {
+            beforeTitle: 'Vidrio con Película de Grasa',
+            beforeSubtitle: 'Peligro al conducir de noche',
+            beforeItems: [
+                'Capa de grasa y manchas de lluvia que encandilan con las luces de frente',
+                'Limpiaparabrisas que rechinan y rayan el cristal sin limpiar bien',
+                'Productos caseros que dejan marcas y empañan la visibilidad',
+                'Alto riesgo de accidentes por reflejos y visión borrosa bajo la lluvia'
+            ],
+            afterTitle: `Con ${name}`,
+            afterSubtitle: 'Visibilidad cristalina HD',
+            afterItems: [
+                'Elimina el 100% de la película de aceite, grasa y lluvia ácida',
+                'Restaura la transparencia óptica pura del parabrisas',
+                'Efecto hidrofóbico que repele el agua al instante',
+                'Fórmula segura que no raya el vidrio ni daña los sellos de goma'
+            ]
+        };
+    }
+    // 6. Universal Dynamic Fallback
+    else {
+        comparisonData = {
+            beforeTitle: `Sin ${name}`,
             beforeSubtitle: 'Complicaciones y gastos innecesarios',
             beforeItems: [
-                'Pérdida de tiempo y soluciones temporales de baja calidad',
-                'Gastos recurrentes en productos que no resuelven el problema',
-                'Incertidumbre y frustración al no ver resultados reales',
-                'Riesgo de comprar por internet sin poder revisar antes'
+                'Pérdida de tiempo con alternativas de baja calidad que no duran',
+                'Gastos recurrentes en soluciones temporales',
+                'Incertidumbre y frustración al no obtener los resultados esperados',
+                'Riesgo de comprar online sin poder revisar antes'
             ],
-            afterTitle: 'Con ' + name,
-            afterSubtitle: 'Resultados comprobados desde el primer día',
+            afterTitle: `Con ${name}`,
+            afterSubtitle: 'Resultados comprobados desde el primer uso',
             afterItems: [
-                'Solución directa y garantizada para tu día a día',
-                'Materiales de alta durabilidad y máximo rendimiento',
-                'Ahorro significativo con envío 100% gratis a tu puerta',
-                'Pagas al recibir en efectivo o Pago Móvil (Tasa BCV)'
+                'Solución directa, práctica y garantizada para tu día a día',
+                'Materiales de alta durabilidad con garantía de funcionamiento',
+                'Envío 100% GRATIS directo a tu puerta o agencia',
+                'Cero riesgo: Pagas al recibir en efectivo o Pago Móvil BCV'
             ]
         };
     }
