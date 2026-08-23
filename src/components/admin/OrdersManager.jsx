@@ -2,12 +2,13 @@ import { useEffect, useState, useMemo } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { useCurrency } from '../../context/CurrencyContext';
 import { ZONES } from '../cod/codData';
+import { createDroPanasOrder } from '../../lib/dropanasApi';
 import ConfirmModal from './ConfirmModal';
 import { 
     Truck, CheckCircle2, RotateCcw, Trash2, 
     Search, MessageCircle, Clock, 
     Building2, MapPin, User, AlertTriangle, 
-    Sparkles, RefreshCw, Layers, ExternalLink, X
+    Sparkles, RefreshCw, Layers, ExternalLink, X, XCircle, PackageCheck
 } from 'lucide-react';
 
 export default function OrdersManager() {
@@ -20,6 +21,8 @@ export default function OrdersManager() {
 
     // Modal State
     const [contactOrder, setContactOrder] = useState(null);
+    const [orderToConfirm, setOrderToConfirm] = useState(null);
+    const [orderToCancel, setOrderToCancel] = useState(null);
     const [orderToDelete, setOrderToDelete] = useState(null);
     const [showEmptyTrashModal, setShowEmptyTrashModal] = useState(false);
     const [actionLoading, setActionLoading] = useState(false);
@@ -63,6 +66,89 @@ export default function OrdersManager() {
             fetchOrders();
         } catch (error) {
             showFeedback('error', 'Error actualizando pedido: ' + error.message);
+        }
+    }
+
+    /* ===== Double Confirmation: Confirm & Dispatch Order ===== */
+    async function handleConfirmOrder() {
+        if (!orderToConfirm) return;
+        setActionLoading(true);
+        try {
+            // 1. Dispatch to DroPanas API
+            const dpRes = await createDroPanasOrder({
+                orderId: orderToConfirm.order_id,
+                customerName: orderToConfirm.user_name,
+                customerPhone: orderToConfirm.user_phone,
+                customerDocument: orderToConfirm.user_ci,
+                deliveryAddress: orderToConfirm.delivery_address,
+                city: orderToConfirm.city,
+                state: orderToConfirm.state,
+                notes: orderToConfirm.delivery_ref || '',
+                totalAmount: orderToConfirm.total_price,
+                items: [{
+                    id: orderToConfirm.product_id,
+                    name: orderToConfirm.product_name,
+                    quantity: orderToConfirm.quantity || 1,
+                    price: orderToConfirm.unit_price || orderToConfirm.total_price
+                }]
+            }).catch(e => {
+                console.warn('DroPanas dispatch note:', e);
+                return { success: false, message: e.message };
+            });
+
+            const guideNumber = dpRes?.data?.tracking?.numero_guia || dpRes?.data?.id || null;
+
+            // 2. Update status in Supabase to 'shipped' (En camino)
+            const updatePayload = { status: 'shipped' };
+            if (guideNumber) {
+                updatePayload.delivery_ref = orderToConfirm.delivery_ref 
+                    ? `${orderToConfirm.delivery_ref} | Guía: ${guideNumber}`
+                    : `Guía: ${guideNumber}`;
+            }
+
+            const { error } = await supabase
+                .from('orders')
+                .update(updatePayload)
+                .eq('id', orderToConfirm.id);
+
+            if (error) throw error;
+
+            showFeedback(
+                'success', 
+                guideNumber 
+                    ? `🎉 ¡Pedido #${orderToConfirm.order_id} confirmado y despachado con Guía ${guideNumber}!`
+                    : `✅ ¡Pedido #${orderToConfirm.order_id} confirmado y cambiado a 'En camino'!`
+            );
+            setOrderToConfirm(null);
+            fetchOrders();
+        } catch (err) {
+            console.error('Error confirming order:', err);
+            showFeedback('error', 'Error al confirmar el pedido: ' + (err.message || 'Error desconocido'));
+        } finally {
+            setActionLoading(false);
+        }
+    }
+
+    /* ===== Cancel Order Handler ===== */
+    async function handleCancelOrder() {
+        if (!orderToCancel) return;
+        setActionLoading(true);
+        try {
+            const { error } = await supabase
+                .from('orders')
+                .update({ status: 'cancelled' })
+                .eq('id', orderToCancel.id);
+
+            if (error) throw error;
+
+            showFeedback('success', `Pedido #${orderToCancel.order_id} cancelado correctamente.`);
+            setOrderToCancel(null);
+            fetchOrders();
+        } catch (err) {
+            console.error('Error cancelling order:', err);
+            showFeedback('error', 'Error al cancelar el pedido: ' + err.message);
+        } finally {
+            setActionLoading(false);
         }
     }
 
@@ -417,13 +503,37 @@ export default function OrdersManager() {
                                         <p className="font-mono text-gray-600 font-bold">{order.user_phone}</p>
 
                                         {order.status !== 'deleted' && (
-                                            <button 
-                                                onClick={() => setContactOrder(order)}
-                                                className="inline-flex items-center gap-1.5 mt-2 bg-[#25D366] hover:bg-[#20bd5a] text-white px-3 py-1.5 rounded-xl text-xs font-extrabold shadow-sm transition-all cursor-pointer"
-                                            >
-                                                <MessageCircle className="w-3.5 h-3.5" />
-                                                <span>Contactar por WhatsApp</span>
-                                            </button>
+                                            <div className="flex flex-wrap items-center gap-2 mt-2.5">
+                                                <button 
+                                                    onClick={() => setContactOrder(order)}
+                                                    className="inline-flex items-center gap-1.5 bg-[#25D366] hover:bg-[#20bd5a] text-white px-3 py-1.5 rounded-xl text-xs font-extrabold shadow-sm transition-all cursor-pointer"
+                                                >
+                                                    <MessageCircle className="w-3.5 h-3.5" />
+                                                    <span>Contactar WhatsApp</span>
+                                                </button>
+
+                                                {order.status === 'pending_whatsapp' && (
+                                                    <>
+                                                        <button 
+                                                            onClick={() => setOrderToConfirm(order)}
+                                                            className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-extrabold shadow-xs transition-all cursor-pointer"
+                                                            title="Confirmar datos y despachar a DroPanas"
+                                                        >
+                                                            <CheckCircle2 className="w-3.5 h-3.5" />
+                                                            <span>Confirmar Pedido</span>
+                                                        </button>
+
+                                                        <button 
+                                                            onClick={() => setOrderToCancel(order)}
+                                                            className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-extrabold text-xs rounded-xl border border-rose-200 transition-all cursor-pointer"
+                                                            title="Cancelar orden"
+                                                        >
+                                                            <XCircle className="w-3.5 h-3.5" />
+                                                            <span>Cancelar</span>
+                                                        </button>
+                                                    </>
+                                                )}
+                                            </div>
                                         )}
                                     </div>
 
@@ -569,6 +679,36 @@ export default function OrdersManager() {
                     </div>
                 </div>
             )}
+
+            {/* Double Confirmation Modal to Confirm and Dispatch Order */}
+            <ConfirmModal
+                isOpen={!!orderToConfirm}
+                onClose={() => setOrderToConfirm(null)}
+                onConfirm={handleConfirmOrder}
+                title={`¿Confirmar y despachar orden #${orderToConfirm?.order_id || ''}?`}
+                message={`Estás a punto de confirmar los datos de ${orderToConfirm?.user_name || 'este cliente'} (${orderToConfirm?.city || ''}, ${orderToConfirm?.state || ''}) por un monto de ${formatPrice(orderToConfirm?.total_price || 0)}. Se enviará la orden a DroPanas para generar la guía de despacho y el estado pasará a 'En camino'.`}
+                confirmText="Sí, confirmar y despachar"
+                cancelText="Volver"
+                confirmColor="bg-emerald-600 hover:bg-emerald-700"
+                icon="local_shipping"
+                iconBg="bg-emerald-100 text-emerald-600"
+                loading={actionLoading}
+            />
+
+            {/* Confirmation Modal to Cancel Order */}
+            <ConfirmModal
+                isOpen={!!orderToCancel}
+                onClose={() => setOrderToCancel(null)}
+                onConfirm={handleCancelOrder}
+                title={`¿Cancelar orden #${orderToCancel?.order_id || ''}?`}
+                message={`El pedido de ${orderToCancel?.user_name || ''} pasará a estado 'Cancelado' y no se procesará ningún envío ni cobro.`}
+                confirmText="Sí, cancelar orden"
+                cancelText="Volver"
+                confirmColor="bg-rose-600 hover:bg-rose-700"
+                icon="cancel"
+                iconBg="bg-rose-100 text-rose-600"
+                loading={actionLoading}
+            />
 
             {/* Delete Single Order Modal */}
             <ConfirmModal
