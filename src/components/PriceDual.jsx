@@ -10,8 +10,8 @@ export default function PriceDual({ amount, size = 'md', showRate = false, class
 
     const sizes = {
         sm: {
-            usd: 'text-xl font-black text-gray-950',
-            bs: 'text-xs font-extrabold text-slate-700 bg-slate-100/90 border border-slate-200/80 px-2 py-0.5 rounded-lg'
+            usd: 'text-lg sm:text-xl font-black text-gray-950',
+            bs: 'text-[10px] sm:text-xs font-extrabold text-slate-700 bg-slate-100/90 border border-slate-200/80 px-1.5 sm:px-2 py-0.5 rounded-lg'
         },
         md: {
             usd: 'text-2xl sm:text-3xl font-black text-gray-950',
@@ -25,7 +25,7 @@ export default function PriceDual({ amount, size = 'md', showRate = false, class
     const s = sizes[size] || sizes.md;
 
     return (
-        <div className={`flex items-center gap-2.5 flex-wrap ${className}`}>
+        <div className={`flex items-baseline sm:items-center gap-1.5 sm:gap-2.5 flex-wrap ${className}`}>
             <span className={`${s.usd} tracking-tight tabular-nums`}>
                 {formatUSD(amount)}
             </span>
