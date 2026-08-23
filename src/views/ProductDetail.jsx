@@ -41,10 +41,23 @@ export default function ProductDetail() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [comboData, setComboData] = useState(null);
     const [copiedLink, setCopiedLink] = useState(false);
+    const [showDesktopSticky, setShowDesktopSticky] = useState(false);
 
     // Marketing State
     const [viewersCount, setViewersCount] = useState(24);
     const [selectedBundle, setSelectedBundle] = useState(1);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 480) {
+                setShowDesktopSticky(true);
+            } else {
+                setShowDesktopSticky(false);
+            }
+        };
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const handleSelectCombo = (combo) => {
         setComboData(combo);
@@ -625,6 +638,75 @@ export default function ProductDetail() {
             </main>
 
             <Footer />
+
+            {/* Desktop Compact Sticky Buy Bar */}
+            {showDesktopSticky && (
+                <div className="hidden md:block fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200/90 shadow-[0_-10px_35px_rgba(0,0,0,0.12)] z-50 py-2.5 px-6 animate-slideUp">
+                    <div className="max-w-7xl mx-auto flex items-center justify-between gap-6">
+                        {/* Left: Product Thumbnail + Title + Rating */}
+                        <div className="flex items-center gap-3 min-w-0">
+                            <img 
+                                src={product.image_url} 
+                                alt={product.name} 
+                                className="w-12 h-12 rounded-xl object-contain bg-white border border-gray-200 p-0.5 shrink-0 shadow-2xs"
+                            />
+                            <div className="min-w-0">
+                                <p className="font-extrabold text-sm text-gray-950 truncate max-w-md">{product.name}</p>
+                                <div className="flex items-center gap-2 text-xs">
+                                    <div className="flex text-amber-400">
+                                        {[1, 2, 3, 4, 5].map((i) => (
+                                            <Star key={i} className="w-3 h-3 fill-amber-400" />
+                                        ))}
+                                    </div>
+                                    <span className="text-[11px] font-bold text-gray-500">4.9 (142 reseñas)</span>
+                                    <span className="text-gray-300">•</span>
+                                    <span className="text-[11px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
+                                        🚚 Envío Gratis
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Center: Price & Bundle Indicator */}
+                        <div className="flex items-center gap-3 shrink-0">
+                            <div className="text-right">
+                                <div className="text-xl font-black text-emerald-700">
+                                    ${getPrice()} USD
+                                </div>
+                                {product.compare_at_price && (
+                                    <span className="text-[11px] text-gray-400 line-through font-semibold">
+                                        ${product.compare_at_price.toFixed(2)} USD
+                                    </span>
+                                )}
+                            </div>
+                            {selectedBundle > 1 && (
+                                <span className="text-[10px] font-black text-amber-800 bg-amber-100 px-2 py-0.5 rounded-md border border-amber-200">
+                                    Pack {selectedBundle}X
+                                </span>
+                            )}
+                        </div>
+
+                        {/* Right: Fast Actions */}
+                        <div className="flex items-center gap-3 shrink-0">
+                            <button
+                                onClick={handleAddToCart}
+                                className="h-11 px-4 bg-gray-100 hover:bg-gray-200 active:scale-95 text-gray-900 font-extrabold text-xs rounded-xl flex items-center gap-2 transition-all cursor-pointer border border-gray-200/60"
+                            >
+                                <ShoppingCart className="w-4 h-4 text-gray-700" />
+                                <span>Al Carrito</span>
+                            </button>
+                            <button
+                                onClick={() => { setComboData(null); setIsModalOpen(true); }}
+                                className="h-11 px-6 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 active:scale-[0.98] text-white font-black text-sm rounded-xl flex items-center gap-2 shadow-lg shadow-emerald-600/25 transition-all cursor-pointer"
+                            >
+                                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                                <span>PEDIR AHORA · ${getPrice()} USD</span>
+                                <span className="text-[11px] font-bold text-emerald-100 opacity-90 hidden lg:inline">(Pagas al Recibir)</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Mobile Sticky Buy Bar */}
             <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md p-3 shadow-[0_-4px_25px_rgba(0,0,0,0.12)] border-t border-gray-200 z-50 animate-slideUp md:hidden" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
