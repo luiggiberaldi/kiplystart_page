@@ -11,18 +11,34 @@ export default function CartDrawerCrossSell() {
     useEffect(() => {
         async function fetchCrossSells() {
             try {
-                // Fetch 2-3 affordable active impulse products
-                const { data, error } = await supabase
+                const inCartIds = new Set(cartItems.map(item => item.id));
+                const cartCategories = [...new Set(cartItems.map(i => i.category).filter(Boolean))];
+
+                let query = supabase
                     .from('products')
-                    .select('id, name, slug, price, compare_at_price, image_url')
+                    .select('id, name, slug, price, compare_at_price, image_url, category')
                     .eq('is_active', true)
                     .order('price', { ascending: true })
-                    .limit(4);
+                    .limit(10);
 
-                if (error || !data) return;
+                if (cartCategories.length > 0) {
+                    query = query.in('category', cartCategories);
+                }
+
+                let { data, error } = await query;
+
+                // Fallback to affordable items if no category match
+                if (!data || data.length === 0) {
+                    const fallbackRes = await supabase
+                        .from('products')
+                        .select('id, name, slug, price, compare_at_price, image_url, category')
+                        .eq('is_active', true)
+                        .order('price', { ascending: true })
+                        .limit(8);
+                    data = fallbackRes.data || [];
+                }
 
                 // Filter out items already in cart
-                const inCartIds = new Set(cartItems.map(item => item.id));
                 const available = data.filter(p => !inCartIds.has(p.id)).slice(0, 2);
                 setUpsellProducts(available);
             } catch (err) {

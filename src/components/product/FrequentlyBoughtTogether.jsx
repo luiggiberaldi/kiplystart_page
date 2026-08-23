@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Check, Zap, Sparkles, ArrowRight, ShieldCheck, Truck } from 'lucide-react';
+import { Plus, Zap, Sparkles, ArrowRight } from 'lucide-react';
 import { useCurrency } from '../../context/CurrencyContext';
 import { supabase } from '../../lib/supabaseClient';
 
@@ -15,43 +15,70 @@ export default function FrequentlyBoughtTogether({ product, onSelectCombo }) {
             try {
                 setLoading(true);
                 const s = (product.slug || product.name || '').toLowerCase();
+                const targetCategory = product.category;
 
-                // 1. Curated smart complementary pairings
-                let targetCategory = product.category;
-                let excludeId = product.id;
-
-                const { data, error } = await supabase
+                // 1. Strictly query products from the SAME CATEGORY
+                let query = supabase
                     .from('products')
                     .select('id, name, slug, price, compare_at_price, image_url, category')
                     .eq('is_active', true)
-                    .neq('id', excludeId)
-                    .limit(10);
+                    .neq('id', product.id);
+
+                if (targetCategory) {
+                    query = query.eq('category', targetCategory);
+                }
+
+                const { data, error } = await query.limit(20);
 
                 if (error || !data || data.length === 0) {
+                    // Fallback only if category name has related keywords (e.g. Carro / Auto)
+                    const isCar = s.includes('carro') || s.includes('auto') || (targetCategory || '').toLowerCase().includes('carro');
+                    if (isCar) {
+                        const { data: carData } = await supabase
+                            .from('products')
+                            .select('id, name, slug, price, compare_at_price, image_url, category')
+                            .eq('is_active', true)
+                            .neq('id', product.id)
+                            .ilike('category', '%carro%')
+                            .limit(10);
+                        
+                        if (carData && carData.length > 0) {
+                            selectBestMatch(s, carData);
+                            return;
+                        }
+                    }
+
+                    // If no related products exist in the same category, do not show unrelated combo
                     setPairedProduct(null);
                     return;
                 }
 
-                // Smart priority selection
-                let matched = null;
-
-                if (s.includes('cargador') || s.includes('bateria')) {
-                    matched = data.find(p => p.slug.includes('compresor') || p.slug.includes('esponja') || p.slug.includes('pomo'));
-                } else if (s.includes('compresor')) {
-                    matched = data.find(p => p.slug.includes('cargador') || p.slug.includes('bateria') || p.slug.includes('esponja'));
-                } else if (s.includes('pomo') || s.includes('palanca')) {
-                    matched = data.find(p => p.slug.includes('esponja') || p.slug.includes('ambientador') || p.slug.includes('toalla'));
-                } else {
-                    // Match same category or fallback to first available
-                    matched = data.find(p => p.category === targetCategory) || data[0];
-                }
-
-                setPairedProduct(matched || data[0]);
+                selectBestMatch(s, data);
             } catch (err) {
                 console.error('Error loading complementary product:', err);
+                setPairedProduct(null);
             } finally {
                 setLoading(false);
             }
+        }
+
+        function selectBestMatch(currentSlug, candidates) {
+            let matched = null;
+
+            // Smart pairings within the same category
+            if (currentSlug.includes('esponja') || currentSlug.includes('vidrio') || currentSlug.includes('oil film')) {
+                matched = candidates.find(p => p.slug.includes('compresor') || p.slug.includes('cargador') || p.slug.includes('pomo') || p.slug.includes('toalla'));
+            } else if (currentSlug.includes('cargador') || currentSlug.includes('bateria')) {
+                matched = candidates.find(p => p.slug.includes('compresor') || p.slug.includes('esponja') || p.slug.includes('pomo'));
+            } else if (currentSlug.includes('compresor')) {
+                matched = candidates.find(p => p.slug.includes('cargador') || p.slug.includes('bateria') || p.slug.includes('esponja'));
+            } else if (currentSlug.includes('pomo') || currentSlug.includes('palanca')) {
+                matched = candidates.find(p => p.slug.includes('esponja') || p.slug.includes('compresor') || p.slug.includes('cargador'));
+            } else if (currentSlug.includes('nox') || currentSlug.includes('nasal')) {
+                matched = candidates.find(p => p.slug !== product.slug);
+            }
+
+            setPairedProduct(matched || candidates[0] || null);
         }
 
         findComplementaryProduct();
@@ -59,7 +86,7 @@ export default function FrequentlyBoughtTogether({ product, onSelectCombo }) {
 
     if (loading || !pairedProduct || !product) return null;
 
-    // Combo pricing calculations (Give ~15-20% bundle discount on the pair)
+    // Combo pricing calculations (15% bundle discount on the pair)
     const baseTotal = product.price + pairedProduct.price;
     const discountAmount = Math.ceil(baseTotal * 0.15); // 15% combo savings
     const comboPrice = baseTotal - discountAmount;
@@ -86,7 +113,7 @@ export default function FrequentlyBoughtTogether({ product, onSelectCombo }) {
                         <span>Frecuentemente Comprados Juntos</span>
                     </div>
                     <h3 className="text-lg sm:text-xl font-black text-white tracking-tight">
-                        Lleva el Combo Completo y Ahorra ${savings} USD
+                        Lleva el Combo de {product.category || 'la misma categoría'} y Ahorra ${savings} USD
                     </h3>
                 </div>
                 <span className="text-xs font-bold text-emerald-300 bg-emerald-500/20 border border-emerald-400/30 px-3 py-1 rounded-full w-fit">
