@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { X, Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
 import PriceDual from '../PriceDual';
 import CODField from '../cod/CODField';
+import CustomSelect from '../cod/CustomSelect';
 import { ZONES, getSavedCustomer, saveCustomer, clearSavedCustomer } from '../cod/codData';
 import { trackInitiateCheckout, trackPurchase } from '../../lib/fbPixelEvents';
 import { createDroPanasOrder } from '../../lib/dropanasApi';
@@ -460,30 +461,31 @@ export default function CartDrawer() {
 
                                     <CODField label="Estado" icon="map" name="state"
                                         error={errors.state} status={getFieldStatus('state')} borderClass={fieldBorder('state')}>
-                                        <select name="state" value={formData.state} onChange={handleChange}
+                                        <CustomSelect
+                                            name="state"
+                                            value={formData.state}
+                                            onChange={(e) => {
+                                                handleChange(e);
+                                                handleChange({ target: { name: 'city', value: '' } });
+                                            }}
                                             onBlur={() => handleBlur('state')}
-                                            className="flex-1 outline-none text-sm bg-transparent appearance-none cursor-pointer">
-                                            <option value="">Selecciona tu estado...</option>
-                                            {ZONES.map(z => (
-                                                <option key={z.state} value={z.state}>{z.state}</option>
-                                            ))}
-                                        </select>
-                                        <span className="material-symbols-outlined text-gray-300 text-[18px]">expand_more</span>
+                                            options={ZONES.map(z => z.state)}
+                                            placeholder="Selecciona tu estado..."
+                                        />
                                     </CODField>
 
                                     {formData.state && (
                                         <div className="animate-fadeIn">
                                             <CODField label="Ciudad" icon="location_city" name="city"
                                                 error={errors.city} status={getFieldStatus('city')} borderClass={fieldBorder('city')}>
-                                                <select name="city" value={formData.city} onChange={handleChange}
+                                                <CustomSelect
+                                                    name="city"
+                                                    value={formData.city}
+                                                    onChange={handleChange}
                                                     onBlur={() => handleBlur('city')}
-                                                    className="flex-1 outline-none text-sm bg-transparent appearance-none cursor-pointer">
-                                                    <option value="">Selecciona tu ciudad...</option>
-                                                    {(selectedZone?.cities || []).map(c => (
-                                                        <option key={c} value={c}>{c}</option>
-                                                    ))}
-                                                </select>
-                                                <span className="material-symbols-outlined text-gray-300 text-[18px]">expand_more</span>
+                                                    options={selectedZone?.cities || []}
+                                                    placeholder="Selecciona tu ciudad..."
+                                                />
                                             </CODField>
                                         </div>
                                     )}

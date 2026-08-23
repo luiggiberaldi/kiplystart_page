@@ -17,7 +17,7 @@ import { trackViewContent, trackAddToCart } from '../lib/fbPixelEvents';
 import { 
     Truck, ShieldCheck, RotateCcw, Flame, CheckCircle2, 
     ShoppingBag, ShoppingCart, Share2, ChevronRight, 
-    MessageCircle, Star, Sparkles, ChevronDown, Package
+    MessageCircle, Star, Sparkles, ChevronDown, Package, Check
 } from 'lucide-react';
 
 export default function ProductDetail() {
@@ -31,10 +31,25 @@ export default function ProductDetail() {
     // UI State
     const [showSpecs, setShowSpecs] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [copiedLink, setCopiedLink] = useState(false);
 
     // Marketing State
     const [viewersCount, setViewersCount] = useState(24);
     const [selectedBundle, setSelectedBundle] = useState(1);
+
+    const handleShare = async () => {
+        if (navigator.share) {
+            try { 
+                await navigator.share({ title: product?.name || 'KiplyStart', url: window.location.href }); 
+                return;
+            } catch {}
+        }
+        try {
+            await navigator.clipboard.writeText(window.location.href);
+            setCopiedLink(true);
+            setTimeout(() => setCopiedLink(false), 3000);
+        } catch {}
+    };
 
     const fetchProduct = useCallback(async () => {
         try {
@@ -157,19 +172,23 @@ export default function ProductDetail() {
                     </div>
 
                     <button
-                        onClick={async () => {
-                            if (navigator.share) {
-                                try { await navigator.share({ title: product.name, url: window.location.href }); } catch {}
-                            } else {
-                                await navigator.clipboard.writeText(window.location.href);
-                                alert('¡Enlace del producto copiado al portapapeles!');
-                            }
-                        }}
-                        className="p-1.5 hover:bg-gray-100 rounded-xl text-gray-500 hover:text-gray-900 transition-colors flex items-center gap-1 shrink-0 cursor-pointer"
+                        onClick={handleShare}
+                        className={`p-1.5 px-2.5 rounded-xl transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
+                            copiedLink ? 'bg-emerald-50 text-emerald-700 font-bold border border-emerald-200' : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900'
+                        }`}
                         title="Compartir producto"
                     >
-                        <Share2 className="w-4 h-4" />
-                        <span className="hidden sm:inline text-xs font-bold">Compartir</span>
+                        {copiedLink ? (
+                            <>
+                                <Check className="w-4 h-4 text-emerald-600 animate-scaleIn" />
+                                <span className="text-xs font-bold text-emerald-700">¡Enlace copiado!</span>
+                            </>
+                        ) : (
+                            <>
+                                <Share2 className="w-4 h-4" />
+                                <span className="hidden sm:inline text-xs font-bold">Compartir</span>
+                            </>
+                        )}
                     </button>
                 </div>
             </div>

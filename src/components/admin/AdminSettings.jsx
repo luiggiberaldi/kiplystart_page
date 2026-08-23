@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { useCurrency } from '../../context/CurrencyContext';
 import { supabase } from '../../lib/supabaseClient';
+import ConfirmModal from './ConfirmModal';
 import { 
     Save, RotateCcw, CheckCircle2, AlertTriangle, 
     DollarSign, Percent, Store, Phone, 
@@ -22,6 +23,7 @@ export default function AdminSettings() {
     const [recalculating, setRecalculating] = useState(false);
     const [recalcProgress, setRecalcProgress] = useState(0);
     const [recalcResult, setRecalcResult] = useState(null);
+    const [showRecalcModal, setShowRecalcModal] = useState(false);
 
     useEffect(() => {
         if (loaded) {
@@ -59,10 +61,7 @@ export default function AdminSettings() {
 
     // Recalculates all products in the database using the new formula
     async function handleBulkRecalculate() {
-        if (!window.confirm(`¿Deseas recalcular y actualizar los precios de venta de todo el catálogo en Supabase usando Costo de Envío ($${local.shipping_cost}) y Margen ($${local.profit_margin})?`)) {
-            return;
-        }
-
+        setShowRecalcModal(false);
         setRecalculating(true);
         setRecalcProgress(0);
         setRecalcResult(null);
@@ -290,7 +289,7 @@ export default function AdminSettings() {
                     <div className="pt-3 border-t border-gray-100">
                         <button
                             type="button"
-                            onClick={handleBulkRecalculate}
+                            onClick={() => setShowRecalcModal(true)}
                             disabled={recalculating}
                             className="w-full py-3.5 px-4 bg-gradient-to-r from-[#0A2463] to-blue-900 hover:from-blue-900 hover:to-[#0A2463] text-white rounded-2xl text-xs font-black shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
                         >
@@ -487,6 +486,21 @@ export default function AdminSettings() {
                     />
                 </SettingsCard>
             </div>
+
+            {/* Recalculate Catalog Confirmation Modal */}
+            <ConfirmModal
+                isOpen={showRecalcModal}
+                onClose={() => setShowRecalcModal(false)}
+                onConfirm={handleBulkRecalculate}
+                title="¿Recalcular precios del catálogo?"
+                message={`Se actualizarán los precios de venta de todos los productos en Supabase usando Costo de Envío ($${local.shipping_cost || 8} USD) y Margen de Ganancia ($${local.profit_margin || 6} USD).`}
+                confirmText="Sí, recalcular catálogo"
+                cancelText="Cancelar"
+                confirmColor="bg-[#0A2463] hover:bg-[#081c4d]"
+                icon="price_change"
+                iconBg="bg-blue-100 text-[#0A2463]"
+                loading={recalculating}
+            />
         </div>
     );
 }

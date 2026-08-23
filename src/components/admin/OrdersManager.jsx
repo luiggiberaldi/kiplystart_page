@@ -2,11 +2,12 @@ import { useEffect, useState, useMemo } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { useCurrency } from '../../context/CurrencyContext';
 import { ZONES } from '../cod/codData';
+import ConfirmModal from './ConfirmModal';
 import { 
     Truck, CheckCircle2, RotateCcw, Trash2, 
     Search, MessageCircle, Clock, 
     Building2, MapPin, User, AlertTriangle, 
-    Sparkles, RefreshCw, Layers, ExternalLink
+    Sparkles, RefreshCw, Layers, ExternalLink, X
 } from 'lucide-react';
 
 export default function OrdersManager() {
@@ -15,10 +16,18 @@ export default function OrdersManager() {
     const [loading, setLoading] = useState(true);
     const [filterStatus, setFilterStatus] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
+    const [feedbackMsg, setFeedbackMsg] = useState(null);
 
     // Modal State
     const [contactOrder, setContactOrder] = useState(null);
     const [orderToDelete, setOrderToDelete] = useState(null);
+    const [showEmptyTrashModal, setShowEmptyTrashModal] = useState(false);
+    const [actionLoading, setActionLoading] = useState(false);
+
+    function showFeedback(type, text) {
+        setFeedbackMsg({ type, text });
+        setTimeout(() => setFeedbackMsg(null), 5000);
+    }
 
     useEffect(() => {
         fetchOrders();
@@ -36,6 +45,7 @@ export default function OrdersManager() {
             setOrders(data || []);
         } catch (error) {
             console.error('Error fetching orders:', error);
+            showFeedback('error', 'Error al cargar pedidos: ' + error.message);
         } finally {
             setLoading(false);
         }
@@ -49,9 +59,10 @@ export default function OrdersManager() {
                 .eq('id', orderId);
 
             if (error) throw error;
+            showFeedback('success', `Pedido actualizado a ${newStatus}.`);
             fetchOrders();
         } catch (error) {
-            alert('Error actualizando pedido: ' + error.message);
+            showFeedback('error', 'Error actualizando pedido: ' + error.message);
         }
     }
 
@@ -66,24 +77,32 @@ export default function OrdersManager() {
 
     async function confirmDeleteOrder() {
         if (!orderToDelete) return;
+        setActionLoading(true);
         try {
             const { error } = await supabase.from('orders').delete().eq('id', orderToDelete.id);
             if (error) throw error;
+            showFeedback('success', `Orden #${orderToDelete.order_id} eliminada permanentemente.`);
             fetchOrders();
             setOrderToDelete(null);
         } catch (e) {
-            alert('Error eliminando permanentemente: ' + e.message);
+            showFeedback('error', 'Error eliminando pedido: ' + e.message);
+        } finally {
+            setActionLoading(false);
         }
     }
 
-    async function emptyTrash() {
-        if (!window.confirm('¿Estás seguro de que deseas vaciar la papelera? Se eliminarán todos los pedidos en ella de forma permanente.')) return;
+    async function confirmEmptyTrash() {
+        setShowEmptyTrashModal(false);
+        setActionLoading(true);
         try {
             const { error } = await supabase.from('orders').delete().eq('status', 'deleted');
             if (error) throw error;
+            showFeedback('success', 'Papelera vaciada permanentemente.');
             fetchOrders();
         } catch (e) {
-            alert('Error vaciando papelera: ' + e.message);
+            showFeedback('error', 'Error vaciando papelera: ' + e.message);
+        } finally {
+            setActionLoading(false);
         }
     }
 
@@ -136,6 +155,28 @@ export default function OrdersManager() {
         const message = TEMPLATES[templateType];
         window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
         setContactOrder(null);
+    };
+
+    /* ===== Helper to format Order Date cleanly ===== */
+    const formatOrderDate = (order) => {
+        let dateStr = order?.created_at;
+        if (!dateStr) {
+            try {
+                const parsed = JSON.parse(order?.notes || '{}');
+                if (parsed?.historial?.length > 0) {
+                    dateStr = parsed.historial[0].created_at;
+                }
+            } catch {
+                // ignore
+            }
+        }
+        if (!dateStr) return 'Fecha no disponible';
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return 'Fecha no disponible';
+        return d.toLocaleDateString('es-VE', { 
+            year: 'numeric', month: 'short', day: 'numeric', 
+            hour: '2-digit', minute: '2-digit' 
+        });
     };
 
     /* ===== Helper to detect Carrier & Mode ===== */
@@ -228,6 +269,27 @@ export default function OrdersManager() {
                 </button>
             </div>
 
+            {/* Flash Feedback Banner */}
+            {feedbackMsg && (
+                <div className={`p-4 rounded-2xl text-xs sm:text-sm font-bold flex items-center justify-between shadow-xs animate-fadeIn ${
+                    feedbackMsg.type === 'success' 
+                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
+                        : 'bg-rose-50 text-rose-800 border border-rose-200'
+                }`}>
+                    <div className="flex items-center gap-2">
+                        {feedbackMsg.type === 'success' ? (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        ) : (
+                            <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                        )}
+                        <span>{feedbackMsg.text}</span>
+                    </div>
+                    <button onClick={() => setFeedbackMsg(null)} className="text-gray-400 hover:text-gray-600 font-bold ml-2">
+                        <X className="w-4 h-4" />
+                    </button>
+                </div>
+            )}
+
             {/* Filter Pills and Search Bar */}
             <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center">
                 {/* Status Pills */}
@@ -264,7 +326,7 @@ export default function OrdersManager() {
             {filterStatus === 'deleted' && filteredOrders.length > 0 && (
                 <div className="flex justify-end">
                     <button 
-                        onClick={emptyTrash} 
+                        onClick={() => setShowEmptyTrashModal(true)} 
                         className="px-4 py-2 text-red-600 hover:text-white hover:bg-red-600 text-xs font-bold border border-red-200 rounded-2xl transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
                     >
                         <Trash2 className="w-4 h-4" />
@@ -328,12 +390,9 @@ export default function OrdersManager() {
                                             </span>
                                         </div>
 
-                                        <p className="text-xs text-gray-500 flex items-center gap-1.5">
+                                        <p className="text-xs text-gray-500 flex items-center gap-1.5 font-medium">
                                             <Clock className="w-3.5 h-3.5 text-gray-400" />
-                                            {new Date(order.created_at).toLocaleDateString('es-VE', { 
-                                                year: 'numeric', month: 'short', day: 'numeric', 
-                                                hour: '2-digit', minute: '2-digit' 
-                                            })}
+                                            <span>{formatOrderDate(order)}</span>
                                         </p>
                                     </div>
 
@@ -511,29 +570,35 @@ export default function OrdersManager() {
                 </div>
             )}
 
-            {/* Delete Modal */}
-            {orderToDelete && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-xs" onClick={() => setOrderToDelete(null)} />
-                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm relative z-10 overflow-hidden p-6 text-center animate-scaleIn">
-                        <div className="w-12 h-12 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                            <Trash2 className="w-6 h-6" />
-                        </div>
-                        <h3 className="font-extrabold text-base text-gray-950 mb-1">¿Eliminar permanentemente?</h3>
-                        <p className="text-xs text-gray-500 mb-5">
-                            Estás a punto de eliminar permanentemente la orden <strong>#{orderToDelete.order_id}</strong>. Esta acción no se puede deshacer.
-                        </p>
-                        <div className="flex gap-3">
-                            <button onClick={() => setOrderToDelete(null)} className="flex-1 py-2.5 rounded-2xl border border-gray-200 text-xs font-extrabold text-gray-700 hover:bg-slate-50 cursor-pointer">
-                                Cancelar
-                            </button>
-                            <button onClick={confirmDeleteOrder} className="flex-1 py-2.5 rounded-2xl bg-red-600 text-white text-xs font-black hover:bg-red-700 shadow-md shadow-red-600/20 cursor-pointer">
-                                Sí, eliminar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Delete Single Order Modal */}
+            <ConfirmModal
+                isOpen={!!orderToDelete}
+                onClose={() => setOrderToDelete(null)}
+                onConfirm={confirmDeleteOrder}
+                title="¿Eliminar orden permanentemente?"
+                message={`Estás a punto de eliminar de forma definitiva la orden #${orderToDelete?.order_id || ''}. Esta acción no se puede deshacer.`}
+                confirmText="Sí, eliminar orden"
+                cancelText="Cancelar"
+                confirmColor="bg-red-600 hover:bg-red-700"
+                icon="delete_forever"
+                iconBg="bg-red-100 text-red-600"
+                loading={actionLoading}
+            />
+
+            {/* Empty Trash Confirmation Modal */}
+            <ConfirmModal
+                isOpen={showEmptyTrashModal}
+                onClose={() => setShowEmptyTrashModal(false)}
+                onConfirm={confirmEmptyTrash}
+                title="¿Vaciar la papelera de pedidos?"
+                message="Se eliminarán todos los pedidos en la papelera de forma permanente e irrecuperable."
+                confirmText="Sí, vaciar papelera"
+                cancelText="Cancelar"
+                confirmColor="bg-red-600 hover:bg-red-700"
+                icon="delete_sweep"
+                iconBg="bg-red-100 text-red-600"
+                loading={actionLoading}
+            />
         </div>
     );
 }

@@ -3,6 +3,7 @@ import { useCurrency } from '../../context/CurrencyContext';
 import ProductFilters from './product-list/ProductFilters';
 import ProductBulkActions from './product-list/ProductBulkActions';
 import ProductTable from './product-list/ProductTable';
+import ConfirmModal from './ConfirmModal';
 
 /**
  * ProductList v3.0 (Modularized)
@@ -16,6 +17,8 @@ export default function ProductList({ products, onEdit, onDelete, onRefresh, onT
     const [selectedIds, setSelectedIds] = useState(new Set());
     const [sortBy, setSortBy] = useState('name');
     const [sortDir, setSortDir] = useState('asc');
+    const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+    const [bulkDeleting, setBulkDeleting] = useState(false);
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
@@ -101,12 +104,22 @@ export default function ProductList({ products, onEdit, onDelete, onRefresh, onT
         setSelectedIds(new Set());
     }
 
-    async function handleBulkDelete() {
-        if (!window.confirm(`¿Eliminar ${selectedIds.size} productos permanentemente?`)) return;
-        for (const id of selectedIds) {
-            await onDelete(id);
+    function handleBulkDelete() {
+        if (selectedIds.size === 0) return;
+        setShowBulkDeleteModal(true);
+    }
+
+    async function confirmBulkDelete() {
+        setBulkDeleting(true);
+        try {
+            for (const id of selectedIds) {
+                await onDelete(id);
+            }
+            setSelectedIds(new Set());
+            setShowBulkDeleteModal(false);
+        } finally {
+            setBulkDeleting(false);
         }
-        setSelectedIds(new Set());
     }
 
     return (
@@ -152,6 +165,21 @@ export default function ProductList({ products, onEdit, onDelete, onRefresh, onT
                 onToggleFeatured={onToggleFeatured}
                 onClone={onClone}
                 formatPrice={formatPrice}
+            />
+
+            {/* Bulk Delete Confirmation Modal */}
+            <ConfirmModal
+                isOpen={showBulkDeleteModal}
+                onClose={() => setShowBulkDeleteModal(false)}
+                onConfirm={confirmBulkDelete}
+                title={`¿Eliminar ${selectedIds.size} productos?`}
+                message="Esta acción eliminará de forma permanente los productos seleccionados de tu base de datos y no se podrá deshacer."
+                confirmText="Sí, eliminar seleccionados"
+                cancelText="Cancelar"
+                confirmColor="bg-red-600 hover:bg-red-700"
+                icon="delete_sweep"
+                iconBg="bg-red-100 text-red-600"
+                loading={bulkDeleting}
             />
         </div>
     );

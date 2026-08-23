@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useCurrency } from "../../context/CurrencyContext";
+import ConfirmModal from "./ConfirmModal";
 import { 
     LayoutDashboard, Package, ShoppingBag, RefreshCw, 
     Users, BarChart3, Activity, Settings, 
@@ -19,12 +21,11 @@ const menuItems = [
 
 export default function AdminSidebar({ activeTab, setActiveTab, collapsed, setCollapsed }) {
     const { exchangeRate } = useCurrency();
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-    const handleLogout = () => {
-        if (confirm('¿Cerrar sesión de administrador?')) {
-            sessionStorage.removeItem('admin_auth');
-            window.location.reload();
-        }
+    const handleConfirmLogout = () => {
+        sessionStorage.removeItem('admin_auth');
+        window.location.reload();
     };
 
     return (
@@ -103,7 +104,7 @@ export default function AdminSidebar({ activeTab, setActiveTab, collapsed, setCo
                     </button>
 
                     <button
-                        onClick={handleLogout}
+                        onClick={() => setShowLogoutModal(true)}
                         className="p-2 text-red-400 hover:text-red-300 hover:bg-red-950/40 rounded-xl transition-colors cursor-pointer"
                         title="Cerrar Sesión"
                     >
@@ -111,6 +112,20 @@ export default function AdminSidebar({ activeTab, setActiveTab, collapsed, setCo
                     </button>
                 </div>
             </div>
+
+            {/* Logout Confirmation Modal */}
+            <ConfirmModal
+                isOpen={showLogoutModal}
+                onClose={() => setShowLogoutModal(false)}
+                onConfirm={handleConfirmLogout}
+                title="¿Cerrar sesión de administrador?"
+                message="Tendrás que ingresar tu contraseña nuevamente para acceder al panel."
+                confirmText="Cerrar Sesión"
+                cancelText="Cancelar"
+                confirmColor="bg-rose-600 hover:bg-rose-700"
+                icon="logout"
+                iconBg="bg-rose-100 text-rose-600"
+            />
         </aside>
     );
 }

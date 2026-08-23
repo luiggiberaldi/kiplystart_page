@@ -1,6 +1,7 @@
 import CODField from './CODField';
+import CustomSelect from './CustomSelect';
 import { ZONES } from './codData';
-import { ArrowLeft, MapPin, Building2, Home, Navigation, ChevronDown, Clock, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, MapPin, Building2, Home, Navigation, Clock, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 export default function CODStepDelivery({
     formData, errors, handleChange, handleBlur, fieldBorder, getFieldStatus,
@@ -29,15 +30,17 @@ export default function CODStepDelivery({
             {/* State */}
             <CODField label="Estado" icon={MapPin} name="state"
                 error={errors.state} status={getFieldStatus('state')} borderClass={fieldBorder('state')}>
-                <select name="state" value={formData.state} onChange={handleChange}
+                <CustomSelect 
+                    name="state" 
+                    value={formData.state} 
+                    onChange={(e) => {
+                        handleChange(e);
+                        handleChange({ target: { name: 'city', value: '' } });
+                    }}
                     onBlur={() => handleBlur('state')}
-                    className="flex-1 outline-none text-sm font-semibold text-gray-950 bg-transparent appearance-none cursor-pointer">
-                    <option value="">Selecciona tu estado...</option>
-                    {ZONES.map(z => (
-                        <option key={z.state} value={z.state}>{z.state}</option>
-                    ))}
-                </select>
-                <ChevronDown className="w-4 h-4 text-gray-400 pointer-events-none" />
+                    options={ZONES.map(z => z.state)}
+                    placeholder="Selecciona tu estado..."
+                />
             </CODField>
 
             {/* City (dynamic) */}
@@ -45,15 +48,14 @@ export default function CODStepDelivery({
                 <div className="animate-fadeIn">
                     <CODField label="Ciudad / Municipio" icon={Building2} name="city"
                         error={errors.city} status={getFieldStatus('city')} borderClass={fieldBorder('city')}>
-                        <select name="city" value={formData.city} onChange={handleChange}
+                        <CustomSelect 
+                            name="city" 
+                            value={formData.city} 
+                            onChange={handleChange}
                             onBlur={() => handleBlur('city')}
-                            className="flex-1 outline-none text-sm font-semibold text-gray-950 bg-transparent appearance-none cursor-pointer">
-                            <option value="">Selecciona tu ciudad...</option>
-                            {cities.map(c => (
-                                <option key={c} value={c}>{c}</option>
-                            ))}
-                        </select>
-                        <ChevronDown className="w-4 h-4 text-gray-400 pointer-events-none" />
+                            options={cities}
+                            placeholder="Selecciona tu ciudad..."
+                        />
                     </CODField>
                 </div>
             )}

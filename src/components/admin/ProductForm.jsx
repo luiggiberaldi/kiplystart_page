@@ -29,6 +29,7 @@ export default function ProductForm({ onSuccess, editingProduct = null, onCancel
     const [formData, setFormData] = useState(DEFAULT_STATE);
     const [loading, setLoading] = useState(false);
     const [uploadingVideo, setUploadingVideo] = useState(false);
+    const [videoError, setVideoError] = useState(null);
 
     const categories = ['General', 'Electrónica', 'Accesorios', 'Hogar', 'Deportes', 'Belleza', 'Moda', 'Tecnología'];
 
@@ -105,17 +106,18 @@ export default function ProductForm({ onSuccess, editingProduct = null, onCancel
     const handleVideoUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
+        setVideoError(null);
 
         // Validate file type (mp4, webm) matching bucket config
         if (!['video/mp4', 'video/webm'].includes(file.type)) {
-            alert('Solo se permiten archivos MP4 y WebM.');
+            setVideoError('Formato no soportado. Solo se permiten videos en formato MP4 o WebM.');
             return;
         }
 
         // Validate file size (max 100MB)
         const maxSize = 100 * 1024 * 1024; // 100MB
         if (file.size > maxSize) {
-            alert('El archivo es demasiado grande. El límite es 100MB.');
+            setVideoError('El archivo excede el tamaño máximo permitido de 100MB.');
             return;
         }
 
@@ -138,9 +140,10 @@ export default function ProductForm({ onSuccess, editingProduct = null, onCancel
                 .getPublicUrl(filePath);
 
             setFormData(prev => ({ ...prev, video_url: publicUrl }));
+            setVideoError(null);
         } catch (error) {
             console.error('Error uploading video:', error);
-            alert(`Error al subir el video: ${error.message || 'Error desconocido'}`);
+            setVideoError(`Error al subir el video: ${error.message || 'Error desconocido'}`);
         } finally {
             setUploadingVideo(false);
         }
@@ -215,6 +218,18 @@ export default function ProductForm({ onSuccess, editingProduct = null, onCancel
                             )}
                         </div>
                     )}
+
+                    {/* Video Error Message */}
+                    {videoError && (
+                        <div className="mt-2 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs font-bold text-rose-800 flex items-center justify-between animate-fadeIn">
+                            <div className="flex items-center gap-2">
+                                <span className="material-symbols-outlined text-[18px] text-rose-600 shrink-0">error</span>
+                                <span>{videoError}</span>
+                            </div>
+                            <button type="button" onClick={() => setVideoError(null)} className="text-rose-400 hover:text-rose-700 font-bold ml-2">×</button>
+                        </div>
+                    )}
+
                     {/* Hidden input to store URL just in case */}
                     <input type="hidden" name="video_url" value={formData.video_url} />
                 </div>

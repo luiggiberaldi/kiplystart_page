@@ -188,16 +188,17 @@ export default function AdminPortal() {
         }
     }
 
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
+
     function showMessage(type, text) {
         setMessage({ type, text });
         setTimeout(() => setMessage(null), 4000);
     }
 
     function handleLogout() {
-        if (confirm('¿Deseas cerrar sesión del Panel Admin?')) {
-            sessionStorage.removeItem('admin_auth');
-            setAuthenticated(false);
-        }
+        sessionStorage.removeItem('admin_auth');
+        setAuthenticated(false);
+        setShowLogoutModal(false);
     }
 
     function openNewProduct() {
@@ -263,7 +264,7 @@ export default function AdminPortal() {
                             </Link>
 
                             <button
-                                onClick={handleLogout}
+                                onClick={() => setShowLogoutModal(true)}
                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer"
                                 title="Cerrar sesión"
                             >
@@ -411,6 +412,20 @@ export default function AdminPortal() {
                         message={`"${deleteTarget?.name || ''}" será eliminado permanentemente de tu catálogo. Esta acción no se puede deshacer.`}
                         confirmText="Eliminar permanentemente"
                         icon="delete_forever"
+                    />
+
+                    {/* Logout Confirmation Modal */}
+                    <ConfirmModal
+                        isOpen={showLogoutModal}
+                        onClose={() => setShowLogoutModal(false)}
+                        onConfirm={handleLogout}
+                        title="¿Deseas cerrar sesión del Panel Admin?"
+                        message="Tendrás que ingresar tu contraseña nuevamente para acceder a la gestión de la tienda."
+                        confirmText="Cerrar Sesión"
+                        cancelText="Cancelar"
+                        confirmColor="bg-rose-600 hover:bg-rose-700"
+                        icon="logout"
+                        iconBg="bg-rose-100 text-rose-600"
                     />
 
                     {/* New Order Notification Toast */}
