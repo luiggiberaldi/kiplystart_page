@@ -8,6 +8,12 @@ import TrustBar from '../components/TrustBar';
 import FeaturedCarousel from '../components/FeaturedCarousel';
 import WhatsAppFloat from '../components/WhatsAppFloat';
 
+// Neuromarketing & High Conversion Components
+import ZeroRiskBanner from '../components/home/ZeroRiskBanner';
+import FlashDealsSection from '../components/home/FlashDealsSection';
+import CuratedBentoGrid from '../components/home/CuratedBentoGrid';
+import DeliveryEstimator from '../components/home/DeliveryEstimator';
+
 // Lazy-load below-the-fold sections for performance
 const CategoryGrid = lazy(() => import('../components/CategoryGrid'));
 const CODBanner = lazy(() => import('../components/CODBanner'));
@@ -76,25 +82,40 @@ const Home = () => {
             {/* 1. Hero Section (Video + Stats Bar) */}
             <VideoHero />
 
-            <main className="max-w-md mx-auto md:max-w-7xl">
+            <main className="max-w-md mx-auto md:max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-12 my-6 sm:my-10">
 
-                {/* 2. TrustBar 2.0 — "Pides → Recibes → Pagas" + payment methods */}
-                <section className="px-6 py-8">
+                {/* 2. TrustBar 2.0 — Quick Trust Signals */}
+                <section>
                     <TrustBar />
                 </section>
 
-                {/* 3. Category Grid — Visual navigation */}
-                <Suspense fallback={<SectionSkeleton />}>
-                    <CategoryGrid />
-                </Suspense>
+                {/* 3. Neuromarketing: Zero Risk Reversal Banner */}
+                <section>
+                    <ZeroRiskBanner />
+                </section>
 
-                {/* 4. Featured Products Carousel */}
-                <section className="px-6 py-8 flex flex-col gap-6">
+                {/* 4. Neuromarketing: 24h Flash Deals with Live Countdown */}
+                <section>
+                    <FlashDealsSection products={featuredProducts} />
+                </section>
+
+                {/* 5. Neuromarketing: Curated Bento Grid Collections */}
+                <section>
+                    <CuratedBentoGrid />
+                </section>
+
+                {/* 6. Featured Products Carousel */}
+                <section className="flex flex-col gap-6">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-brand-blue text-[24px] md:text-[28px] font-extrabold tracking-tight">
-                            🔥 Productos Destacados
-                        </h2>
-                        <Link to="/catalogo" className="text-steel-blue text-sm font-bold hover:underline shrink-0">
+                        <div>
+                            <span className="text-xs font-black text-brand-red uppercase tracking-wider">
+                                Preferidos por los Clientes
+                            </span>
+                            <h2 className="text-brand-blue text-[24px] md:text-[28px] font-extrabold tracking-tight">
+                                🔥 Más Vendidos de la Semana
+                            </h2>
+                        </div>
+                        <Link to="/catalogo" className="text-[#0A2463] text-sm font-extrabold hover:underline shrink-0">
                             Ver todos →
                         </Link>
                     </div>
@@ -102,7 +123,7 @@ const Home = () => {
                     {loading ? (
                         <div className="flex gap-4 overflow-hidden">
                             {[1, 2, 3, 4].map((n) => (
-                                <div key={n} className="bg-white rounded-lg h-80 w-[72%] sm:w-[48%] md:w-[32%] lg:w-[24%] shrink-0 animate-pulse"></div>
+                                <div key={n} className="bg-white rounded-2xl h-80 w-[72%] sm:w-[48%] md:w-[32%] lg:w-[24%] shrink-0 animate-pulse"></div>
                             ))}
                         </div>
                     ) : (
@@ -110,12 +131,22 @@ const Home = () => {
                     )}
                 </section>
 
-                {/* 5. COD Education Banner */}
+                {/* 7. Interactive Delivery & Transit Estimator for Venezuela */}
+                <section>
+                    <DeliveryEstimator />
+                </section>
+
+                {/* 8. Category Grid — Visual navigation */}
+                <Suspense fallback={<SectionSkeleton />}>
+                    <CategoryGrid />
+                </Suspense>
+
+                {/* 9. COD Education Banner */}
                 <Suspense fallback={<SectionSkeleton />}>
                     <CODBanner />
                 </Suspense>
 
-                {/* 5b. Live Tracking Banner */}
+                {/* 10. Live Tracking Banner */}
                 <Suspense fallback={<SectionSkeleton />}>
                     <HomeTrackingBanner />
                 </Suspense>

@@ -51,6 +51,8 @@ import { CartProvider } from './context/CartContext';
 import { SettingsProvider } from './context/SettingsContext';
 import CartDrawer from './components/cart/CartDrawer';
 import FacebookPixel from './components/FacebookPixel';
+import LiveSalesToast from './components/home/LiveSalesToast';
+import MobileBottomNav from './components/MobileBottomNav';
 
 function PageTracker() {
   usePageTracker();
@@ -64,6 +66,8 @@ function App() {
         <Router>
           <PageTracker />
           <FacebookPixel />
+          <LiveSalesToast />
+          <MobileBottomNav />
           <Suspense fallback={<PageLoader />}>
             <CartDrawer />
             <Routes>
