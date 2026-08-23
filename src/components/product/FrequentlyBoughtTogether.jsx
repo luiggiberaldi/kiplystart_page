@@ -3,6 +3,48 @@ import { Plus, Zap, Sparkles, ArrowRight } from 'lucide-react';
 import { useCurrency } from '../../context/CurrencyContext';
 import { supabase } from '../../lib/supabaseClient';
 
+/**
+ * Semantic niche rules to ensure 100% logical and contextual pairings
+ */
+const NICHE_RULES = [
+    {
+        id: 'moto_tactical',
+        test: (s) => /motorizado|moto|piernera|t[aá]ctico|pechera|rider|casco/i.test(s),
+        matchKeywords: ['moto', 'compresor', 'guante', 'soporte', 'táctico', 'tactico', 'linterna', 'impermeable', 'herramienta'],
+        forbiddenKeywords: ['guess', 'dama', 'maquillaje', 'skincare', 'tana', 'vestido', 'femenino']
+    },
+    {
+        id: 'car_automotive',
+        test: (s) => /carro|auto|veh[ií]culo|parabrisas|esponja|cargador|compresor|pomo|palanca|lubristone|faros|h4/i.test(s),
+        matchKeywords: ['carro', 'auto', 'esponja', 'compresor', 'cargador', 'pomo', 'lubristone', 'toalla', 'parabrisas', 'vidrio'],
+        forbiddenKeywords: ['dama', 'maquillaje', 'skincare', 'guess', 'semilla', 'calabaza', 'depiladora']
+    },
+    {
+        id: 'health_sleep',
+        test: (s) => /nox|nasal|ronquido|roncar|sue[ñn]o|respirar|salud|dolor|postura/i.test(s),
+        matchKeywords: ['nox', 'nasal', 'salud', 'sueño', 'masajeador', 'postura', 'spray'],
+        forbiddenKeywords: ['carro', 'auto', 'moto', 'pomo', 'cargador 12v', 'compresor']
+    },
+    {
+        id: 'women_fashion',
+        test: (s) => /cartera|shoulder|guess|tote|monedero|dama|mujer|tana/i.test(s),
+        matchKeywords: ['cartera', 'bolso', 'billetera', 'monedero', 'accesorio', 'perfume', 'reloj dama'],
+        forbiddenKeywords: ['motorizado', 'cargador 12v', 'pomo', 'compresor']
+    },
+    {
+        id: 'beauty_skincare',
+        test: (s) => /serum|facial|skincare|cepillo secador|depiladora|belleza|cabello/i.test(s),
+        matchKeywords: ['serum', 'facial', 'belleza', 'cepillo', 'depiladora', 'mascarilla', 'crema'],
+        forbiddenKeywords: ['carro', 'moto', 'pomo', 'batería 12v', 'compresor']
+    },
+    {
+        id: 'tech_gadgets',
+        test: (s) => /reloj|smartwatch|t900|z59|ultra|aud[ií]fono|bluetooth|tws|parlante/i.test(s),
+        matchKeywords: ['reloj', 'smartwatch', 'audífono', 'auricular', 'soporte', 'cable', 'cargador'],
+        forbiddenKeywords: ['cartera dama', 'vestido', 'semilla']
+    }
+];
+
 export default function FrequentlyBoughtTogether({ product, onSelectCombo }) {
     const { formatUSD, formatBs } = useCurrency();
     const [pairedProduct, setPairedProduct] = useState(null);
@@ -14,46 +56,62 @@ export default function FrequentlyBoughtTogether({ product, onSelectCombo }) {
         async function findComplementaryProduct() {
             try {
                 setLoading(true);
-                const s = (product.slug || product.name || '').toLowerCase();
-                const targetCategory = product.category;
+                const s = `${product.slug || ''} ${product.name || ''} ${product.category || ''}`.toLowerCase();
+                const mainPrice = Number(product.price) || 20;
 
-                // 1. Strictly query products from the SAME CATEGORY
-                let query = supabase
+                // 1. Identify product niche
+                const activeNiche = NICHE_RULES.find(rule => rule.test(s));
+
+                // 2. Fetch active catalog products excluding the current product
+                const { data: allActive, error } = await supabase
                     .from('products')
                     .select('id, name, slug, price, compare_at_price, image_url, category')
                     .eq('is_active', true)
-                    .neq('id', product.id);
+                    .neq('id', product.id)
+                    .limit(60);
 
-                if (targetCategory) {
-                    query = query.eq('category', targetCategory);
-                }
-
-                const { data, error } = await query.limit(20);
-
-                if (error || !data || data.length === 0) {
-                    // Fallback only if category name has related keywords (e.g. Carro / Auto)
-                    const isCar = s.includes('carro') || s.includes('auto') || (targetCategory || '').toLowerCase().includes('carro');
-                    if (isCar) {
-                        const { data: carData } = await supabase
-                            .from('products')
-                            .select('id, name, slug, price, compare_at_price, image_url, category')
-                            .eq('is_active', true)
-                            .neq('id', product.id)
-                            .ilike('category', '%carro%')
-                            .limit(10);
-                        
-                        if (carData && carData.length > 0) {
-                            selectBestMatch(s, carData);
-                            return;
-                        }
-                    }
-
-                    // If no related products exist in the same category, do not show unrelated combo
+                if (error || !allActive || allActive.length === 0) {
                     setPairedProduct(null);
                     return;
                 }
 
-                selectBestMatch(s, data);
+                // 3. Price Filter: Complementary product must NOT be absurdly more expensive than main item
+                // (Max 1.4x of main price, or max $45 for impulse combo buying)
+                const priceFiltered = allActive.filter(p => {
+                    const pPrice = Number(p.price) || 0;
+                    return pPrice > 0 && pPrice <= Math.max(mainPrice * 1.4, 40) && pPrice >= 8;
+                });
+
+                let bestMatch = null;
+
+                if (activeNiche) {
+                    // Filter candidates that match niche keywords and don't contain forbidden terms
+                    const nicheCandidates = priceFiltered.filter(p => {
+                        const candidateText = `${p.slug} ${p.name} ${p.category}`.toLowerCase();
+                        
+                        // Reject forbidden keywords
+                        if (activeNiche.forbiddenKeywords.some(f => candidateText.includes(f))) {
+                            return false;
+                        }
+
+                        // Must match at least one niche keyword
+                        return activeNiche.matchKeywords.some(k => candidateText.includes(k));
+                    });
+
+                    if (nicheCandidates.length > 0) {
+                        // Prioritize items with closest price ratio or specific complement
+                        bestMatch = nicheCandidates[0];
+                    }
+                } else if (product.category) {
+                    // Fallback to same exact category if no specific niche rule, but WITH strict price check
+                    const sameCatCandidates = priceFiltered.filter(p => p.category === product.category);
+                    if (sameCatCandidates.length > 0) {
+                        bestMatch = sameCatCandidates[0];
+                    }
+                }
+
+                // If no logical match found, set null to cleanly hide the combo module
+                setPairedProduct(bestMatch || null);
             } catch (err) {
                 console.error('Error loading complementary product:', err);
                 setPairedProduct(null);
@@ -62,28 +120,10 @@ export default function FrequentlyBoughtTogether({ product, onSelectCombo }) {
             }
         }
 
-        function selectBestMatch(currentSlug, candidates) {
-            let matched = null;
-
-            // Smart pairings within the same category
-            if (currentSlug.includes('esponja') || currentSlug.includes('vidrio') || currentSlug.includes('oil film')) {
-                matched = candidates.find(p => p.slug.includes('compresor') || p.slug.includes('cargador') || p.slug.includes('pomo') || p.slug.includes('toalla'));
-            } else if (currentSlug.includes('cargador') || currentSlug.includes('bateria')) {
-                matched = candidates.find(p => p.slug.includes('compresor') || p.slug.includes('esponja') || p.slug.includes('pomo'));
-            } else if (currentSlug.includes('compresor')) {
-                matched = candidates.find(p => p.slug.includes('cargador') || p.slug.includes('bateria') || p.slug.includes('esponja'));
-            } else if (currentSlug.includes('pomo') || currentSlug.includes('palanca')) {
-                matched = candidates.find(p => p.slug.includes('esponja') || p.slug.includes('compresor') || p.slug.includes('cargador'));
-            } else if (currentSlug.includes('nox') || currentSlug.includes('nasal')) {
-                matched = candidates.find(p => p.slug !== product.slug);
-            }
-
-            setPairedProduct(matched || candidates[0] || null);
-        }
-
         findComplementaryProduct();
     }, [product]);
 
+    // If no logical pairing exists, hide the module entirely (never show bizarre pairings)
     if (loading || !pairedProduct || !product) return null;
 
     // Combo pricing calculations (15% bundle discount on the pair)
@@ -113,7 +153,7 @@ export default function FrequentlyBoughtTogether({ product, onSelectCombo }) {
                         <span>Frecuentemente Comprados Juntos</span>
                     </div>
                     <h3 className="text-lg sm:text-xl font-black text-white tracking-tight">
-                        Lleva el Combo de {product.category || 'la misma categoría'} y Ahorra ${savings} USD
+                        Lleva el Combo Completo y Ahorra ${savings} USD
                     </h3>
                 </div>
                 <span className="text-xs font-bold text-emerald-300 bg-emerald-500/20 border border-emerald-400/30 px-3 py-1 rounded-full w-fit">
