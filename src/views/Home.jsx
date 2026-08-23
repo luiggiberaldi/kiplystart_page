@@ -1,7 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Link } from 'react-router-dom';
-import { TrendingUp } from 'lucide-react';
+import { TrendingUp, Watch, Car, Sparkles } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import VideoHero from '../components/VideoHero';
@@ -38,9 +38,9 @@ const SectionSkeleton = () => (
  * Ordered by priority — only the top 3 categories are shown.
  */
 const topCategories = [
-    { name: 'Relojes & Accesorios', emoji: '⌚' },
-    { name: 'Accesorios para Carros', emoji: '🚗' },
-    { name: 'Belleza & Skincare', emoji: '✨' },
+    { name: 'Relojes & Accesorios', icon: Watch },
+    { name: 'Accesorios para Carros', icon: Car },
+    { name: 'Belleza & Skincare', icon: Sparkles },
 ];
 
 /**
@@ -157,31 +157,31 @@ const Home = () => {
                     <HomeTrackingBanner />
                 </Suspense>
 
-                {/* 6. Category Product Rows */}
+                {/* 9. Category Product Rows */}
                 <Suspense fallback={<SectionSkeleton />}>
                     <section className="px-6 py-4">
                         {topCategories.map(cat => (
-                            <CategoryRow key={cat.name} category={cat.name} emoji={cat.emoji} />
+                            <CategoryRow key={cat.name} category={cat.name} icon={cat.icon} />
                         ))}
                     </section>
                 </Suspense>
 
-                {/* 7. Testimonials + Business Metrics */}
+                {/* 10. Testimonials + Business Metrics */}
                 <Suspense fallback={<SectionSkeleton />}>
                     <TestimonialsSection />
                 </Suspense>
 
-                {/* 8. Coverage Map */}
+                {/* 11. Detailed Coverage Section */}
                 <Suspense fallback={<SectionSkeleton />}>
                     <CoverageSection />
                 </Suspense>
 
-                {/* 9. FAQ — COD Questions */}
+                {/* 12. FAQ — COD Questions */}
                 <Suspense fallback={<SectionSkeleton />}>
                     <FAQSection />
                 </Suspense>
 
-                {/* 10. Brand Story CTA */}
+                {/* 13. Brand Story CTA */}
                 <Suspense fallback={<SectionSkeleton />}>
                     <BrandStoryCTA />
                 </Suspense>

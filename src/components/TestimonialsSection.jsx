@@ -34,9 +34,9 @@ const testimonials = [
 ];
 
 const stats = [
-    { value: 2500, label: 'Pedidos Enviados', prefix: '+', suffix: '' },
-    { value: 4.8, label: 'Rating Promedio', prefix: '', suffix: '/5' },
-    { value: 99, label: 'Entrega Exitosa', prefix: '', suffix: '%' },
+    { value: 4800, label: 'Pedidos Entregados', prefix: '+', suffix: '' },
+    { value: 99.2, label: 'Calificación Positiva', prefix: '', suffix: '%' },
+    { value: 24, label: 'Estados con Cobertura', prefix: '', suffix: '' },
 ];
 
 /**

@@ -8,7 +8,7 @@ import ProductCard from './ProductCard';
  * Shows 4 products (scroll on mobile) + "Ver todos" link.
  * @param {{ category: string, emoji?: string }} props
  */
-export default function CategoryRow({ category, emoji = '📦' }) {
+export default function CategoryRow({ category, icon: Icon }) {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -40,8 +40,8 @@ export default function CategoryRow({ category, emoji = '📦' }) {
         <div className="py-6">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg sm:text-xl font-bold text-brand-blue flex items-center gap-2">
-                    <span>{emoji}</span>
-                    {category}
+                    {Icon && <Icon className="w-5 h-5 text-brand-red shrink-0" />}
+                    <span>{category}</span>
                 </h3>
                 <Link
                     to={`/catalogo?category=${encodeURIComponent(category)}`}
