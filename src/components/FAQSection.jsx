@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 
 const faqs = [
     {
@@ -7,7 +8,7 @@ const faqs = [
     },
     {
         q: '¿Cuánto tarda el envío?',
-        a: 'Caracas y zona metropolitana: 24 horas. Interior del país: 24 a 48 horas. Todos los envíos son GRATIS.'
+        a: 'Caracas: Express en 60 Minutos. Resto del país: 24 a 48 horas vía Tealca. Todos los envíos a domicilio son 100% GRATIS.'
     },
     {
         q: '¿Qué métodos de pago aceptan al momento de recibir?',
@@ -32,15 +33,13 @@ function AccordionItem({ faq, isOpen, onToggle }) {
         <div className="border-b border-gray-100 last:border-b-0">
             <button
                 onClick={onToggle}
-                className="flex items-center justify-between w-full py-5 px-1 text-left group"
+                className="flex items-center justify-between w-full py-5 px-1 text-left group cursor-pointer"
                 aria-expanded={isOpen}
             >
                 <span className="text-[15px] sm:text-base font-semibold text-soft-black pr-4 group-hover:text-brand-blue transition-colors">
                     {faq.q}
                 </span>
-                <span className={`material-symbols-outlined text-brand-blue shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
-                    expand_more
-                </span>
+                <ChevronDown className={`w-5 h-5 text-brand-blue shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
             </button>
             <div
                 className={`grid transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}

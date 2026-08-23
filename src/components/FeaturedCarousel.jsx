@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import ProductCard from './ProductCard';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 /**
  * FeaturedCarousel – infinite auto-scrolling product carousel.
@@ -109,17 +110,17 @@ export default function FeaturedCarousel({ products = [] }) {
                 <>
                     <button
                         onClick={goPrev}
-                        className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 z-10 w-10 h-10 bg-white/90 backdrop-blur shadow-lg rounded-full items-center justify-center text-brand-blue hover:bg-white hover:scale-110 transition-all"
+                        className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 z-10 w-10 h-10 bg-white/90 backdrop-blur shadow-lg rounded-full items-center justify-center text-brand-blue hover:bg-white hover:scale-110 transition-all cursor-pointer"
                         aria-label="Anterior"
                     >
-                        <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+                        <ChevronLeft className="w-5 h-5 text-brand-blue" />
                     </button>
                     <button
                         onClick={goNext}
-                        className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 z-10 w-10 h-10 bg-white/90 backdrop-blur shadow-lg rounded-full items-center justify-center text-brand-blue hover:bg-white hover:scale-110 transition-all"
+                        className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 z-10 w-10 h-10 bg-white/90 backdrop-blur shadow-lg rounded-full items-center justify-center text-brand-blue hover:bg-white hover:scale-110 transition-all cursor-pointer"
                         aria-label="Siguiente"
                     >
-                        <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+                        <ChevronRight className="w-5 h-5 text-brand-blue" />
                     </button>
                 </>
             )}

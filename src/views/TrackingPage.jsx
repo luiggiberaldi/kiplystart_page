@@ -2,6 +2,7 @@ import { useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import TrackingWidget from '../components/tracking/TrackingWidget';
+import { ShieldCheck, Truck, Coins } from 'lucide-react';
 
 export default function TrackingPage() {
     const [searchParams] = useSearchParams();
@@ -33,7 +34,7 @@ export default function TrackingPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto mt-16 text-center">
                     <div className="p-6 rounded-2xl bg-white border border-gray-100 shadow-sm flex flex-col items-center">
                         <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
-                            <span className="material-symbols-outlined text-2xl">verified_user</span>
+                            <ShieldCheck className="w-6 h-6" />
                         </div>
                         <h3 className="font-bold text-gray-900 text-sm">Pago Seguro al Recibir</h3>
                         <p className="text-xs text-gray-500 mt-1">Verificas que tu producto esté en perfecto estado antes de pagar.</p>
@@ -41,7 +42,7 @@ export default function TrackingPage() {
 
                     <div className="p-6 rounded-2xl bg-white border border-gray-100 shadow-sm flex flex-col items-center">
                         <div className="w-12 h-12 rounded-xl bg-green-50 text-green-600 flex items-center justify-center mb-3">
-                            <span className="material-symbols-outlined text-2xl">local_shipping</span>
+                            <Truck className="w-6 h-6" />
                         </div>
                         <h3 className="font-bold text-gray-900 text-sm">Despacho 24 a 48h</h3>
                         <p className="text-xs text-gray-500 mt-1">Envíos rápidos y asegurados en toda Venezuela sin costo adicional.</p>
@@ -49,7 +50,7 @@ export default function TrackingPage() {
 
                     <div className="p-6 rounded-2xl bg-white border border-gray-100 shadow-sm flex flex-col items-center">
                         <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-3">
-                            <span className="material-symbols-outlined text-2xl">currency_exchange</span>
+                            <Coins className="w-6 h-6" />
                         </div>
                         <h3 className="font-bold text-gray-900 text-sm">Tasa Oficial BCV</h3>
                         <p className="text-xs text-gray-500 mt-1">Tu pago en Bolívares se cobra a la tasa oficial del día sin recargos.</p>
