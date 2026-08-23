@@ -34,7 +34,7 @@ export default function CategoryRow({ category, icon: Icon }) {
         fetchProducts();
     }, [category]);
 
-    if (!loading && products.length === 0) return null;
+    if (!loading && products.length <= 1) return null;
 
     return (
         <div className="py-6">

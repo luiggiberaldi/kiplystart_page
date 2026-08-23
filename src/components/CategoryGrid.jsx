@@ -42,6 +42,7 @@ export default function CategoryGrid() {
                 });
 
                 const sorted = Object.entries(counts)
+                    .filter(([, count]) => count > 1)
                     .sort(([, a], [, b]) => b - a)
                     .map(([name, count]) => ({ name, count }));
 
