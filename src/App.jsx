@@ -21,16 +21,17 @@ import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './views/Home';
 
-// Lazy-loaded routes for code splitting
-const Catalogo = React.lazy(() => import('./views/Catalogo'));
-const ProductDetail = React.lazy(() => import('./views/ProductDetail'));
+import { lazyWithRetry } from './utils/lazyWithRetry';
 
-const Terminos = React.lazy(() => import('./views/Terminos'));
-const Privacidad = React.lazy(() => import('./views/Privacidad'));
-const Soporte = React.lazy(() => import('./views/Soporte'));
-const TrackingPage = React.lazy(() => import('./views/TrackingPage'));
-const AdminPortal = React.lazy(() => import('./views/AdminPortal'));
-const NotFound = React.lazy(() => import('./views/NotFound'));
+// Lazy-loaded routes with auto-recovery for stale chunks after new deployments
+const Catalogo = lazyWithRetry(() => import('./views/Catalogo'));
+const ProductDetail = lazyWithRetry(() => import('./views/ProductDetail'));
+const Terminos = lazyWithRetry(() => import('./views/Terminos'));
+const Privacidad = lazyWithRetry(() => import('./views/Privacidad'));
+const Soporte = lazyWithRetry(() => import('./views/Soporte'));
+const TrackingPage = lazyWithRetry(() => import('./views/TrackingPage'));
+const AdminPortal = lazyWithRetry(() => import('./views/AdminPortal'));
+const NotFound = lazyWithRetry(() => import('./views/NotFound'));
 
 // Loading fallback for lazy routes
 function PageLoader() {

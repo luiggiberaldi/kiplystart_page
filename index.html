@@ -97,9 +97,28 @@
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
   <script>
+    // Vite dynamic import chunk auto-recovery upon new deployments
+    window.addEventListener('vite:preloadError', (event) => {
+      console.warn('Vite preload error detected. Reloading for latest version...', event);
+      window.location.reload();
+    });
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(() => { });
+        navigator.serviceWorker.register('/sw.js').then((reg) => {
+          // Check for new service worker on route transitions / updates
+          reg.onupdatefound = () => {
+            const installingWorker = reg.installing;
+            if (installingWorker) {
+              installingWorker.onstatechange = () => {
+                if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // New content is available; auto-update caches
+                  console.info('New content available, refreshing caches...');
+                }
+              };
+            }
+          };
+        }).catch(() => { });
       });
     }
   </script>

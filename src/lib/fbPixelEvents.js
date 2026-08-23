@@ -9,8 +9,12 @@
  */
 
 function track(eventName, params = {}) {
-    if (typeof window !== 'undefined' && window.fbq) {
-        window.fbq('track', eventName, params);
+    try {
+        if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
+            window.fbq('track', eventName, params);
+        }
+    } catch {
+        // Gracefully ignore if blocked by browser / adblocker
     }
 }
 
