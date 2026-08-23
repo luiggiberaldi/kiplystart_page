@@ -24,6 +24,7 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
     const [errors, setErrors] = useState({});
     const [touched, setTouched] = useState({});
     const [success, setSuccess] = useState(false);
+    const [registeredOrderId, setRegisteredOrderId] = useState(null);
     const formRef = useRef(null);
 
     /* ===== Lifecycle ===== */
@@ -118,52 +119,14 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
 
             if (error) console.error('Supabase order insert error:', error);
 
-            // Inyección Automática en DroPanas API
-            createDroPanasOrder({
-                orderId,
-                customerName: formData.name,
-                customerPhone: formData.phone,
-                customerDocument: formData.ci,
-                deliveryAddress: formData.address,
-                city: formData.city,
-                state: formData.state,
-                notes: formData.ref || '',
-                totalAmount: totalPrice,
-                items: [{
-                    id: product.id,
-                    name: product.name,
-                    quantity: quantity * (selectedBundle || 1),
-                    price: unitPrice
-                }]
-            }).catch(e => console.warn('DroPanas auto-dispatch note:', e));
-
-            setSuccess(true);
-
             const displayId = data?.[0]?.order_id || orderId;
-            const bundleText = selectedBundle > 1 ? `(Oferta ${selectedBundle} unidades)` : '';
-            const bsLine = exchangeRate ? `\n💱 *Monto en Bs:* ${formatBs(totalPrice)}` : '';
-
-            const message =
-                `Hola, deseo confirmar mi pedido en KiplyStart.\n\n` +
-                `📦 *DETALLES DEL PEDIDO*\n` +
-                `• *Nro de Orden:* ${displayId}\n` +
-                `• *Producto:* ${product.name}\n` +
-                `• *Cantidad:* ${quantity} ${bundleText}\n` +
-                `• *Total:* ${formatUSD(totalPrice)}${bsLine}\n\n` +
-                `📍 *DATOS DE ENTREGA*\n` +
-                `• *Nombre:* ${formData.name}\n` +
-                `• *Cédula:* ${formData.ci}\n` +
-                `• *Teléfono:* ${formData.phone}\n` +
-                `• *Ubicación:* ${formData.city}, ${formData.state}\n` +
-                `• *Dirección Exacta:* ${formData.address}\n` +
-                (formData.ref ? `• *Referencia:* ${formData.ref}\n` : '') +
-                `\n✅ *Método:* Pago Contra Entrega (Tasa Oficial BCV)`;
-
-            const WA = import.meta.env.VITE_WHATSAPP_NUMBER || '584124340546';
-            setTimeout(() => { window.location.href = `https://wa.me/${WA}?text=${encodeURIComponent(message)}`; }, 1000);
+            setRegisteredOrderId(displayId);
+            setSuccess(true);
         } catch (err) {
             console.error('Submission error:', err);
-            setLoading(false); setSuccess(false);
+            setSuccess(false);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -175,7 +138,21 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
 
     const fieldProps = { formData, errors, handleChange, handleBlur, fieldBorder, getFieldStatus };
 
-    if (success) return <CODSuccess />;
+    if (success) {
+        return (
+            <CODSuccess 
+                orderId={registeredOrderId}
+                customerName={formData.name}
+                customerPhone={formData.phone}
+                productName={product.name}
+                totalPrice={totalPrice}
+                onClose={() => {
+                    setSuccess(false);
+                    onClose();
+                }}
+            />
+        );
+    }
 
     return (
         <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4">

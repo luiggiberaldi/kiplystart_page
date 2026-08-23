@@ -6,6 +6,7 @@ import { X, Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
 import PriceDual from '../PriceDual';
 import CODField from '../cod/CODField';
 import CustomSelect from '../cod/CustomSelect';
+import CODSuccess from '../cod/CODSuccess';
 import { ZONES, getSavedCustomer, saveCustomer, clearSavedCustomer } from '../cod/codData';
 import { trackInitiateCheckout, trackPurchase } from '../../lib/fbPixelEvents';
 import { createDroPanasOrder } from '../../lib/dropanasApi';
@@ -37,6 +38,7 @@ export default function CartDrawer() {
     const [errors, setErrors] = useState({});
     const [touched, setTouched] = useState({});
     const [success, setSuccess] = useState(false);
+    const [lastOrderId, setLastOrderId] = useState(null);
     const formRef = useRef(null);
 
     const closeDrawer = () => {
@@ -136,77 +138,14 @@ export default function CartDrawer() {
                 });
             }
 
-            // 🚀 Inyección Automática en DroPanas API
-            createDroPanasOrder({
-                orderId,
-                customerName: formData.name,
-                customerPhone: formData.phone,
-                customerDocument: formData.ci,
-                deliveryAddress: formData.address,
-                city: formData.city,
-                state: formData.state,
-                notes: formData.ref || '',
-                totalAmount: cartTotal,
-                items: cartItems.map(item => ({
-                    id: item.id,
-                    name: item.name,
-                    quantity: (item.bundleSize || 1) * (item.bundleSets || 1),
-                    price: item.price
-                }))
-            }).catch(e => console.warn('DroPanas cart auto-dispatch note:', e));
-
+            setLastOrderId(orderId);
             setSuccess(true);
             trackPurchase(orderId, cartItems, cartTotal);
-
-            // Build WhatsApp message with all cart items
-            const bsLine = exchangeRate ? `\n💱 *En Bs:* ${formatBs(cartTotal)}` : '';
-            const itemsList = cartItems.map(item => {
-                const sets = item.bundleSets || 1;
-                const totalUnits = (item.bundleSize || 1) * sets;
-                let bundleLabel;
-
-                if (item.bundleType === 'quantity') {
-                    const freeUnits = Math.floor(totalUnits / 3);
-                    bundleLabel = freeUnits > 0
-                        ? `${totalUnits}u (${freeUnits} Gratis)`
-                        : `${totalUnits} Unidad${totalUnits > 1 ? 'es' : ''}`;
-                } else {
-                    if (item.bundleSize > 1) {
-                        bundleLabel = `Pack ${item.bundleSize}u (-${item.discountPct}%)`;
-                    } else if (item.discountPct > 0) {
-                        bundleLabel = `${sets}u (-${item.discountPct}%)`;
-                    } else {
-                        bundleLabel = `${sets} Unidad${sets > 1 ? 'es' : ''}`;
-                    }
-                }
-                const lineTotal = (item.bundleTotal || item.price) * sets;
-                return `• ${item.name} — ${bundleLabel} — ${formatUSD(lineTotal)}`;
-            }).join('\n');
-
-            const message =
-                `Hola, deseo confirmar mi pedido en KiplyStart.\n\n` +
-                `DETALLES DEL PEDIDO\n` +
-                `ID: ${orderId}\n` +
-                `${itemsList}\n` +
-                `Total: ${formatUSD(cartTotal)}${bsLine}\n\n` +
-                `DATOS DE ENVÍO\n` +
-                `Nombre: ${formData.name}\n` +
-                `CI: ${formData.ci}\n` +
-                `Teléfono: ${formData.phone}\n` +
-                `Dirección: ${formData.city}, ${formData.state}\n` +
-                `Dirección exacta: ${formData.address}\n` +
-                (formData.ref ? `Referencia: ${formData.ref}\n` : '') +
-                `\nEspero su confirmación para el despacho.`;
-
-            const WA = import.meta.env.VITE_WHATSAPP_NUMBER || '584241234567';
-            setTimeout(() => {
-                window.location.href = `https://wa.me/${WA}?text=${encodeURIComponent(message)}`;
-                clearCart();
-            }, 1200);
         } catch (err) {
             console.error('Submission error:', err);
-            setLoading(false);
             setSuccess(false);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -219,16 +158,19 @@ export default function CartDrawer() {
     /* ===== Success overlay ===== */
     if (success) {
         return (
-            <div className="fixed inset-0 z-[1100] flex items-center justify-center">
-                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-                <div className="relative bg-white rounded-2xl p-8 text-center max-w-sm mx-4 animate-scaleIn">
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
-                        <span className="material-symbols-outlined text-green-600 text-[40px] animate-checkmark">check_circle</span>
-                    </div>
-                    <h3 className="text-xl font-bold font-display text-brand-blue mb-2">¡Pedido Enviado!</h3>
-                    <p className="text-sm text-gray-500">Redirigiendo a WhatsApp...</p>
-                </div>
-            </div>
+            <CODSuccess 
+                orderId={lastOrderId}
+                customerName={formData.name}
+                customerPhone={formData.phone}
+                productName={cartItems.map(i => i.name).join(', ')}
+                totalPrice={cartTotal}
+                onClose={() => {
+                    setSuccess(false);
+                    clearCart();
+                    setIsCartOpen(false);
+                    setStep(0);
+                }}
+            />
         );
     }
 
