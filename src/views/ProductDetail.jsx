@@ -468,7 +468,7 @@ export default function ProductDetail() {
                             </div>
                         </div>
 
-                        {/* Delivery Urgency Countdown Timer (Mon-Sat, Caracas <2h, National 24-48h) */}
+                        {/* Delivery Urgency Countdown Timer (Mon-Sat, Caracas 60 min Express, National 24-48h) */}
                         <DeliveryUrgencyTimer />
 
                         {/* Stock Urgency Bar */}
