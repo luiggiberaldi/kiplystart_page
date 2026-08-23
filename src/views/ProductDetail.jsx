@@ -15,7 +15,6 @@ import ProductFAQ from '../components/product/ProductFAQ';
 import ProductDescription from '../components/ProductDescription';
 import PASBlock from '../components/PASBlock';
 import SocialProofChat from '../components/social/SocialProofChat';
-import LiveSalesToast from '../components/social/LiveSalesToast';
 import TrustBadges from '../components/social/TrustBadges';
 import { useCart } from '../context/CartContext';
 import { useSettings } from '../context/SettingsContext';
@@ -632,9 +631,6 @@ export default function ProductDetail() {
                         )}
                     </div>
                 </div>
-
-                {/* Real-Time Live Sales Social Proof Notification */}
-                <LiveSalesToast productName={product?.name || ''} />
             </main>
 
             <Footer />

@@ -10,8 +10,8 @@ export default function MobileBottomNav() {
     const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '584124340546';
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent('¡Hola KiplyStart! Deseo información sobre un producto con Pago al Recibir.')}`;
 
-    // Hide bottom nav on admin routes
-    if (location.pathname.startsWith('/admin')) return null;
+    // Hide bottom nav on admin routes and product detail pages (where the sticky buy bar takes precedence)
+    if (location.pathname.startsWith('/admin') || location.pathname.startsWith('/producto/')) return null;
 
     const navItems = [
         { label: 'Inicio', icon: Home, path: '/' },
