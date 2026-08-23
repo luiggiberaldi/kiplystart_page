@@ -1,39 +1,80 @@
-import { useState, useEffect } from 'react';
-import { Zap, Check, Sparkles, Plus, Gift } from 'lucide-react';
+import { Zap, Check } from 'lucide-react';
 import { useCurrency } from '../../context/CurrencyContext';
 import { useSettings } from '../../context/SettingsContext';
 
 /**
- * Curated list of high-converting impulse order bumps by category
+ * Intelligent Catalog of Complementary Order Bumps
  */
-const BUMP_OFFERS = {
-    car: {
+const BUMP_CATALOG = {
+    sponge: {
         id: 'bump-esponja-vidrios',
         name: 'Esponja Mágica Desengrasante de Vidrios',
         description: 'Elimina 100% la grasa y marcas de lluvia ácida del parabrisas. ¡Visibilidad cristalina de noche!',
         originalPrice: 18,
-        image: 'https://app.dropanas.com/storage/images/sample.jpg'
     },
-    general: {
+    towel: {
         id: 'bump-toalla-microfibra',
-        name: 'Toalla Ultra Absorbente de Secado Rápido',
-        description: 'Microfibra de alta densidad para secado y pulitura sin dejar marcas ni rayas.',
+        name: 'Toalla Microfibra Ultra Absorbente de Secado Rápido',
+        description: 'Microfibra de alta densidad para secado y pulitura sin dejar marcas ni rayas en cristales o pintura.',
         originalPrice: 15,
-        image: 'https://app.dropanas.com/storage/images/sample.jpg'
+    },
+    airFreshener: {
+        id: 'bump-ambientador-lubristone',
+        name: 'Restaurador & Ambientador Lubristone Premium',
+        description: 'Protege tableros y plásticos del sol con brillo duradero y fragancia exclusiva.',
+        originalPrice: 16,
+    },
+    phoneMount: {
+        id: 'bump-soporte-magnetico',
+        name: 'Soporte Magnético 360° para Celular',
+        description: 'Fijación ultra segura en cualquier rejilla o tablero, compatible con todos los teléfonos.',
+        originalPrice: 14,
+    },
+    noxSpray: {
+        id: 'bump-spray-nasal',
+        name: 'Spray Descongestionante Salino Natural',
+        description: 'Humecta y potencia la apertura de las vías respiratorias antes de usar las bandas Nox.',
+        originalPrice: 12,
     }
 };
 
 /**
- * Helper to get computed bump offer with dynamic discount
+ * Intelligent matching: Never recommends the product being purchased!
  */
 export function getBumpOffer(product, discountPct = 30) {
-    const category = (product?.category || '').toLowerCase();
-    const isCarCategory = category.includes('carro') || category.includes('auto') || (product?.slug || '').includes('carro');
-    const base = isCarCategory ? BUMP_OFFERS.car : BUMP_OFFERS.general;
-    const price = Math.round(base.originalPrice * (1 - (discountPct / 100)));
+    const s = `${product?.slug || ''} ${product?.name || ''} ${product?.category || ''}`.toLowerCase();
+    
+    let chosen = BUMP_CATALOG.sponge;
+
+    // 1. If customer is ordering the Sponge itself -> Recommend Microfiber Towel!
+    if (s.includes('esponja') || s.includes('vidrio') || s.includes('oil film') || s.includes('limpia parabrisas')) {
+        chosen = BUMP_CATALOG.towel;
+    }
+    // 2. If customer is ordering Towel / Cleaner -> Recommend Lubristone Restorer
+    else if (s.includes('toalla') || s.includes('microfibra') || s.includes('lubristone')) {
+        chosen = BUMP_CATALOG.airFreshener;
+    }
+    // 3. If customer is ordering Nox / Health -> Recommend Nasal Spray
+    else if (s.includes('nox') || s.includes('nasal') || s.includes('ronquido') || s.includes('salud') || s.includes('sueño')) {
+        chosen = BUMP_CATALOG.noxSpray;
+    }
+    // 4. If customer is ordering Tech / Smartwatch / Gadgets -> Recommend Magnetic Phone Mount
+    else if (s.includes('reloj') || s.includes('t900') || s.includes('smartwatch') || s.includes('tecno') || s.includes('gadget') || s.includes('audifono')) {
+        chosen = BUMP_CATALOG.phoneMount;
+    }
+    // 5. If customer is ordering Car Accessories (charger, compressor, gear knob) -> Recommend Sponge!
+    else if (s.includes('carro') || s.includes('auto') || s.includes('cargador') || s.includes('compresor') || s.includes('pomo') || s.includes('palanca')) {
+        chosen = BUMP_CATALOG.sponge;
+    }
+    // 6. Default fallback
+    else {
+        chosen = BUMP_CATALOG.towel;
+    }
+
+    const price = Math.round(chosen.originalPrice * (1 - (discountPct / 100)));
 
     return {
-        ...base,
+        ...chosen,
         price,
         discountPct
     };
@@ -112,4 +153,4 @@ export default function CODOrderBump({ product, isSelected, onToggle }) {
     );
 }
 
-export { BUMP_OFFERS };
+export { BUMP_CATALOG };
