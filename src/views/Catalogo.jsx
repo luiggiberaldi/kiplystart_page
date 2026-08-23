@@ -166,7 +166,7 @@ export default function Catalogo() {
 
                     {/* Interactive Category Filter Pills (Mobile Horizontal Scroll / Desktop Wrap) */}
                     {categories.length > 1 && (
-                        <div className="mt-5 -mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto no-scrollbar flex items-center gap-2 sm:gap-2.5 sm:flex-wrap py-2 snap-x scroll-smooth">
+                        <div className="mt-5 overflow-x-auto no-scrollbar flex items-center gap-2 sm:gap-2.5 sm:flex-wrap py-2 px-0.5 snap-x scroll-smooth">
                             {categories.map(cat => {
                                 const isActive = selectedCategory === cat;
                                 return (
