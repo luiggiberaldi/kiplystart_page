@@ -6,6 +6,7 @@ import CODProductSummary from './cod/CODProductSummary';
 import CODStepPersonal from './cod/CODStepPersonal';
 import CODStepDelivery from './cod/CODStepDelivery';
 import CODSuccess from './cod/CODSuccess';
+import { createDroPanasOrder } from '../lib/dropanasApi';
 
 const EMPTY_FORM = { name: '', ci: '', phone: '', state: '', city: '', address: '', ref: '' };
 
@@ -120,6 +121,26 @@ export default function CODModal({ isOpen, onClose, product, quantity, totalPric
             }).select();
 
             if (error) console.error('Supabase error:', error);
+
+            // 🚀 Inyección Automática en DroPanas API
+            createDroPanasOrder({
+                orderId,
+                customerName: formData.name,
+                customerPhone: formData.phone,
+                customerDocument: formData.ci,
+                deliveryAddress: formData.address,
+                city: formData.city,
+                state: formData.state,
+                notes: formData.ref || '',
+                totalAmount: totalPrice,
+                items: [{
+                    id: product.id,
+                    name: product.name,
+                    quantity: quantity * (selectedBundle || 1),
+                    price: unitPrice
+                }]
+            }).catch(e => console.warn('DroPanas auto-dispatch note:', e));
+
             setSuccess(true);
 
             const displayId = data?.[0]?.order_id || orderId;

@@ -28,6 +28,7 @@ const ProductDetail = React.lazy(() => import('./views/ProductDetail'));
 const Terminos = React.lazy(() => import('./views/Terminos'));
 const Privacidad = React.lazy(() => import('./views/Privacidad'));
 const Soporte = React.lazy(() => import('./views/Soporte'));
+const TrackingPage = React.lazy(() => import('./views/TrackingPage'));
 const AdminPortal = React.lazy(() => import('./views/AdminPortal'));
 const NotFound = React.lazy(() => import('./views/NotFound'));
 
@@ -70,6 +71,8 @@ function App() {
             <Route path="/terminos" element={<Terminos />} />
             <Route path="/privacidad" element={<Privacidad />} />
             <Route path="/soporte" element={<Soporte />} />
+            <Route path="/rastreo" element={<TrackingPage />} />
+            <Route path="/tracking" element={<TrackingPage />} />
             <Route path="/admin-portal-2026" element={<AdminPortal />} />
 
             {/* 404 Fallback */}

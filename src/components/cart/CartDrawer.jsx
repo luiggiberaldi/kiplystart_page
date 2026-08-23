@@ -7,6 +7,7 @@ import PriceDual from '../PriceDual';
 import CODField from '../cod/CODField';
 import { ZONES, getSavedCustomer, saveCustomer, clearSavedCustomer } from '../cod/codData';
 import { trackInitiateCheckout, trackPurchase } from '../../lib/fbPixelEvents';
+import { createDroPanasOrder } from '../../lib/dropanasApi';
 
 const EMPTY_FORM = { name: '', ci: '', phone: '', state: '', city: '', address: '', ref: '' };
 
@@ -133,6 +134,25 @@ export default function CartDrawer() {
                     status: 'pending_whatsapp'
                 });
             }
+
+            // 🚀 Inyección Automática en DroPanas API
+            createDroPanasOrder({
+                orderId,
+                customerName: formData.name,
+                customerPhone: formData.phone,
+                customerDocument: formData.ci,
+                deliveryAddress: formData.address,
+                city: formData.city,
+                state: formData.state,
+                notes: formData.ref || '',
+                totalAmount: cartTotal,
+                items: cartItems.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    quantity: (item.bundleSize || 1) * (item.bundleSets || 1),
+                    price: item.price
+                }))
+            }).catch(e => console.warn('DroPanas cart auto-dispatch note:', e));
 
             setSuccess(true);
             trackPurchase(orderId, cartItems, cartTotal);
