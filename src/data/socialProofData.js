@@ -587,44 +587,297 @@ export const socialProofData = {
             { user: "Pedro", location: "Caracas", time: "09:00", text: "La huella sigue funcionando bien con el vidrio puesto.", platform: "whatsapp" }
         ],
         badges: { salesCount: 380, badgeText: "Auto instalable en 10 segundos. Full cover edge-to-edge.", viewCount: 150, badgeTitle: "Instalación Perfecta" }
-    }
-};
-
-export const getSocialProof = (slug, product = null) => {
-    // Try exact match first
-    if (slug && socialProofData[slug]) {
-        return socialProofData[slug];
-    }
-
-    const prodName = product?.name || 'pedido';
-
-    return {
+    },
+    "cargador-auto-inteligente-bateria-12v": {
         chatMessages: [
             { 
-                user: "Carlos M.", 
+                user: "Roberto V.", 
+                location: "San Antonio de los Altos, Miranda", 
+                time: "Ayer 5:12 p. m.", 
+                text: "¡Hermano me salvó la vida! Tenía la batería de la camioneta descargada desde hace 2 semanas. La conecté en modo Repair y en 4 horas arrancó de una. Pagué en efectivo al recibir aquí en San Antonio. ¡100% recomendado! ⚡", 
+                platform: "whatsapp",
+                hasVoiceNote: false
+            },
+            { 
+                user: "Marcos T.", 
+                location: "Chacao, Caracas", 
+                time: "Hoy 11:20 a. m.", 
+                text: "Recibido en Caracas en 60 minutos con el motorizado express. Brutal la pantalla digital, te dice el voltaje exacto y la temperatura. Pagué por Pago Móvil BCV al motorizado 👍", 
+                platform: "whatsapp",
+                hasVoiceNote: false
+            },
+            { 
+                user: "Ing. Luis P.", 
                 location: "Valencia, Carabobo", 
-                time: "Ayer 4:18 p. m.", 
-                text: `¡Buenas tardes! Ya me entregó el motorizado de Tealca aquí en San Diego. Pagué en efectivo al recibir y el ${prodName.toLowerCase().slice(0, 32)} llegó impecable y bien sellado. ¡Recomendados 100%! 🙌`, 
-                platform: "whatsapp",
-                hasVoiceNote: false
-            },
-            { 
-                user: "Daniela R.", 
-                location: "Los Palos Grandes, Caracas", 
-                time: "Hoy 11:32 a. m.", 
-                text: `Hola amigos, recibido en Caracas. Súper rápido el despacho en 24 horas y funciona tal cual como en el video. Ya se lo recomendé a mi hermana 👍`, 
-                platform: "whatsapp",
-                hasVoiceNote: false
-            },
-            { 
-                user: "Andrés G.", 
-                location: "Maracay, Aragua", 
-                time: "Hoy 1:45 p. m.", 
-                text: `Todo fino mi pana, excelente servicio con el pago contra entrega. Me dio mucha tranquilidad pagar directo al tener el paquete en mano 🔥`, 
+                time: "Hoy 2:40 p. m.", 
+                text: "Buenas tardes mi pana, excelente el cargador. Lo probé con una batería de moto y una de carro y ambas las cargó y recuperó perfecto. Muy seguro el pago contra entrega.", 
                 platform: "whatsapp", 
                 hasVoiceNote: true 
             }
         ],
-        badges: { salesCount: 184, badgeText: "Compra 100% Protegida. Paga en efectivo o pago móvil al recibir.", viewCount: 42, badgeTitle: "Entrega Garantizada" }
+        badges: { salesCount: 310, badgeText: "Diagnóstico y Carga Inteligente. Protección contra sobrecarga y polaridad invertida.", viewCount: 114, badgeTitle: "Carga Segura" }
+    },
+    "compresor-de-aire-portatil-digital": {
+        chatMessages: [
+            { 
+                user: "Alejandro G.", 
+                location: "Lechería, Anzoátegui", 
+                time: "Ayer 3:45 p. m.", 
+                text: "Llegó por Tealca a Lechería en 2 días. Lo probé calibrando los 4 cauchos a 32 PSI y se apaga solito cuando llega a la presión exacta. Una maravilla de aparato 🚗💨", 
+                platform: "whatsapp",
+                hasVoiceNote: false
+            },
+            { 
+                user: "Valeria S.", 
+                location: "El Cafetal, Caracas", 
+                time: "Hoy 10:15 a. m.", 
+                text: "Despacho express súper rápido en Caracas en 60 min. Me da mucha seguridad llevarlo en la maleta por si se me baja un caucho de noche. Pagué al recibir al motorizado.", 
+                platform: "whatsapp",
+                hasVoiceNote: false
+            },
+            { 
+                user: "Héctor M.", 
+                location: "Barquisimeto, Lara", 
+                time: "Hoy 1:10 p. m.", 
+                text: "Epale pana, de verdad 10 de 10 el compresor. Trae todas las boquillas hasta para inflar balones y la linterna alumbra durísimo.", 
+                platform: "whatsapp", 
+                hasVoiceNote: true 
+            }
+        ],
+        badges: { salesCount: 245, badgeText: "Inflado Automático con Apagado Inteligente. Presión exacta garantizada.", viewCount: 92, badgeTitle: "Herramienta Esencial" }
+    },
+    "nox-tiras-nasales": {
+        chatMessages: [
+            { 
+                user: "Dr. Javier C.", 
+                location: "Maracaibo, Zulia", 
+                time: "Ayer 8:30 p. m.", 
+                text: "Mi esposa me dijo que por fin pudo dormir en silencio jajaja. Abre las fosas nasales al 100% de inmediato. Pedí la caja grande y pagué en efectivo al recibir en Maracaibo.", 
+                platform: "whatsapp",
+                hasVoiceNote: false
+            },
+            { 
+                user: "Camila M.", 
+                location: "Altamira, Caracas", 
+                time: "Hoy 9:45 a. m.", 
+                text: "Llegó rapidísimo con el delivery en Caracas. El adhesivo médico no irrita la piel y no se despega en toda la noche. Despierto con energía y sin resequedad en la garganta.", 
+                platform: "whatsapp",
+                hasVoiceNote: false
+            },
+            { 
+                user: "Andrés D.", 
+                location: "Maracay, Aragua", 
+                time: "Hoy 12:20 p. m.", 
+                text: "Buenas tardes, excelente producto las tiras Nox. Sufría de congestión al acostarme y esto me cambió el descanso por completo. Pago contra entrega confiable.", 
+                platform: "whatsapp", 
+                hasVoiceNote: true 
+            }
+        ],
+        badges: { salesCount: 430, badgeText: "Apertura Nasal Instantánea. Alivio garantizado desde la primera noche.", viewCount: 168, badgeTitle: "Descanso Comprobado" }
+    },
+    "t900-ultra-2-smart-watch-compatible-con-android-y-iphone": {
+        chatMessages: [
+            { 
+                user: "Nelson P.", 
+                location: "Valencia, Carabobo", 
+                time: "Ayer 6:20 p. m.", 
+                text: "Llegó impecable con todas las correas. La pantalla se ve súper nítida y las llamadas por Bluetooth se escuchan claritas. Pagué al recibir con Pago Móvil BCV.", 
+                platform: "whatsapp",
+                hasVoiceNote: false
+            },
+            { 
+                user: "Gabriela S.", 
+                location: "Santa Fe, Caracas", 
+                time: "Hoy 11:00 a. m.", 
+                text: "Súper puntual el motorizado en Caracas. Se conectó facilito con mi iPhone y me llegan todas las notificaciones de WhatsApp. Excelente relación calidad/precio 👌", 
+                platform: "whatsapp",
+                hasVoiceNote: false
+            },
+            { 
+                user: "Eduardo R.", 
+                location: "Puerto La Cruz, Anzoátegui", 
+                time: "Hoy 3:15 p. m.", 
+                text: "Saludos mi gente, recibido por Tealca en Puerto La Cruz. La batería me dura 3 días completos con uso continuo. Recomendados 100%.", 
+                platform: "whatsapp", 
+                hasVoiceNote: true 
+            }
+        ],
+        badges: { salesCount: 290, badgeText: "Llamadas Bluetooth y Pantalla HD. Compatible con iOS y Android.", viewCount: 105, badgeTitle: "Tecnología Verificada" }
+    }
+};
+
+/**
+ * Intelligent Dynamic Social Proof Generator
+ * Ensures that EVERY product gets a unique, tailored review experience
+ * matching its real category, realistic locations, authentic Venezuelan slang, and delivery benefits.
+ */
+export const getSocialProof = (slug, product = null) => {
+    const cleanSlug = (slug || '').toLowerCase();
+    const prodName = product?.name || 'producto';
+    const category = (product?.category || '').toLowerCase();
+
+    // 1. Check exact key match in static dictionary
+    if (cleanSlug && socialProofData[cleanSlug]) {
+        return socialProofData[cleanSlug];
+    }
+
+    // 2. Check keyword partial matches in static dictionary
+    if (cleanSlug.includes('cargador') || cleanSlug.includes('bateria-12v')) {
+        return socialProofData["cargador-auto-inteligente-bateria-12v"];
+    }
+    if (cleanSlug.includes('compresor') || cleanSlug.includes('inflador')) {
+        return socialProofData["compresor-de-aire-portatil-digital"];
+    }
+    if (cleanSlug.includes('nox') || cleanSlug.includes('nasal') || cleanSlug.includes('tiras')) {
+        return socialProofData["nox-tiras-nasales"];
+    }
+    if (cleanSlug.includes('t900') || cleanSlug.includes('reloj') || cleanSlug.includes('smart-watch')) {
+        return socialProofData["t900-ultra-2-smart-watch-compatible-con-android-y-iphone"];
+    }
+    if (cleanSlug.includes('esponja') || cleanSlug.includes('vidrio')) {
+        return socialProofData["esponja-magica-para-vidrios-de-carro-nuevo-pro-performance"];
+    }
+    if (cleanSlug.includes('pomo') || cleanSlug.includes('palanca')) {
+        return socialProofData["pomopalanca-led-tactil-rgb-estilo-exotico-para-tu-carro"];
+    }
+
+    // 3. Category-Specific Realistic Dynamic Review Pools
+    // Unique personas and messages depending on product category
+    const isAuto = category.includes('carro') || category.includes('auto') || cleanSlug.includes('carro');
+    const isTech = category.includes('tecnolog') || category.includes('electr') || category.includes('audio');
+    const isBeauty = category.includes('belleza') || category.includes('salud') || category.includes('cuidado') || category.includes('skincare');
+    const isHome = category.includes('hogar') || category.includes('casa') || category.includes('cocina');
+
+    let dynamicMessages = [];
+    let salesCount = 195;
+    let badgeText = "Compra 100% Protegida. Paga en efectivo o Pago Móvil BCV al recibir.";
+    let badgeTitle = "Entrega Garantizada";
+
+    if (isAuto) {
+        dynamicMessages = [
+            {
+                user: "Manuel R.",
+                location: "San Diego, Carabobo",
+                time: "Ayer 4:35 p. m.",
+                text: `¡Buenas tardes! Ya me entregó el repartidor aquí en San Diego. Pagué en efectivo al recibir y el ${prodName.toLowerCase().slice(0, 36)} llegó intacto y de excelente calidad. ¡100% recomendados! 🚗`,
+                platform: "whatsapp",
+                hasVoiceNote: false
+            },
+            {
+                user: "Sebastián G.",
+                location: "Chacao, Caracas",
+                time: "Hoy 10:45 a. m.",
+                text: `Hola amigos, recibido en Caracas súper rápido en 60 minutos. Lo probé de una en el carro y funciona tal cual como en el video. Muy práctico pagar al recibir 👍`,
+                platform: "whatsapp",
+                hasVoiceNote: false
+            },
+            {
+                user: "Víctor M.",
+                location: "Maracay, Aragua",
+                time: "Hoy 2:10 p. m.",
+                text: `Todo fino mi pana, excelente servicio con Tealca. Me dio total tranquilidad pagar directo al tener el paquete en mano.`,
+                platform: "whatsapp",
+                hasVoiceNote: true
+            }
+        ];
+        badgeText = "Calidad Automotriz Garantizada. Revisas tu pedido antes de pagar.";
+        badgeTitle = "Accesorios para Carro";
+    } else if (isBeauty) {
+        dynamicMessages = [
+            {
+                user: "Mariana P.",
+                location: "Lechería, Anzoátegui",
+                time: "Ayer 7:15 p. m.",
+                text: `¡Hola! Me llegó hoy a Lechería por Tealca. El empaque súper protegido y el producto es tal cual las fotos. Pagué por Pago Móvil al retirar. ¡Me encantó! ✨`,
+                platform: "whatsapp",
+                hasVoiceNote: false
+            },
+            {
+                user: "Carolina B.",
+                location: "Las Mercedes, Caracas",
+                time: "Hoy 11:20 a. m.",
+                text: `Recibido en Caracas en mi oficina. El motorizado express llegó súper rápido. Ya lo empecé a usar y los resultados se sienten desde el primer día 💖`,
+                platform: "whatsapp",
+                hasVoiceNote: false
+            },
+            {
+                user: "Dra. Andrea F.",
+                location: "Valencia, Carabobo",
+                time: "Hoy 1:50 p. m.",
+                text: `Buenas tardes, excelente atención y despacho rápido. Muy buena calidad y confianza total al pagar contra entrega.`,
+                platform: "whatsapp",
+                hasVoiceNote: true
+            }
+        ];
+        badgeText = "Fórmula y Calidad Comprobada. Entrega directa a tu puerta.";
+        badgeTitle = "Cuidado Personal";
+    } else if (isTech) {
+        dynamicMessages = [
+            {
+                user: "Gabriel N.",
+                location: "Maracaibo, Zulia",
+                time: "Ayer 5:50 p. m.",
+                text: `Saludos, recibido en Maracaibo sin novedad. Conectó perfecto a la primera y los acabados se sienten premium. Pagué en efectivo al recibir. Recomendado 100% 📱`,
+                platform: "whatsapp",
+                hasVoiceNote: false
+            },
+            {
+                user: "David L.",
+                location: "Altamira, Caracas",
+                time: "Hoy 10:15 a. m.",
+                text: `Entrega express en Caracas en 60 minutos, puntual y bien embalado. Pagué por Pago Móvil con la tasa oficial BCV al motorizado 👍`,
+                platform: "whatsapp",
+                hasVoiceNote: false
+            },
+            {
+                user: "Ing. Jorge M.",
+                location: "Barquisimeto, Lara",
+                time: "Hoy 3:05 p. m.",
+                text: `Buenas tardes panas, llegó todo en orden por Tealca. Muy buena calidad técnica y la atención al cliente por WhatsApp fue excelente.`,
+                platform: "whatsapp",
+                hasVoiceNote: true
+            }
+        ];
+        badgeText = "Tecnología Verificada. Compatible y con garantía de funcionamiento.";
+        badgeTitle = "Tecnología & Gadgets";
+    } else {
+        // Universal Adaptive Pool
+        dynamicMessages = [
+            {
+                user: "Carlos M.",
+                location: "Valencia, Carabobo",
+                time: "Ayer 4:18 p. m.",
+                text: `¡Buenas tardes! Ya me entregó el repartidor aquí en Valencia. Pagué en efectivo al recibir y ${prodName.toLowerCase().slice(0, 34)} llegó impecable y bien sellado. ¡Recomendados 100%! 🙌`,
+                platform: "whatsapp",
+                hasVoiceNote: false
+            },
+            {
+                user: "Daniela R.",
+                location: "Los Palos Grandes, Caracas",
+                time: "Hoy 11:32 a. m.",
+                text: `Hola amigos, recibido en Caracas en entrega express de 60 min. Funciona tal cual como se muestra en la página y pagué al motorizado al llegar 👍`,
+                platform: "whatsapp",
+                hasVoiceNote: false
+            },
+            {
+                user: "Andrés G.",
+                location: "Maracay, Aragua",
+                time: "Hoy 1:45 p. m.",
+                text: `Todo fino mi pana, excelente servicio con el pago contra entrega. Me dio mucha tranquilidad pagar directo al tener el paquete en mano 🔥`,
+                platform: "whatsapp",
+                hasVoiceNote: true
+            }
+        ];
+    }
+
+    return {
+        chatMessages: dynamicMessages,
+        badges: { 
+            salesCount, 
+            badgeText, 
+            viewCount: Math.floor(Math.random() * (48 - 25 + 1)) + 25, 
+            badgeTitle 
+        }
     };
 };
+
