@@ -21,7 +21,7 @@ export default function ProductCard({ product, loading = false }) {
         <div className="bg-white rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-xs hover:shadow-2xl border border-gray-100 hover:border-gray-200/80 flex flex-col h-full group transition-all duration-300 transform hover:-translate-y-1">
             <Link to={`/producto/${product.slug || product.id}`} className="block flex-1 flex flex-col">
                 {/* Image Container with Crisp Framing */}
-                <div className="aspect-square bg-gradient-to-b from-gray-50/50 to-gray-100/70 rounded-xl sm:rounded-2xl mb-3 sm:mb-4 overflow-hidden relative border border-gray-100/80 flex items-center justify-center p-2.5 sm:p-3">
+                <div className="aspect-square bg-gradient-to-b from-gray-50/50 to-gray-100/70 rounded-xl sm:rounded-2xl mb-2.5 sm:mb-4 overflow-hidden relative border border-gray-100/80 flex items-center justify-center p-1.5 sm:p-3">
                     {product.image_url ? (
                         <img
                             src={product.image_url}
@@ -56,7 +56,7 @@ export default function ProductCard({ product, loading = false }) {
 
                     {/* Category Pill */}
                     {product.category && (
-                        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 max-w-[75%] bg-white/95 backdrop-blur-md text-gray-800 text-[9px] sm:text-[10px] font-extrabold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg sm:rounded-xl shadow-2xs border border-gray-200/70 flex items-center gap-1 z-10">
+                        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 max-w-[80%] bg-white/95 backdrop-blur-md text-gray-800 text-[9px] sm:text-[10px] font-extrabold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg sm:rounded-xl shadow-2xs border border-gray-200/70 flex items-center gap-1 z-10">
                             <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-brand-red shrink-0" />
                             <span className="truncate">{product.category}</span>
                         </div>
@@ -64,7 +64,7 @@ export default function ProductCard({ product, loading = false }) {
                 </div>
 
                 {/* Product Info */}
-                <div className="flex-grow flex flex-col mb-3 sm:mb-4">
+                <div className="flex-grow flex flex-col mb-2.5 sm:mb-4">
                     <h3 className="text-xs sm:text-sm md:text-base font-extrabold text-gray-900 leading-snug mb-1.5 sm:mb-2 line-clamp-2 group-hover:text-[#0A2463] transition-colors min-h-[2rem] sm:min-h-[2.5rem]">
                         {product.name}
                     </h3>
@@ -87,12 +87,12 @@ export default function ProductCard({ product, loading = false }) {
 
                 {/* High Converting Action Button */}
                 <div
-                    className="w-full h-11 sm:h-12 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-black rounded-xl sm:rounded-2xl transition-all flex items-center justify-center shadow-md shadow-emerald-600/25 px-2 sm:px-4 gap-1.5 mt-auto cursor-pointer"
+                    className="w-full py-2.5 sm:py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-black rounded-xl sm:rounded-2xl transition-all flex items-center justify-center shadow-md shadow-emerald-600/25 px-2 gap-1.5 mt-auto cursor-pointer"
                     aria-label={`Pedir ${product.name}`}
                 >
                     <ShoppingBag className="w-4 h-4 shrink-0" />
-                    <span className="text-xs sm:text-sm font-black tracking-tight whitespace-nowrap">
-                        Pedir · Pagas al Recibir
+                    <span className="text-xs sm:text-sm font-black tracking-tight">
+                        Pedir Ahora
                     </span>
                 </div>
             </Link>
