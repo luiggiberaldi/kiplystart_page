@@ -13,13 +13,22 @@ export default function CODSuccess({
 
     const WA = import.meta.env.VITE_WHATSAPP_NUMBER || '584124340546';
     
-    // Pre-crafted WhatsApp message
+    // Format amounts cleanly
+    const usdText = totalPrice ? formatUSD(totalPrice) : '';
+    const bsText = (totalPrice && exchangeRate) ? ` (${formatBs(totalPrice)})` : '';
+    const totalLine = (usdText || bsText) ? `• *Total a Pagar:* ${usdText}${bsText}\n` : '';
+
+    // Clean, professional WhatsApp message
     const message = 
-        `Hola KiplyStart, acabo de registrar mi pedido #${orderId || ''}.\n\n` +
-        `👤 Nombre: ${customerName || ''}\n` +
-        (productName ? `📦 Producto: ${productName}\n` : '') +
-        (totalPrice ? `💵 Total: ${formatUSD(totalPrice)}${exchangeRate ? ` (${formatBs(totalPrice)})` : ''}\n\n` : '\n') +
-        `Deseo confirmar los datos de entrega para el despacho Contra Entrega.`;
+        `¡Hola KiplyStart! 👋\n` +
+        `Acabo de registrar mi pedido en la tienda web:\n\n` +
+        `*DETALLES DEL PEDIDO*\n` +
+        `• *Nro de Orden:* #${orderId || ''}\n` +
+        `• *Cliente:* ${customerName || ''}\n` +
+        (productName ? `• *Producto:* ${productName}\n` : '') +
+        totalLine +
+        `• *Método de Pago:* Contra Entrega (Pagas al recibir)\n\n` +
+        `Quedo atento a su mensaje para verificar los datos de entrega y coordinar el despacho. ¡Muchas gracias!`;
 
     const whatsappUrl = `https://wa.me/${WA}?text=${encodeURIComponent(message)}`;
 
