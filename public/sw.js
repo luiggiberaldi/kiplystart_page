@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kiply-store-v2';
+const CACHE_NAME = 'kiply-store-v3';
 
 // Network-first strategy for same-origin static assets
 self.addEventListener('install', (event) => {

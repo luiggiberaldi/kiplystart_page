@@ -116,10 +116,15 @@
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
   <script>
-    // Vite dynamic import chunk auto-recovery upon new deployments
+    // Vite dynamic import chunk auto-recovery upon new deployments (with infinite loop prevention)
     window.addEventListener('vite:preloadError', (event) => {
-      console.warn('Vite preload error detected. Reloading for latest version...', event);
-      window.location.reload();
+      console.warn('Vite preload error detected. Checking reload cooldown...', event);
+      const lastReload = parseInt(sessionStorage.getItem('vite-preload-reload') || '0', 10);
+      const now = Date.now();
+      if (now - lastReload > 10000) {
+        sessionStorage.setItem('vite-preload-reload', now.toString());
+        window.location.reload();
+      }
     });
 
     if ('serviceWorker' in navigator) {

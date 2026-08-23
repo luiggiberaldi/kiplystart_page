@@ -5,7 +5,7 @@ import ConfirmModal from "./ConfirmModal";
 import { 
     LayoutDashboard, Package, ShoppingBag, RefreshCw, 
     Users, BarChart3, Activity, Settings, 
-    ChevronLeft, ChevronRight, Store, LogOut, ShieldCheck
+    ChevronLeft, ChevronRight, Store, LogOut, ShieldCheck, Zap
 } from 'lucide-react';
 
 const menuItems = [
