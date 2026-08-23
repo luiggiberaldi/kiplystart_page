@@ -33,9 +33,9 @@ const SectionSkeleton = () => (
  * Ordered by priority — only the top 3 categories are shown.
  */
 const topCategories = [
-    { name: 'Relojes', emoji: '⌚' },
+    { name: 'Relojes & Accesorios', emoji: '⌚' },
     { name: 'Accesorios para Carros', emoji: '🚗' },
-    { name: 'Belleza & Cuidado Personal', emoji: '💄' },
+    { name: 'Belleza & Skincare', emoji: '✨' },
 ];
 
 /**
