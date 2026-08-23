@@ -9,7 +9,6 @@ import CustomSelect from '../cod/CustomSelect';
 import CODSuccess from '../cod/CODSuccess';
 import { ZONES, getSavedCustomer, saveCustomer, clearSavedCustomer } from '../cod/codData';
 import { trackInitiateCheckout, trackPurchase } from '../../lib/fbPixelEvents';
-import { createDroPanasOrder } from '../../lib/dropanasApi';
 
 const EMPTY_FORM = { name: '', ci: '', phone: '', state: '', city: '', address: '', ref: '' };
 

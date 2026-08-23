@@ -2,13 +2,13 @@ import { useEffect, useState, useMemo } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { useCurrency } from '../../context/CurrencyContext';
 import { ZONES } from '../cod/codData';
-import { createDroPanasOrder } from '../../lib/dropanasApi';
 import ConfirmModal from './ConfirmModal';
 import { 
     Truck, CheckCircle2, RotateCcw, Trash2, 
     Search, MessageCircle, Clock, 
     Building2, MapPin, User, AlertTriangle, 
-    Sparkles, RefreshCw, Layers, ExternalLink, X, XCircle, PackageCheck
+    Sparkles, RefreshCw, Layers, ExternalLink, X, XCircle, PackageCheck,
+    Copy, Check, Edit2, FileText
 } from 'lucide-react';
 
 export default function OrdersManager() {
@@ -19,11 +19,14 @@ export default function OrdersManager() {
     const [searchTerm, setSearchTerm] = useState('');
     const [feedbackMsg, setFeedbackMsg] = useState(null);
 
-    // Modal State
+    // Modal & Action State
     const [contactOrder, setContactOrder] = useState(null);
     const [orderToConfirm, setOrderToConfirm] = useState(null);
     const [orderToCancel, setOrderToCancel] = useState(null);
     const [orderToDelete, setOrderToDelete] = useState(null);
+    const [editingGuideOrder, setEditingGuideOrder] = useState(null);
+    const [guideInput, setGuideInput] = useState('');
+    const [copiedId, setCopiedId] = useState(null);
     const [showEmptyTrashModal, setShowEmptyTrashModal] = useState(false);
     const [actionLoading, setActionLoading] = useState(false);
 
@@ -69,55 +72,41 @@ export default function OrdersManager() {
         }
     }
 
-    /* ===== Double Confirmation: Confirm & Dispatch Order ===== */
+    /* ===== Copy formatted customer data for DroPanas manual entry ===== */
+    function copyCustomerData(order) {
+        const text = 
+            `DATOS PARA DESPACHO (DROPANAS / TEALCA):\n` +
+            `• Nombre: ${order.user_name}\n` +
+            `• Teléfono: ${order.user_phone}\n` +
+            `• Cédula: ${order.user_ci || 'N/A'}\n` +
+            `• Estado: ${order.state}\n` +
+            `• Ciudad: ${order.city}\n` +
+            `• Dirección: ${order.delivery_address}\n` +
+            (order.delivery_ref ? `• Referencia: ${order.delivery_ref}\n` : '') +
+            `• Producto: ${order.product_name} (${order.quantity || 1} un.)\n` +
+            `• Monto Total COD: ${formatPrice(order.total_price)}`;
+
+        navigator.clipboard.writeText(text);
+        setCopiedId(order.id);
+        setTimeout(() => setCopiedId(null), 3000);
+        showFeedback('success', '¡Datos copiados al portapapeles! Listos para crear el pedido en DroPanas.');
+    }
+
+    /* ===== Double Confirmation: Confirm Order (Manual Workflow) ===== */
     async function handleConfirmOrder() {
         if (!orderToConfirm) return;
         setActionLoading(true);
         try {
-            // 1. Dispatch to DroPanas API
-            const dpRes = await createDroPanasOrder({
-                orderId: orderToConfirm.order_id,
-                customerName: orderToConfirm.user_name,
-                customerPhone: orderToConfirm.user_phone,
-                customerDocument: orderToConfirm.user_ci,
-                deliveryAddress: orderToConfirm.delivery_address,
-                city: orderToConfirm.city,
-                state: orderToConfirm.state,
-                notes: orderToConfirm.delivery_ref || '',
-                totalAmount: orderToConfirm.total_price,
-                items: [{
-                    id: orderToConfirm.product_id,
-                    name: orderToConfirm.product_name,
-                    quantity: orderToConfirm.quantity || 1,
-                    price: orderToConfirm.unit_price || orderToConfirm.total_price
-                }]
-            }).catch(e => {
-                console.warn('DroPanas dispatch note:', e);
-                return { success: false, message: e.message };
-            });
-
-            const guideNumber = dpRes?.data?.tracking?.numero_guia || dpRes?.data?.id || null;
-
-            // 2. Update status in Supabase to 'shipped' (En camino)
-            const updatePayload = { status: 'shipped' };
-            if (guideNumber) {
-                updatePayload.delivery_ref = orderToConfirm.delivery_ref 
-                    ? `${orderToConfirm.delivery_ref} | Guía: ${guideNumber}`
-                    : `Guía: ${guideNumber}`;
-            }
-
             const { error } = await supabase
                 .from('orders')
-                .update(updatePayload)
+                .update({ status: 'shipped' })
                 .eq('id', orderToConfirm.id);
 
             if (error) throw error;
 
             showFeedback(
                 'success', 
-                guideNumber 
-                    ? `🎉 ¡Pedido #${orderToConfirm.order_id} confirmado y despachado con Guía ${guideNumber}!`
-                    : `✅ ¡Pedido #${orderToConfirm.order_id} confirmado y cambiado a 'En camino'!`
+                `🎉 ¡Pedido #${orderToConfirm.order_id} confirmado! Estado cambiado a 'En camino'. Puedes registrar el despacho en DroPanas.`
             );
             setOrderToConfirm(null);
             fetchOrders();
@@ -147,6 +136,37 @@ export default function OrdersManager() {
         } catch (err) {
             console.error('Error cancelling order:', err);
             showFeedback('error', 'Error al cancelar el pedido: ' + err.message);
+        } finally {
+            setActionLoading(false);
+        }
+    }
+
+    /* ===== Save / Edit Guide Tracking Number ===== */
+    async function handleSaveGuide() {
+        if (!editingGuideOrder) return;
+        const cleanGuide = guideInput.trim();
+        if (!cleanGuide) {
+            showFeedback('error', 'Por favor ingresa un número de guía válido.');
+            return;
+        }
+        setActionLoading(true);
+        try {
+            const { error } = await supabase
+                .from('orders')
+                .update({ 
+                    order_id: cleanGuide,
+                    status: 'shipped'
+                })
+                .eq('id', editingGuideOrder.id);
+
+            if (error) throw error;
+
+            showFeedback('success', `Guía asignada con éxito: ${cleanGuide}`);
+            setEditingGuideOrder(null);
+            setGuideInput('');
+            fetchOrders();
+        } catch (err) {
+            showFeedback('error', 'Error al guardar la guía: ' + err.message);
         } finally {
             setActionLoading(false);
         }
@@ -459,6 +479,19 @@ export default function OrdersManager() {
                                                 <span className="text-[#0A2463] font-mono font-extrabold">#{order.order_id || order.id?.slice(0, 8)}</span>
                                             </h4>
 
+                                            {order.status !== 'deleted' && (
+                                                <button
+                                                    onClick={() => {
+                                                        setEditingGuideOrder(order);
+                                                        setGuideInput(order.order_id || '');
+                                                    }}
+                                                    className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
+                                                    title="Asignar o editar número de guía asignado por DroPanas/Tealca"
+                                                >
+                                                    <Edit2 className="w-3.5 h-3.5" />
+                                                </button>
+                                            )}
+
                                             {/* Carrier Badge */}
                                             <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black border ${carrier.color}`}>
                                                 <Truck className="w-3 h-3" />
@@ -515,12 +548,34 @@ export default function OrdersManager() {
                                                     <span>Contactar WhatsApp</span>
                                                 </button>
 
+                                                <button
+                                                    onClick={() => copyCustomerData(order)}
+                                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer border ${
+                                                        copiedId === order.id
+                                                            ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                                                            : 'bg-white hover:bg-slate-100 text-gray-700 border-gray-200 shadow-xs'
+                                                    }`}
+                                                    title="Copiar datos estructurados para crear en DroPanas"
+                                                >
+                                                    {copiedId === order.id ? (
+                                                        <>
+                                                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                                            <span>¡Copiado!</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Copy className="w-3.5 h-3.5 text-gray-500" />
+                                                            <span>Copiar p/ DroPanas</span>
+                                                        </>
+                                                    )}
+                                                </button>
+
                                                 {order.status === 'pending_whatsapp' && (
                                                     <>
                                                         <button 
                                                             onClick={() => setOrderToConfirm(order)}
                                                             className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-extrabold shadow-xs transition-all cursor-pointer"
-                                                            title="Confirmar datos y despachar a DroPanas"
+                                                            title="Confirmar datos y pasar a 'En camino'"
                                                         >
                                                             <CheckCircle2 className="w-3.5 h-3.5" />
                                                             <span>Confirmar Pedido</span>
@@ -683,17 +738,17 @@ export default function OrdersManager() {
                 </div>
             )}
 
-            {/* Double Confirmation Modal to Confirm and Dispatch Order */}
+            {/* Double Confirmation Modal to Confirm Order */}
             <ConfirmModal
                 isOpen={!!orderToConfirm}
                 onClose={() => setOrderToConfirm(null)}
                 onConfirm={handleConfirmOrder}
-                title={`¿Confirmar y despachar orden #${orderToConfirm?.order_id || ''}?`}
-                message={`Estás a punto de confirmar los datos de ${orderToConfirm?.user_name || 'este cliente'} (${orderToConfirm?.city || ''}, ${orderToConfirm?.state || ''}) por un monto de ${formatPrice(orderToConfirm?.total_price || 0)}. Se enviará la orden a DroPanas para generar la guía de despacho y el estado pasará a 'En camino'.`}
-                confirmText="Sí, confirmar y despachar"
+                title={`¿Confirmar orden #${orderToConfirm?.order_id || ''}?`}
+                message={`Estás a punto de confirmar los datos de ${orderToConfirm?.user_name || 'este cliente'} (${orderToConfirm?.city || ''}, ${orderToConfirm?.state || ''}) por un monto de ${formatPrice(orderToConfirm?.total_price || 0)}. El estado pasará a 'En camino' para que registres el despacho manualmente en DroPanas o Tealca.`}
+                confirmText="Sí, confirmar pedido"
                 cancelText="Volver"
                 confirmColor="bg-emerald-600 hover:bg-emerald-700"
-                icon="local_shipping"
+                icon="check_circle"
                 iconBg="bg-emerald-100 text-emerald-600"
                 loading={actionLoading}
             />
@@ -704,7 +759,7 @@ export default function OrdersManager() {
                 onClose={() => setOrderToCancel(null)}
                 onConfirm={handleCancelOrder}
                 title={`¿Cancelar orden #${orderToCancel?.order_id || ''}?`}
-                message={`El pedido de ${orderToCancel?.user_name || ''} pasará a estado 'Cancelado' y no se procesará ningún envío ni cobro.`}
+                message={`El pedido de ${orderToCancel?.user_name || ''} pasará a estado 'Cancelado' y no se procesará ningún despacho.`}
                 confirmText="Sí, cancelar orden"
                 cancelText="Volver"
                 confirmColor="bg-rose-600 hover:bg-rose-700"
@@ -712,6 +767,50 @@ export default function OrdersManager() {
                 iconBg="bg-rose-100 text-rose-600"
                 loading={actionLoading}
             />
+
+            {/* Assign / Edit Guide Modal */}
+            {editingGuideOrder && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-xs" onClick={() => setEditingGuideOrder(null)} />
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm relative z-10 p-6 animate-scaleIn">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="font-extrabold text-base text-gray-900 flex items-center gap-2">
+                                <Truck className="w-5 h-5 text-blue-600" />
+                                Asignar / Editar Guía
+                            </h3>
+                            <button onClick={() => setEditingGuideOrder(null)} className="p-1 text-gray-400 hover:text-gray-600 cursor-pointer">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <p className="text-xs text-gray-500 mb-4 leading-relaxed">
+                            Ingresa el número de guía asignado por DroPanas o Tealca al crear el pedido manualmente (ej: <strong>DP30070</strong> o <strong>84714060</strong>):
+                        </p>
+                        <input 
+                            type="text"
+                            value={guideInput}
+                            onChange={(e) => setGuideInput(e.target.value)}
+                            placeholder="Número de guía..."
+                            className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm font-mono font-bold text-gray-900 outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+                            autoFocus
+                        />
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setEditingGuideOrder(null)}
+                                className="flex-1 py-2.5 rounded-xl border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 cursor-pointer"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleSaveGuide}
+                                disabled={actionLoading}
+                                className="flex-1 py-2.5 rounded-xl bg-[#0A2463] hover:bg-[#081c4d] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+                            >
+                                {actionLoading ? 'Guardando...' : 'Guardar Guía'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Delete Single Order Modal */}
             <ConfirmModal

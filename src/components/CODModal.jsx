@@ -6,7 +6,6 @@ import CODProductSummary from './cod/CODProductSummary';
 import CODStepPersonal from './cod/CODStepPersonal';
 import CODStepDelivery from './cod/CODStepDelivery';
 import CODSuccess from './cod/CODSuccess';
-import { createDroPanasOrder } from '../lib/dropanasApi';
 import { Truck, X, User, MapPin, CheckCircle2, ShieldCheck } from 'lucide-react';
 
 const EMPTY_FORM = { name: '', ci: '', phone: '', state: '', city: '', address: '', ref: '' };
