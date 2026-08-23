@@ -213,29 +213,32 @@ export default function OrdersManager() {
 
         const TEMPLATES = {
             confirm:
-                `Hola *${user_name}*, te saludamos de *KiplyStart* 🚀\n\n` +
+                `¡Hola *${user_name}*! Te saludamos de *KiplyStart*.\n\n` +
                 `Recibimos tu pedido *#${displayId}* de: *${product_name}*.\n` +
-                `💰 Total con Envío Gratis: *${formatPrice(total_price)}*\n\n` +
-                `Para proceder con el despacho por Tealca / DroPanas, ¿nos podrías confirmar tu dirección exacta?\n` +
-                `📍 *${delivery_address}, ${city}, ${state}*\n\n` +
-                `¡Pagas al recibir! Quedamos atentos para despacharlo de inmediato.`,
+                `• *Total a Pagar:* ${formatPrice(total_price)} (Envío Gratis)\n` +
+                `• *Método:* Pago Contra Entrega (Pagas al recibir)\n\n` +
+                `Para proceder con el despacho a tu ciudad, ¿nos confirmas si esta dirección es correcta?\n` +
+                `• *Dirección:* ${delivery_address}, ${city}, ${state}\n\n` +
+                `Quedamos atentos a tu respuesta para procesar tu envío de inmediato. ¡Muchas gracias!`,
 
             shipped:
-                `¡Hola *${user_name}*! Buenas noticias 🚚💨\n\n` +
-                `Tu pedido *#${displayId}* ya va en camino.\n\n` +
-                `📦 Guía de Despacho: *${displayId}*\n` +
-                `⏳ Tiempo estimado de llegada a *${city}, ${state}*: *${estimation}*.\n\n` +
-                `Puedes rastrearlo en tiempo real en nuestra web: https://www.kiplystart.com/rastreo\n\n` +
-                `¡Gracias por elegir KiplyStart!`,
+                `¡Hola *${user_name}*! Buenas noticias de *KiplyStart*:\n\n` +
+                `Tu pedido *#${displayId}* ya fue despachado y va en camino.\n\n` +
+                `• *Guía de Despacho:* #${displayId}\n` +
+                `• *Destino:* ${city}, ${state}\n` +
+                `• *Tiempo Estimado de Entrega:* ${estimation}\n\n` +
+                `Puedes hacer seguimiento a tu paquete en nuestra web:\n` +
+                `https://www.kiplystart.com/rastreo?id=${encodeURIComponent(displayId)}\n\n` +
+                `¡Gracias por tu compra!`,
 
             delivered:
-                `¡Hola *${user_name}*! Esperamos que estés disfrutando tu compra 🌟\n\n` +
-                `Vemos que tu pedido *#${displayId}* ha sido entregado exitosamente.\n` +
-                `Si tienes alguna duda o necesitas soporte, estamos a tu orden.\n\n` +
-                `¡Gracias por confiar en KiplyStart!`,
+                `¡Hola *${user_name}*! Esperamos que estés disfrutando tu compra con *KiplyStart*.\n\n` +
+                `Vemos que tu pedido *#${displayId}* ha sido entregado exitosamente.\n\n` +
+                `Si tienes alguna duda o necesitas soporte con tu producto, estamos a tu completa disposición.\n\n` +
+                `¡Gracias por confiar en nosotros!`,
 
             custom:
-                `Hola *${user_name}*, te escribo de KiplyStart respecto a tu pedido *#${displayId}*...`
+                `¡Hola *${user_name}*! Te escribo de *KiplyStart* respecto a tu pedido *#${displayId}*:`
         };
 
         const message = TEMPLATES[templateType];
