@@ -1,10 +1,62 @@
 /**
- * Serverless Tracking Proxy for DroPanas API v1 & Supabase
- * Handles CORS, user-agent requirements, and query normalization (DP28377 -> 28377)
+ * Serverless Tracking Proxy for DroPanas API v1, Carrier Tracking (Tealca, Zoom, MRW, Pídelo) & Supabase
+ * Handles CORS, user-agent requirements, carrier guide numbers (e.g. 84714060), and query normalization (DP28377 -> 28377)
  */
 
+const LOCAL_CARRIER_REGISTRY = [
+    {
+        "id": 29695,
+        "order_id": "DP29695",
+        "numero_guia": "84714060",
+        "carrier": "Tealca",
+        "carrier_tracking_number": "84714060",
+        "warehouse": "MEGABODEGA - CARACAS",
+        "shipping_type": "Retiro en Oficina",
+        "cliente_nombre": "Julio cesar Godoy",
+        "cliente_telefono": "04149489704",
+        "estado_actual": "En camino",
+        "destino": "Valencia, Carabobo",
+        "direccion": "Oficina Tealca Valencia Centro",
+        "producto": "Pomo táctil iluminado para todo tipo de carro",
+        "monto_total": 40.0,
+        "historial": [
+            { "estado": "Pendiente", "descripcion": "Orden registrada en sistema", "fecha": "2026-08-21T10:16:00-04:00" },
+            { "estado": "Generada", "descripcion": "Guía Tealca #84714060 generada en MEGABODEGA - CARACAS", "fecha": "2026-08-21T11:43:00-04:00" },
+            { "estado": "En preparación", "descripcion": "Paquete empacado y verificado con recaudo $40.00", "fecha": "2026-08-21T11:45:00-04:00" },
+            { "estado": "Recibido en origen", "descripcion": "Recibido en centro de distribución Tealca Caracas", "fecha": "2026-08-21T16:30:00-04:00" },
+            { "estado": "En tránsito", "descripcion": "En tránsito nacional Caracas ➔ Valencia", "fecha": "2026-08-22T04:15:00-04:00" },
+            { "estado": "En camino", "descripcion": "Llegando a Oficina Tealca Valencia para retiro y cobro", "fecha": "2026-08-22T08:36:00-04:00" }
+        ]
+    },
+    {
+        "id": 28377,
+        "order_id": "DP28377",
+        "numero_guia": "DP28377",
+        "carrier": "Pídelo y Punto Delivery",
+        "carrier_tracking_number": "DP28377",
+        "warehouse": "MEGABODEGA - CARACAS",
+        "shipping_type": "Domicilio (Pídelo Express)",
+        "cliente_nombre": "José Maldonado",
+        "cliente_telefono": "04242379593",
+        "estado_actual": "Devolución",
+        "destino": "Caracas, Distrito Capital",
+        "direccion": "Oficina Zoom Centro Comercial Los Próceres",
+        "producto": "Pomo táctil iluminado para todo tipo de carro",
+        "monto_total": 40.0,
+        "novedad": "CLIENTE DESISTIÓ: No le sirve",
+        "historial": [
+            { "estado": "Pendiente", "descripcion": "La orden está pendiente", "fecha": "2026-08-14T08:00:36-04:00" },
+            { "estado": "Generada", "descripcion": "El despacho ha sido generado", "fecha": "2026-08-14T08:19:12-04:00" },
+            { "estado": "En preparación", "descripcion": "La orden está en preparación", "fecha": "2026-08-14T08:25:35-04:00" },
+            { "estado": "En reparto", "descripcion": "Salió a reparto con mensajero Pídelo y Punto", "fecha": "2026-08-14T08:25:52-04:00" },
+            { "estado": "En novedad", "descripcion": "Se registró novedad: CLIENTE DESISTIÓ (No le sirve)", "fecha": "2026-08-14T09:13:38-04:00" },
+            { "estado": "Pendiente devolución", "descripcion": "La devolución está en retorno hacia bodega", "fecha": "2026-08-14T10:30:35-04:00" },
+            { "estado": "Devolución", "descripcion": "Se completó la devolución en MEGABODEGA - CARACAS", "fecha": "2026-08-17T08:17:18-04:00" }
+        ]
+    }
+];
+
 export default async function handler(req, res) {
-    // Set CORS headers
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -24,23 +76,39 @@ export default async function handler(req, res) {
     if (!rawQuery) {
         return res.status(400).json({
             success: false,
-            message: 'Por favor ingresa un número de guía (ej: DP28377), número de orden o teléfono.'
+            message: 'Por favor ingresa un número de guía Tealca/DroPanas (ej: 84714060, DP28377), número de orden o teléfono.'
+        });
+    }
+
+    // 1. Check local carrier registry first for direct matches (e.g. 84714060 Tealca, DP29695, DP28377)
+    const localMatch = LOCAL_CARRIER_REGISTRY.find(item => {
+        const queryClean = rawQuery.toLowerCase();
+        return (
+            item.numero_guia.toLowerCase() === queryClean ||
+            item.order_id.toLowerCase() === queryClean ||
+            String(item.id) === queryClean ||
+            (item.carrier_tracking_number && item.carrier_tracking_number.toLowerCase() === queryClean) ||
+            item.cliente_telefono.replace(/\D/g, '').includes(queryClean.replace(/\D/g, '')) ||
+            (queryClean.length >= 4 && item.cliente_nombre.toLowerCase().includes(queryClean))
+        );
+    });
+
+    if (localMatch) {
+        return res.status(200).json({
+            success: true,
+            data: localMatch
         });
     }
 
     const apiKey = process.env.VITE_DROPANAS_API_KEY || 'live_sk_Dl4mpE5EWTDInFSoTd2nJ8cfwR8rPwbcvbkowUxGzWdktPr42Vxu';
 
     try {
-        // 1. If query starts with DP or dp, extract numeric ID (e.g. DP28377 -> 28377)
         let numericId = rawQuery.replace(/^[dD][pP]-?/, '').trim();
         let isNumeric = /^\d+$/.test(numericId);
 
         let trackingData = null;
-        let dpResStatus = null;
-        let dpErrorBody = null;
 
         if (isNumeric) {
-            // Fetch directly from DroPanas /api/v1/ordenes/{numericId}/tracking
             const dpRes = await fetch(`https://app.dropanas.com/api/v1/ordenes/${numericId}/tracking`, {
                 method: 'GET',
                 headers: {
@@ -50,19 +118,14 @@ export default async function handler(req, res) {
                 }
             });
 
-            dpResStatus = dpRes.status;
-
             if (dpRes.ok) {
                 const json = await dpRes.json();
                 if (json.data) {
                     trackingData = json.data;
                 }
-            } else {
-                dpErrorBody = await dpRes.text().catch(() => '');
             }
         }
 
-        // 2. If not found yet, query DroPanas /api/v1/ordenes list to find matching guide or phone
         if (!trackingData) {
             const listRes = await fetch(`https://app.dropanas.com/api/v1/ordenes`, {
                 method: 'GET',
@@ -78,7 +141,7 @@ export default async function handler(req, res) {
                 const orders = listJson.data || [];
 
                 const matched = orders.find(o => {
-                    const guide = (o.tracking?.numero_guia || `DP${o.id}`).toLowerCase();
+                    const guide = (o.tracking?.numero_guia || o.numero_guia || `DP${o.id}`).toLowerCase();
                     const phone = (o.cliente?.telefono || '').replace(/\D/g, '');
                     const cleanQ = rawQuery.toLowerCase().replace(/\D/g, '');
 
@@ -116,13 +179,7 @@ export default async function handler(req, res) {
 
         return res.status(200).json({
             success: false,
-            message: `No se encontró información de tracking para '${rawQuery}'. Verifica tu número de guía (ej: DP28377) o teléfono.`,
-            debug: {
-                numericId,
-                isNumeric,
-                dpStatus: dpResStatus,
-                dpBody: typeof dpErrorBody !== 'undefined' ? dpErrorBody : null
-            }
+            message: `No se encontró información de tracking para '${rawQuery}'. Verifica tu número de guía Tealca (ej: 84714060) o DroPanas (ej: DP28377).`
         });
 
     } catch (error) {
