@@ -12,6 +12,7 @@ import PASBlock from '../components/PASBlock';
 import SocialProofChat from '../components/social/SocialProofChat';
 import TrustBadges from '../components/social/TrustBadges';
 import { useCart } from '../context/CartContext';
+import { useSettings } from '../context/SettingsContext';
 import { getSocialProof } from '../data/socialProofData';
 import { trackViewContent, trackAddToCart } from '../lib/fbPixelEvents';
 import { 
@@ -23,6 +24,7 @@ import {
 export default function ProductDetail() {
     const { slug } = useParams();
     const { addToCart } = useCart();
+    const { settings } = useSettings();
     const [product, setProduct] = useState(null);
     const socialProof = product ? getSocialProof(product.slug) : null;
     const [loading, setLoading] = useState(true);
@@ -87,6 +89,9 @@ export default function ProductDetail() {
         };
     }, [product]);
 
+    const discount2 = product?.bundle_2_discount ?? settings?.bundle_2_discount ?? 15;
+    const discount3 = product?.bundle_3_discount ?? settings?.bundle_3_discount ?? 30;
+
     const getPrice = (bundle = selectedBundle) => {
         if (!product) return 0;
         const basePrice = product.price;
@@ -96,9 +101,6 @@ export default function ProductDetail() {
             if (bundle === 3) return Math.ceil(basePrice * 2);
             return basePrice;
         }
-
-        const discount2 = product.bundle_2_discount || 10;
-        const discount3 = product.bundle_3_discount || 20;
 
         if (bundle === 2) return Math.ceil((basePrice * 2) * (1 - discount2 / 100));
         if (bundle === 3) return Math.ceil((basePrice * 3) * (1 - discount3 / 100));
@@ -117,8 +119,6 @@ export default function ProductDetail() {
         const bundleSize = selectedBundle;
         const bundleTotal = getPrice(bundleSize);
         const isQuantity = product.bundle_type === 'quantity';
-        const discount2 = product.bundle_2_discount || 10;
-        const discount3 = product.bundle_3_discount || 20;
         const discountPct = isQuantity
             ? (bundleSize === 3 ? Math.round((1 / 3) * 100) : 0)
             : (bundleSize === 3 ? discount3 : bundleSize === 2 ? discount2 : 0);
@@ -314,6 +314,8 @@ export default function ProductDetail() {
                             onSelectBundle={setSelectedBundle}
                             getPrice={getPrice}
                             getSavings={getSavings}
+                            discount2={discount2}
+                            discount3={discount3}
                         />
 
                         {/* Desktop Fast Actions */}

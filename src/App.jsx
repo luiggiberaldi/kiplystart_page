@@ -47,6 +47,7 @@ function PageLoader() {
 import usePageTracker from './hooks/usePageTracker';
 
 import { CartProvider } from './context/CartContext';
+import { SettingsProvider } from './context/SettingsContext';
 import CartDrawer from './components/cart/CartDrawer';
 import FacebookPixel from './components/FacebookPixel';
 
@@ -57,30 +58,32 @@ function PageTracker() {
 
 function App() {
   return (
-    <CartProvider>
-      <Router>
-        <PageTracker />
-        <FacebookPixel />
-        <Suspense fallback={<PageLoader />}>
-          <CartDrawer />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/catalogo" element={<Catalogo />} />
-            <Route path="/producto/:slug" element={<ProductDetail />} />
+    <SettingsProvider>
+      <CartProvider>
+        <Router>
+          <PageTracker />
+          <FacebookPixel />
+          <Suspense fallback={<PageLoader />}>
+            <CartDrawer />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/catalogo" element={<Catalogo />} />
+              <Route path="/producto/:slug" element={<ProductDetail />} />
 
-            <Route path="/terminos" element={<Terminos />} />
-            <Route path="/privacidad" element={<Privacidad />} />
-            <Route path="/soporte" element={<Soporte />} />
-            <Route path="/rastreo" element={<TrackingPage />} />
-            <Route path="/tracking" element={<TrackingPage />} />
-            <Route path="/admin-portal-2026" element={<AdminPortal />} />
+              <Route path="/terminos" element={<Terminos />} />
+              <Route path="/privacidad" element={<Privacidad />} />
+              <Route path="/soporte" element={<Soporte />} />
+              <Route path="/rastreo" element={<TrackingPage />} />
+              <Route path="/tracking" element={<TrackingPage />} />
+              <Route path="/admin-portal-2026" element={<AdminPortal />} />
 
-            {/* 404 Fallback */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </Router>
-    </CartProvider>
+              {/* 404 Fallback */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </Router>
+      </CartProvider>
+    </SettingsProvider>
   );
 }
 

@@ -1,6 +1,14 @@
 import { Sparkles, Gift, CheckCircle2 } from 'lucide-react';
 
-export default function BundleSelector({ product, selectedBundle, onSelectBundle, getPrice, getSavings }) {
+export default function BundleSelector({ 
+    product, 
+    selectedBundle, 
+    onSelectBundle, 
+    getPrice, 
+    getSavings,
+    discount2 = 15,
+    discount3 = 30
+}) {
     const isQuantity = product.bundle_type === 'quantity';
 
     if (isQuantity) {
@@ -86,7 +94,7 @@ export default function BundleSelector({ product, selectedBundle, onSelectBundle
             >
                 <div className="absolute -top-2.5 right-4 bg-[#0A2463] text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm flex items-center gap-1">
                     <Sparkles className="w-3 h-3 text-amber-400" />
-                    <span>MÁS POPULAR (-10%)</span>
+                    <span>MÁS POPULAR (-{discount2}%)</span>
                 </div>
                 <div className="flex items-center gap-3 min-w-0">
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedBundle === 2 ? 'border-[#0A2463] bg-[#0A2463]' : 'border-gray-300'}`}>
@@ -112,7 +120,7 @@ export default function BundleSelector({ product, selectedBundle, onSelectBundle
             >
                 <div className="absolute -top-2.5 right-4 bg-brand-red text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm flex items-center gap-1">
                     <Sparkles className="w-3 h-3 text-amber-300" />
-                    <span>MÁXIMO AHORRO (-20%)</span>
+                    <span>MÁXIMO AHORRO (-{discount3}%)</span>
                 </div>
                 <div className="flex items-center gap-3 min-w-0">
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedBundle === 3 ? 'border-[#0A2463] bg-[#0A2463]' : 'border-gray-300'}`}>

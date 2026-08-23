@@ -42,6 +42,18 @@ export default function AdminSettings() {
         setSaving(true);
         try {
             await saveSettings(local);
+
+            // Sync bundle discounts across all products in database
+            const b2 = parseInt(local.bundle_2_discount, 10) || 15;
+            const b3 = parseInt(local.bundle_3_discount, 10) || 30;
+            await supabase
+                .from('products')
+                .update({
+                    bundle_2_discount: b2,
+                    bundle_3_discount: b3
+                })
+                .neq('id', '00000000-0000-0000-0000-000000000000');
+
             setStatus('success');
             setDirty(false);
             setTimeout(() => setStatus(null), 4000);
@@ -321,14 +333,14 @@ export default function AdminSettings() {
                         <SettingInput 
                             label="Descuento Pack 2X" 
                             value={local.bundle_2_discount}
-                            onChange={v => handleChange('bundle_2_discount', parseInt(v) || 0)} 
+                            onChange={v => handleChange('bundle_2_discount', v === '' ? '' : parseInt(v, 10) || 0)} 
                             type="number" 
                             suffix="%" 
                         />
                         <SettingInput 
                             label="Descuento Pack 3X" 
                             value={local.bundle_3_discount}
-                            onChange={v => handleChange('bundle_3_discount', parseInt(v) || 0)} 
+                            onChange={v => handleChange('bundle_3_discount', v === '' ? '' : parseInt(v, 10) || 0)} 
                             type="number" 
                             suffix="%" 
                         />
